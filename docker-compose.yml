@@ -1,0 +1,37 @@
+# Phiên bản của cú pháp Docker Compose.
+# '3.8' là một phiên bản ổn định và được khuyến nghị.
+version: "3.8"
+
+services:
+  # Tên của dịch vụ, bạn có thể đặt tên tùy ý.
+  sql-server-db:
+    # Sử dụng hình ảnh chính thức của Microsoft SQL Server 2022 cho Linux.
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_server_dev
+    # Các biến môi trường để cấu hình container SQL Server.
+    environment:
+      # Bắt buộc phải chấp nhận điều khoản cấp phép người dùng cuối.
+      - ACCEPT_EULA=Y
+      # Đặt mật khẩu cho người dùng 'sa' (System Administrator).
+      # THAY ĐỔI MẬT KHẨU NÀY BẰNG MỘT MẬT KHẨU MẠNH!
+      - SA_PASSWORD="YourStrong@Passw0rd"
+      # Bạn có thể chọn phiên bản SQL Server, ví dụ: Developer, Express, Standard, Enterprise.
+      # 'Developer' là phiên bản đầy đủ tính năng và miễn phí cho môi trường phát triển.
+      - MSSQL_PID=Developer
+    ports:
+      # Ánh xạ cổng 1433 của máy chủ host tới cổng 1433 của container.
+      # Cổng 1433 là cổng mặc định cho SQL Server.
+      # <cổng_host>:<cổng_container>
+      - "1433:1433"
+    volumes:
+      # Tạo một volume có tên 'sql-server-data' để lưu trữ dữ liệu database.
+      # Điều này đảm bảo dữ liệu của bạn không bị mất khi container được khởi động lại hoặc xóa đi.
+      - sql-server-data:/var/opt/mssql
+    # Khởi động lại container tự động nếu nó dừng.
+    restart: unless-stopped
+
+# Khai báo các volumes được sử dụng bởi các dịch vụ.
+volumes:
+  # Tên của volume được tham chiếu ở trên.
+  sql-server-data:
+    driver: local
