@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +11,243 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Đọc Căn Cước Công Dân',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        useMaterial3: true,
+        scaffoldBackgroundColor: Colors.grey[200],
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blueAccent,
+          foregroundColor: Colors.white,
+          elevation: 4,
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  static const platform = MethodChannel('com.lele.readnfc/nfc');
+  Map<String, String> _cardData = {};
+  bool _isLoading = false;
+  String _status = 'Đang chờ đọc thẻ...';
+  String? _errorMessage;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    platform.setMethodCallHandler(_handleMethod);
+  }
+
+  Future<void> _handleMethod(MethodCall call) async {
+    switch (call.method) {
+      case "onNfcDataReceived":
+        if (mounted) {
+          setState(() {
+            _cardData = Map<String, String>.from(call.arguments);
+            _isLoading = false;
+            _status = 'Đọc thẻ thành công!';
+            _errorMessage = null;
+          });
+        }
+        break;
+      case "onNfcError":
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _status = 'Lỗi khi đọc thẻ.';
+            _errorMessage = call.arguments.toString();
+          });
+        }
+        break;
+      case "onNfcDetect":
+        if (mounted) {
+          setState(() {
+            _isLoading = true;
+            _status = 'Phát hiện thẻ, đang đọc dữ liệu...';
+            _errorMessage = null;
+            _cardData = {};
+          });
+        }
+        break;
+    }
+  }
+
+  Widget _buildInfoCard() {
+    if (_cardData.isEmpty && !_isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.nfc, size: 100, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'Vui lòng đưa thẻ CCCD vào mặt sau điện thoại',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final photoBase64 = _cardData['photo'];
+    Uint8List? imageBytes;
+    if (photoBase64 != null && photoBase64.isNotEmpty) {
+      try {
+        imageBytes = base64Decode(photoBase64);
+      } catch (e) {
+        imageBytes = null;
+      }
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          if (imageBytes != null)
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: Image.memory(
+                  imageBytes,
+                  width: 150,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          const SizedBox(height: 24),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  _buildInfoRow('Số CCCD', _cardData['documentNumber']),
+                  _buildInfoRow('Họ và tên', _cardData['fullName']),
+                  _buildInfoRow('Ngày sinh', _cardData['dateOfBirth']),
+                  _buildInfoRow('Giới tính', _cardData['gender']),
+                  _buildInfoRow('Quốc tịch', _cardData['nationality']),
+                  _buildInfoRow('Dân tộc', _cardData['ethnicity']),
+                  _buildInfoRow('Tôn giáo', _cardData['religion']),
+                  _buildInfoRow('Quê quán', _cardData['placeOfOrigin']),
+                  _buildInfoRow(
+                      'Nơi thường trú', _cardData['placeOfResidence']),
+                  _buildInfoRow('Ngày cấp', _cardData['dateOfIssue']),
+                  _buildInfoRow('Ngày hết hạn', _cardData['dateOfExpiry']),
+                  _buildInfoRow('Đặc điểm nhận dạng',
+                      _cardData['personalIdentification']),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.grey[700]),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              value ?? 'N/A',
+              style: TextStyle(color: Colors.grey[800]),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Đọc Căn Cước Công Dân'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: Column(
+        children: [
+          Expanded(
+            child: _buildInfoCard(),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16.0),
+            color: _errorMessage != null
+                ? Colors.red.shade100
+                : Colors.blue.shade50,
+            child: Column(
+              children: [
+                if (_isLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                Text(
+                  _status,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: _errorMessage != null
+                        ? Colors.red.shade900
+                        : Colors.blue.shade900,
+                  ),
+                ),
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      _errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red.shade800,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

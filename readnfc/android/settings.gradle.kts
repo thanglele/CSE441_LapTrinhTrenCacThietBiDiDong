@@ -11,6 +11,7 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
+        maven(url = "$flutterSdkPath/packages/flutter_tools/gradle")
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -19,8 +20,17 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "8.9.1" apply false
+    id("com.android.application") version "8.6.0" apply false
     id("org.jetbrains.kotlin.android") version "2.1.0" apply false
 }
 
+// dependencyResolutionManagement {
+//     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+// }
+
+rootProject.name = "android"
 include(":app")
