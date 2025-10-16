@@ -48,8 +48,8 @@ CREATE TABLE classes (
     max_students INT,
     class_start_date DATE, --
     class_end_date DATE, --
-    schedule_summary NVARCHAR(255),
-    default_location NVARCHAR(255),
+    schedule_summary NVARCHAR(255) null,
+    default_location NVARCHAR(255) null,
     class_type VARCHAR(10) CHECK (class_type IN ('theory', 'lab', 'seminar')),
     class_status VARCHAR(20) CHECK (class_status IN ('scheduled', 'open', 'closed', 'in_progress', 'completed')), --
     FOREIGN KEY (subject_code) REFERENCES subjects(subject_code) ON DELETE SET NULL,
@@ -92,9 +92,9 @@ CREATE TABLE attendance_records (
 CREATE TABLE face_data (
     id INT PRIMARY KEY IDENTITY(1,1),
     student_code VARCHAR(50),
-    image_path VARCHAR(255),
-    face_embedding VARCHAR(MAX),
-    is_active BIT DEFAULT 1,
-    uploaded_at DATETIME2 DEFAULT GETDATE(),
+    image_path VARCHAR(255) null,
+    face_embedding VARCHAR(MAX) null,
+    is_active BIT DEFAULT 0,
+    uploaded_at DATETIME2 DEFAULT GETDATE() null,
     FOREIGN KEY (student_code) REFERENCES students(student_code) ON DELETE CASCADE
 );
