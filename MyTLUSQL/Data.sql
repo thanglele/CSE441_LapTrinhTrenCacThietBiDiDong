@@ -1,14 +1,14 @@
 -- D? li?u cho 4 gi?ng viên
 INSERT INTO users (user_code, password_hash, email, full_name, phone_number, user_role, account_status)
 VALUES
-('GV0001', 'hashed_password_1', 'dungcv@e.tlu.edu.vn', N'Cù Vi?t D?ng', '09' + CAST(FLOOR(RAND() * 100000000) AS VARCHAR(8)), 'lecturer', 'active'),
-('GV0002', 'hashed_password_2', 'dungkt@e.tlu.edu.vn', N'Ki?u Tu?n D?ng', '03' + CAST(FLOOR(RAND() * 100000000) AS VARCHAR(8)), 'lecturer', 'active'),
-('GV0003', 'hashed_password_3', 'huongntt@e.tlu.edu.vn', N'Nguy?n Th? Thu H??ng', '08' + CAST(FLOOR(RAND() * 100000000) AS VARCHAR(8)), 'lecturer', 'active'),
-('GV0004', 'hashed_password_4', 'hanhnv@e.tlu.edu.vn', N'Nguy?n V?n H?nh', '09' + CAST(FLOOR(RAND() * 100000000) AS VARCHAR(8)), 'lecturer', 'active');
+('GV0001', 'hashed_password_1', 'dungcv@e.tlu.edu.vn', N'Cù Vi?t D?ng', '09' + RIGHT('00000000' + CAST(ABS(CHECKSUM(NEWID())) % 100000000 AS VARCHAR(8)), 8), 'lecturer', 'active'),
+('GV0002', 'hashed_password_2', 'dungkt@e.tlu.edu.vn', N'Ki?u Tu?n D?ng', '03' + RIGHT('00000000' + CAST(ABS(CHECKSUM(NEWID())) % 100000000 AS VARCHAR(8)), 8), 'lecturer', 'active'),
+('GV0003', 'hashed_password_3', 'huongntt@e.tlu.edu.vn', N'Nguy?n Th? Thu H??ng', '08' + RIGHT('00000000' + CAST(ABS(CHECKSUM(NEWID())) % 100000000 AS VARCHAR(8)), 8), 'lecturer', 'active'),
+('GV0004', 'hashed_password_4', 'hanhnv@e.tlu.edu.vn', N'Nguy?n V?n H?nh', '09' + RIGHT('00000000' + CAST(ABS(CHECKSUM(NEWID())) % 100000000 AS VARCHAR(8)), 8), 'lecturer', 'active');
 
 -- D? li?u cho 1000 sinh viên
 DECLARE @student_loop_counter INT = 1;
-DECLARE @user_code VARCHAR(50);
+DECLARE @user_code_student VARCHAR(50);
 DECLARE @email VARCHAR(255);
 DECLARE @full_name NVARCHAR(255);
 DECLARE @year_code CHAR(1);
@@ -31,8 +31,8 @@ WHILE @student_loop_counter <= @student_count
 BEGIN
     SET @year_code = CAST(FLOOR(RAND() * 4) + 2 AS CHAR(1));
     SET @random_digits = RIGHT('0000' + CAST(FLOOR(RAND() * 10000) AS VARCHAR(4)), 4);
-    SET @user_code = '2' + @year_code + '5117' + @random_digits;
-    SET @email = @user_code + '@e.tlu.edu.vn';
+    SET @user_code_student = '2' + @year_code + '5117' + @random_digits;
+    SET @email = @user_code_student + '@e.tlu.edu.vn';
     SET @full_name = (SELECT TOP 1 name FROM @first_names ORDER BY NEWID()) + ' ' +
                      (SELECT TOP 1 name FROM @middle_names ORDER BY NEWID()) + ' ' +
                      (SELECT TOP 1 name FROM @last_names ORDER BY NEWID());
@@ -40,7 +40,7 @@ BEGIN
     SET @phone_number = @phone_prefix + CAST(FLOOR(RAND() * 100000000) AS VARCHAR(8));
     
     INSERT INTO users (user_code, password_hash, email, full_name, phone_number, user_role, account_status)
-    VALUES (@user_code, 'hashed_password_' + @user_code, @email, @full_name, @phone_number, 'student', 'active');
+    VALUES (@user_code_student, 'hashed_password_' + @user_code_student, @email, @full_name, @phone_number, 'student', 'active');
     
     SET @student_loop_counter = @student_loop_counter + 1;
 END;
@@ -79,7 +79,6 @@ DECLARE @semester VARCHAR(20) = N'H?c k? 1';
 DECLARE @max_students INT = 70;
 DECLARE @class_start_date DATE;
 DECLARE @class_end_date DATE;
-DECLARE @schedule_summary NVARCHAR(255);
 DECLARE @default_location NVARCHAR(255);
 DECLARE @class_type VARCHAR(10);
 DECLARE @class_status VARCHAR(20);
@@ -161,7 +160,7 @@ DECLARE @session_class_code VARCHAR(50);
 DECLARE @start_date DATE;
 DECLARE @end_date DATE;
 DECLARE @session_location NVARCHAR(255);
-DECLARE @subject_code_session VARCHAR(50); -- ?ã ??i tên bi?n
+DECLARE @subject_code_session VARCHAR(50);
 DECLARE @sessions_to_create INT = 2;
 
 DECLARE @subject_schedules TABLE (
@@ -205,6 +204,16 @@ BEGIN
             SET @session_date = DATEADD(day, 1, @session_date);
         END;
 
+        DECLARE @session_status VARCHAR(15);
+        IF (@session_date < CAST(GETDATE() AS DATE))
+        BEGIN
+            SET @session_status = 'completed';
+        END
+        ELSE
+        BEGIN
+            SET @session_status = 'scheduled';
+        END;
+
         INSERT INTO class_sessions (class_code, title, session_date, start_time, end_time, session_location, qr_code_data, session_status)
         VALUES (
             @session_class_code, 
@@ -214,7 +223,7 @@ BEGIN
             @end_time_session,
             @session_location,
             NULL,
-            'scheduled'
+            @session_status
         );
 
         SET @session_date = DATEADD(week, 1, @session_date);
@@ -241,6 +250,7 @@ JOIN @subject_schedules s ON c.subject_code = s.subject_code;
 DECLARE @enrollment_student_code VARCHAR(50);
 DECLARE @enrollment_class_code VARCHAR(50);
 DECLARE @enrollment_count INT;
+DECLARE @max_enrollments INT = 3;
 
 DECLARE student_enroll_cursor CURSOR LOCAL FOR
 SELECT student_code FROM students;
@@ -252,43 +262,37 @@ WHILE @@FETCH_STATUS = 0
 BEGIN
     SET @enrollment_count = 0;
     
-    DECLARE class_enroll_cursor CURSOR LOCAL FOR
-    SELECT class_code FROM classes ORDER BY NEWID();
+    DECLARE class_candidates CURSOR LOCAL FOR
+    SELECT c.class_code
+    FROM classes c
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM enrollments e
+        WHERE e.student_code = @enrollment_student_code AND e.class_code = c.class_code
+    ) AND NOT EXISTS (
+        SELECT 1
+        FROM class_sessions cs_new
+        JOIN class_sessions cs_existing ON cs_new.session_date = cs_existing.session_date
+        JOIN enrollments e ON cs_existing.class_code = e.class_code
+        WHERE e.student_code = @enrollment_student_code
+        AND cs_new.class_code = c.class_code
+        AND (cs_new.start_time < cs_existing.end_time AND cs_existing.start_time < cs_new.end_time)
+    )
+    ORDER BY NEWID();
 
-    OPEN class_enroll_cursor;
-    FETCH NEXT FROM class_enroll_cursor INTO @enrollment_class_code;
+    OPEN class_candidates;
+    FETCH NEXT FROM class_candidates INTO @enrollment_class_code;
 
-    WHILE @@FETCH_STATUS = 0 AND @enrollment_count < 3
+    WHILE @@FETCH_STATUS = 0 AND @enrollment_count < @max_enrollments
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM enrollments WHERE student_code = @enrollment_student_code AND class_code = @enrollment_class_code)
-        BEGIN
-            DECLARE @is_overlap BIT = 0;
-            
-            IF EXISTS (
-                SELECT 1
-                FROM class_sessions cs_new
-                JOIN class_sessions cs_existing ON cs_new.session_date = cs_existing.session_date
-                JOIN enrollments e ON cs_existing.class_code = e.class_code
-                WHERE e.student_code = @enrollment_student_code
-                AND cs_new.class_code = @enrollment_class_code
-                AND (cs_new.start_time < cs_existing.end_time AND cs_existing.start_time < cs_new.end_time)
-            )
-            BEGIN
-                SET @is_overlap = 1;
-            END;
-
-            IF @is_overlap = 0
-            BEGIN
-                INSERT INTO enrollments (student_code, class_code)
-                VALUES (@enrollment_student_code, @enrollment_class_code);
-                SET @enrollment_count = @enrollment_count + 1;
-            END;
-        END;
-        FETCH NEXT FROM class_enroll_cursor INTO @enrollment_class_code;
+        INSERT INTO enrollments (student_code, class_code)
+        VALUES (@enrollment_student_code, @enrollment_class_code);
+        SET @enrollment_count = @enrollment_count + 1;
+        FETCH NEXT FROM class_candidates INTO @enrollment_class_code;
     END;
 
-    CLOSE class_enroll_cursor;
-    DEALLOCATE class_enroll_cursor;
+    CLOSE class_candidates;
+    DEALLOCATE class_candidates;
     
     FETCH NEXT FROM student_enroll_cursor INTO @enrollment_student_code;
 END;
@@ -307,15 +311,16 @@ DECLARE @check_in_time DATETIME2;
 DECLARE @method VARCHAR(10);
 DECLARE @is_present_or_late BIT;
 
-DECLARE sessions_cursor_ar CURSOR FOR
-SELECT id, class_code FROM class_sessions;
+DECLARE sessions_cursor_ar CURSOR LOCAL FOR
+SELECT id, class_code FROM class_sessions
+WHERE session_status = 'completed';
 
 OPEN sessions_cursor_ar;
 FETCH NEXT FROM sessions_cursor_ar INTO @session_id, @session_class_code_ar;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-    DECLARE students_in_class_cursor CURSOR FOR
+    DECLARE students_in_class_cursor CURSOR LOCAL FOR
     SELECT student_code FROM enrollments WHERE class_code = @session_class_code_ar;
     
     OPEN students_in_class_cursor;
@@ -357,10 +362,8 @@ DEALLOCATE sessions_cursor_ar;
 
 -- Chèn d? li?u vào b?ng face_data
 DECLARE @student_code_face VARCHAR(50);
-DECLARE @image_path VARCHAR(255);
-DECLARE @face_embedding VARCHAR(MAX);
 
-DECLARE students_face_cursor CURSOR FOR
+DECLARE students_face_cursor CURSOR LOCAL FOR
 SELECT student_code FROM students;
 
 OPEN students_face_cursor;
@@ -368,14 +371,37 @@ FETCH NEXT FROM students_face_cursor INTO @student_code_face;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-    SET @image_path = 'https://example.com/avatars/' + @student_code_face + '.jpg';
-    SET @face_embedding = 'embedding_data_for_' + @student_code_face + '_123456';
-    
-    INSERT INTO face_data (student_code, image_path, face_embedding)
-    VALUES (@student_code_face, @image_path, @face_embedding);
+    INSERT INTO face_data (student_code, image_path, face_embedding, is_active, uploaded_at)
+    VALUES (@student_code_face, NULL, NULL, 0, NULL);
 
     FETCH NEXT FROM students_face_cursor INTO @student_code_face;
 END;
 
 CLOSE students_face_cursor;
 DEALLOCATE students_face_cursor;
+UPDATE users
+SET phone_number = 
+    CASE
+        WHEN ABS(CHECKSUM(NEWID())) % 3 = 0 THEN '09'
+        WHEN ABS(CHECKSUM(NEWID())) % 3 = 1 THEN '03'
+        ELSE '08'
+    END
+    + RIGHT('00000000' + CAST(ABS(CHECKSUM(NEWID())) % 100000000 AS VARCHAR(8)), 8)
+WHERE user_role = 'student';
+
+UPDATE students
+SET gender = 
+    CASE
+        WHEN ABS(CHECKSUM(NEWID())) % 2 = 0 THEN 'male'
+        ELSE 'female'
+    END
+
+    UPDATE students
+SET date_of_birth = DATEFROMPARTS(
+    (ABS(CHECKSUM(NEWID())) % 5) + 2003,
+    (ABS(CHECKSUM(NEWID())) % 12) + 1,
+    (ABS(CHECKSUM(NEWID())) % 28) + 1
+);
+
+UPDATE classes
+SET semester = N'H?c k? 1';

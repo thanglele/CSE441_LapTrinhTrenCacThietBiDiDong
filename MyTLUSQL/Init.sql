@@ -1,3 +1,7 @@
+CREATE DATABASE Student_Attendance_DB;
+GO
+USE Student_Attendance_DB;
+GO
 CREATE TABLE users (
     user_code VARCHAR(50) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL, --
