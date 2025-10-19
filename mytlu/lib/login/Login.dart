@@ -5,7 +5,8 @@ import 'package:mytlu/login/ForgetPassword.dart';
 class LoginScreen extends StatefulWidget {
   final String? userName;
   final String? userAvatarAsset;
-  const LoginScreen({Key? key, this.userName, this.userAvatarAsset}) : super(key: key);
+  const LoginScreen({Key? key, this.userName, this.userAvatarAsset})
+    : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -67,17 +68,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (widget.userName == null) 
-                    _buildTextField(
-                      hintText: 'Mã sinh viên',
-                      icon: Icons.person_outline,
-                      isPassword: false,
-                    )
-                  // Ngược lại, hiển thị "Xin chào"
-                  else 
+                  if (widget.userName == null)
                     _buildWelcomeHeader(
-                      widget.userName!, 
-                      widget.userAvatarAsset ?? 'assets/images/avatar_default.png'
+                      null,
+                      widget.userAvatarAsset ??
+                          'assets/images/avatar_default.png',
+                    )
+                  else
+                    _buildWelcomeHeader(
+                      widget.userName!,
+                      widget.userAvatarAsset ??
+                          'assets/images/avatar_default.png',
                     ),
 
                   SizedBox(height: 10),
@@ -237,34 +238,50 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildWelcomeHeader(String name, String avatarAsset) {
-    return Container(
-      width: 379.0,
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundImage: AssetImage(avatarAsset), 
-          ),
-          SizedBox(width: 15),
-          
-          Expanded(
-            child: Text(
-              "Xin chào $name",
-              style: TextStyle(
-                fontFamily: 'Ubuntu',
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
+  Widget _buildWelcomeHeader(String? name, String avatarAsset) {
+    if (name == null) {
+      return Container(
+        width: 379.0,
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        child: Center(
+          child: Text(
+            "Xin chào!",
+            style: TextStyle(
+              fontFamily: 'Ubuntu',
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              color: const Color.fromRGBO(0, 19, 122, 1),
             ),
+            overflow: TextOverflow.ellipsis,
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    } else {
+      return Container(
+        width: 379.0,
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(radius: 28, backgroundImage: AssetImage(avatarAsset)),
+            SizedBox(width: 15),
+
+            Expanded(
+              child: Text(
+                "Xin chào $name",
+                style: TextStyle(
+                  fontFamily: 'Ubuntu',
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildNavItem({

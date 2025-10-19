@@ -1,16 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:mytlu/login/OTPCode.dart';
+import 'package:pinput/pinput.dart';
+import 'package:mytlu/login/ForgetPassword.dart';
 
-class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({Key? key}) : super(key: key);
+class OTPCodeScreen extends StatefulWidget {
+  const OTPCodeScreen({Key? key}) : super(key: key);
 
   @override
-  _ForgetScreenState createState() => _ForgetScreenState();
+  _OTPCodeScreenState createState() => _OTPCodeScreenState();
 }
 
-class _ForgetScreenState extends State<ForgetPasswordScreen> {
+class _OTPCodeScreenState extends State<OTPCodeScreen> {
   @override
   Widget build(BuildContext context) {
+    final defaultPinTheme = PinTheme(
+      width: 55,
+      height: 60,
+      textStyle: TextStyle(
+        fontFamily: 'Ubuntu',
+        fontSize: 20,
+        color: Colors.black,
+      ),
+      decoration: BoxDecoration(
+        color: Color(0xFFD9D9D9),
+        borderRadius: BorderRadius.circular(
+          15.0,
+        ),
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration!.copyWith(
+        border: Border.all(color: Colors.blueAccent, width: 2),
+      ),
+    );
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -83,12 +105,12 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        "Nhập Email để lấy mã OTP của bạn",
+                        "Nhập mã OTP xác nhận được gửi qua Email",
                         style: TextStyle(
                           fontFamily: 'Ubuntu',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white
+                          color: Colors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -96,29 +118,49 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                   ),
                   Container(
                     width: 379.0,
-                    height: 60.0,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFD9D9D9),
-                      borderRadius: BorderRadius.circular(20.0),
+                    child: Pinput(
+                      length: 6,
+                      defaultPinTheme: defaultPinTheme,
+                      focusedPinTheme: focusedPinTheme,
+                      submittedPinTheme:
+                          defaultPinTheme,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                      keyboardType: TextInputType.number,
+
+                      onCompleted: (pin) {
+                        print('Đã nhập xong OTP: $pin');
+                        // TODO: Xử lý logic gửi OTP
+                      },
                     ),
-                    child: TextField(
-                      style: TextStyle(
-                        fontFamily: 'Ubuntu',
-                        color: Colors.black,
-                        fontSize: 20,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Nhập email đã đăng ký',
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 20.0,
-                          vertical: 18.0,
+                  ),
+
+                  SizedBox(height: 5),
+                  Container(
+                    width: 379.0,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ForgetPasswordScreen(),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Text(
+                          'Nhập lại Email',
+                          style: TextStyle(
+                            fontFamily: 'Ubuntu',
+                            color: Colors.black,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
                     ),
                   ),
-
-                  SizedBox(height: 30),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -126,12 +168,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                       // Nút Gửi mã OTP
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OTPCodeScreen(),
-                            ),
-                          );
+                          // TODO: Xử lý logic Gửi lại mã OTP
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF0A2A9B),
@@ -141,7 +178,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                           ),
                         ),
                         child: Text(
-                          'Gửi mã OTP',
+                          'Gửi lại mã OTP',
                           style: TextStyle(
                             fontFamily: 'Ubuntu',
                             color: Colors.white,

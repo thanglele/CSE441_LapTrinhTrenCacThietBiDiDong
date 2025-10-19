@@ -47,7 +47,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<String?> _getSavedUserName() async {
-    return "Nguyễn Thị Dinh";
+    // return "Nguyễn Thị Dinh";
+    return null;
   }
 
   Future<String?> _getSavedAvatar() async {
