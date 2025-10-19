@@ -1,6 +1,4 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
-// Import file splash screen của bạn
 import 'presentation/splash_screen.dart'; 
 
 void main() {
@@ -18,7 +16,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      // Màn hình bắt đầu của ứng dụng
       home: const SplashScreen(),
     );
   }

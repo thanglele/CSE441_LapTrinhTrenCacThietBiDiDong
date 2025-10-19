@@ -62,14 +62,15 @@ flutter:
   assets:
     - assets/fonts/
     - assets/icons/
+    - assets/images/
 
   fonts:
     - family: Ubuntu
       fonts:
-        - asset: assets/fonts/Ubuntu-Regular.ttf 
-        - asset: assets/fonts/Ubuntu-Bold.ttf
+        - asset: assets/fonts/Ubuntu/Ubuntu-Regular.ttf
+        - asset: assets/fonts/Ubuntu/Ubuntu-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Ubuntu-Italic.ttf
+        - asset: assets/fonts/Ubuntu/Ubuntu-Italic.ttf
           style: italic
 
 flutter_launcher_icons:

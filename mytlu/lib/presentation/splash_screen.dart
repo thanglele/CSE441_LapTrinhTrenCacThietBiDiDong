@@ -18,15 +18,41 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToLogin() async {
-    await Future.delayed(Duration(seconds: 3), () {});
+    await Future.delayed(Duration(seconds: 3));
+
+    // TODO: Kiểm tra SharedPreferences hoặc Secure Storage
+    String? savedUserName = await _getSavedUserName(); // Hàm giả định
+    String? savedAvatar = await _getSavedAvatar(); // Hàm giả định
 
     if (mounted) {
-      // Chuyển sang màn hình đăng nhập
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Login()),
+        MaterialPageRoute(
+          builder: (context) {
+            // Nếu không có tên, gọi LoginScreen bình thường
+            if (savedUserName == null) {
+              return const LoginScreen();
+            }
+            // Nếu có tên, truyền tên và avatar vào
+            else {
+              return LoginScreen(
+                userName: savedUserName,
+                userAvatarAsset: savedAvatar,
+              );
+            }
+          },
+        ),
       );
     }
+  }
+
+  Future<String?> _getSavedUserName() async {
+    return "Nguyễn Thị Dinh";
+  }
+
+  Future<String?> _getSavedAvatar() async {
+    //return "assets/images/avatar_rabbit.png";
+    return null;
   }
 
   @override
@@ -37,10 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/icons/Logo_TLU.png',
-              width: 150,
-            ),
+            Image.asset('assets/icons/Logo_TLU.png', width: 150),
 
             Text(
               'My TLU',
