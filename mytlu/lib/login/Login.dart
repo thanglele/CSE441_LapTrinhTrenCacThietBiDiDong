@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
+
 import 'package:mytlu/login/ForgetPassword.dart';
+import 'package:mytlu/services/user_session.dart';
+import 'package:mytlu/Dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? userName;
@@ -15,10 +20,123 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
 
+  final LocalAuthentication auth = LocalAuthentication();
+
+  late TextEditingController _studentCodeController;
+  late TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    // --- 2. KHỞI TẠO CONTROLLERS ---
+    _studentCodeController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // --- 3. HỦY CONTROLLERS ---
+    _studentCodeController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _showErrorSnackBar(String message) {
+    // Kiểm tra 'mounted' để đảm bảo an toàn
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red, // Nền đỏ cho lỗi
+      ),
+    );
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    bool authenticated = false;
+    try {
+      final bool canAuthenticate =
+          await auth.canCheckBiometrics || await auth.isDeviceSupported();
+
+      if (!canAuthenticate) {
+        _showErrorSnackBar("Thiết bị này không hỗ trợ sinh trắc học.");
+        return;
+      }
+
+      authenticated = await auth.authenticate(
+        localizedReason: 'Vui lòng quét vân tay để đăng nhập',
+        // Dùng code cho bản 3.0.0+
+        persistAcrossBackgrounding: true,
+      );
+    } on LocalAuthException catch (e) {
+      if (e.code == 'noCredentialsSet') {
+        _showErrorSnackBar(
+          'Lỗi: Bạn chưa cài đặt màn hình khóa (PIN/Vân tay).',
+        );
+      } else if (e.code == 'notEnrolled') {
+        // (Tên code chính xác là 'notEnrolled')
+        _showErrorSnackBar('Lỗi: Bạn chưa đăng ký vân tay nào.');
+      } else {
+        _showErrorSnackBar(
+          'Lỗi: Bạn chưa cài đặt màn hình khóa (PIN/Vân tay).',
+        );
+      }
+      return; // Dừng hàm
+
+      // (Bạn cũng nên giữ lại PlatformException để bắt các lỗi chung khác)
+    } on PlatformException catch (e) {
+      _showErrorSnackBar('Lỗi hệ thống: ${e.message}');
+      return;
+    }
+
+    if (!mounted) return;
+
+    if (authenticated) {
+      print("Xác thực thành công!");
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+      );
+    } else {
+      _showErrorSnackBar("Xác thực thất bại. Vui lòng thử lại.");
+    }
+  }
+
   void _togglePasswordVisibility() {
     setState(() {
       _isPasswordVisible = !_isPasswordVisible;
     });
+  }
+
+  void _handleLogin() async {
+    String username = _studentCodeController.text;
+    String password = _passwordController.text;
+
+    // 1. Gọi API để xác thực...
+    // (Giả sử API trả về thành công và thông tin user)
+    bool loginSuccess = true; // (Kết quả giả định)
+
+    if (loginSuccess) {
+      // 2. LƯU SESSION LẠI
+      await UserSession().saveSession(
+        username: username,
+        fullName: "Nguyễn Thị Dinh", // (Lấy từ API)
+        studentCode: "123456", // (Lấy từ API)
+        password: password, // (Lưu lại mật khẩu)
+        avatarUrl: "http://example.com/avatar.png", // (Lấy từ API)
+      );
+
+      // 3. Điều hướng đến màn hình chính
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+      );
+    } else {
+      // TODO: Hiển thị lỗi đăng nhập
+    }
   }
 
   @override
@@ -81,14 +199,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           'assets/images/avatar_default.png',
                     ),
 
-                  SizedBox(height: 10),
+                  if (widget.userName == null) SizedBox(height: 10),
 
-                  // Ô nhập Mã sinh viên
-                  _buildTextField(
-                    hintText: 'Mã sinh viên',
-                    icon: Icons.person_outline,
-                    isPassword: false,
-                  ),
+                  if (widget.userName == null)
+                    // Ô nhập Mã sinh viên
+                    _buildTextField(
+                      hintText: 'Mã sinh viên',
+                      icon: Icons.person_outline,
+                      isPassword: false,
+                      controller: _studentCodeController,
+                    ),
 
                   SizedBox(height: 20),
 
@@ -99,6 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     isPassword: true,
                     isVisible: _isPasswordVisible,
                     onToggleVisibility: _togglePasswordVisibility,
+                    controller:_passwordController,
                   ),
 
                   SizedBox(height: 30),
@@ -109,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Nút Đăng nhập
                       ElevatedButton(
                         onPressed: () {
-                          // TODO: Xử lý logic đăng nhập
+                          _handleLogin();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF0A2A9B), // Màu xanh đậm
@@ -134,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Nút Vân tay
                       InkWell(
                         onTap: () {
-                          // TODO: Xử lý logic vân tay
+                          _authenticateWithBiometrics();
                         },
                         borderRadius: BorderRadius.circular(31.5), // bo tròn
                         child: Container(
@@ -316,6 +437,7 @@ class _LoginScreenState extends State<LoginScreen> {
     required bool isPassword,
     bool isVisible = false,
     VoidCallback? onToggleVisibility,
+    TextEditingController? controller,
   }) {
     final verticalPadding = (60.0 - 24.0) / 2;
 
@@ -327,6 +449,7 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(20.0),
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword ? !isVisible : false,
         style: TextStyle(
           fontFamily: 'Ubuntu',
