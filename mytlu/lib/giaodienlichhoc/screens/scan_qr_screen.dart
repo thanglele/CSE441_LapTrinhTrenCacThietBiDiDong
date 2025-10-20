@@ -138,41 +138,41 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
      Navigator.of(context).pop();
    }
 
--  Widget _buildAppBar() {
--    return Container(
--      height: 56,
--      decoration: const BoxDecoration(
--        color: Color(0xFF407CDC),
--        boxShadow: [
--          BoxShadow(color: Colors.black12, offset: Offset(0, 1), blurRadius: 4),
--        ],
--      ),
--      padding: const EdgeInsets.symmetric(horizontal: 12),
--      child: Row(
--        children: [
--          IconButton(
--            icon: const Icon(Icons.arrow_back, color: Colors.white),
--            onPressed: _cancelAndBack,
--          ),
--          const SizedBox(width: 8),
--          const Expanded(
--            child: Text(
--              'Khu vực điểm danh',
--              style: TextStyle(
--                color: Colors.white,
--                fontFamily: 'Ubuntu',
--                fontWeight: FontWeight.w700,
--                fontSize: 18,
--              ),
--            ),
--          ),
--          // Placeholder right (could be empty)
--          const SizedBox(width: 8),
--        ],
--      ),
--    );
--  }
-+  // ...existing helper widgets (none) ...
+ Widget _buildAppBar() {
+   return Container(
+     height: 56,
+     decoration: const BoxDecoration(
+       color: Color(0xFF407CDC),
+       boxShadow: [
+         BoxShadow(color: Colors.black12, offset: Offset(0, 1), blurRadius: 4),
+       ],
+     ),
+     padding: const EdgeInsets.symmetric(horizontal: 12),
+     child: Row(
+       children: [
+         IconButton(
+           icon: const Icon(Icons.arrow_back, color: Colors.white),
+           onPressed: _cancelAndBack,
+         ),
+         const SizedBox(width: 8),
+         const Expanded(
+           child: Text(
+             'Khu vực điểm danh',
+             style: TextStyle(
+               color: Colors.white,
+               fontFamily: 'Ubuntu',
+               fontWeight: FontWeight.w700,
+               fontSize: 18,
+             ),
+           ),
+         ),
+         // Placeholder right (could be empty)
+         const SizedBox(width: 8),
+       ],
+     ),
+   );
+ }
+ // ...existing helper widgets (none) ...
 
    Widget _buildFrameCard() {
      // Outer frame 380 x 550 (we'll let it be responsive but constrain by these sizes)
@@ -190,26 +190,26 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
          ),
          child: Column(
            children: [
--            // Title
--            const Text(
--              'Tìm kiếm mã QR',
--              style: TextStyle(
--                fontFamily: 'Ubuntu',
--                fontSize: 16,
--                fontWeight: FontWeight.w700,
--                color: Color(0xFF111827),
--              ),
--            ),
-+            // Use shared Header if you prefer; keep a title inside the card too
-+            const Text(
-+              'Tìm kiếm mã QR',
-+              style: TextStyle(
-+                fontFamily: 'Ubuntu',
-+                fontSize: 16,
-+                fontWeight: FontWeight.w700,
-+                color: Color(0xFF111827),
-+              ),
-+            ),
+           // Title
+           const Text(
+             'Tìm kiếm mã QR',
+             style: TextStyle(
+               fontFamily: 'Ubuntu',
+               fontSize: 16,
+               fontWeight: FontWeight.w700,
+               color: Color(0xFF111827),
+             ),
+           ),
+           // Use shared Header if you prefer; keep a title inside the card too
+           const Text(
+             'Tìm kiếm mã QR',
+             style: TextStyle(
+               fontFamily: 'Ubuntu',
+               fontSize: 16,
+               fontWeight: FontWeight.w700,
+               color: Color(0xFF111827),
+             ),
+           ),
              const SizedBox(height: 8),
              const Text(
                'Đưa mã QR truy cập điểm danh của bạn vào trong khung hình ở dưới',
@@ -253,8 +253,8 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
                        child: BackdropFilter(
                          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
                          child: Container(
--                          color: Colors.black.withOpacity(0.35),
-+                          color: Colors.black.withOpacity(_cameraGranted ? 0.35 : 0.6),
+                        //  color: Colors.black.withOpacity(0.35),
+                         color: Colors.black.withOpacity(_cameraGranted ? 0.35 : 0.6),
                          ),
                        ),
                      ),
@@ -282,8 +282,8 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
                        ),
                        alignment: Alignment.center,
                        child: Text(
--                        _isCounting ? '$_countdown' : (_scanSuccess ? '0' : ''),
-+                        _cameraGranted ? (_isCounting ? '$_countdown' : (_scanSuccess ? '0' : '')) : '',
+                       _isCounting ? '$_countdown' : (_scanSuccess ? '0' : ''),
+                       _cameraGranted ? (_isCounting ? '$_countdown' : (_scanSuccess ? '0' : '')) : '',
                          style: const TextStyle(
                            color: Colors.white,
                            fontFamily: 'Ubuntu',
@@ -300,32 +300,32 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
                      right: 8,
                      child: Container(
                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
--                      decoration: BoxDecoration(
--                        color: const Color(0xFFDCFCE7),
--                        borderRadius: BorderRadius.circular(8),
--                      ),
--                      child: const Text(
--                        'Camera hoạt động',
--                        style: TextStyle(
--                          fontFamily: 'Ubuntu',
--                          fontSize: 10,
--                          fontWeight: FontWeight.w500,
--                          color: Color(0xFF166534),
--                        ),
--                      ),
-+                      decoration: BoxDecoration(
-+                        color: _cameraGranted ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-+                        borderRadius: BorderRadius.circular(8),
-+                      ),
-+                      child: Text(
-+                        _cameraGranted ? 'Camera hoạt động' : 'Camera bị tắt',
-+                        style: TextStyle(
-+                          fontFamily: 'Ubuntu',
-+                          fontSize: 10,
-+                          fontWeight: FontWeight.w500,
-+                          color: _cameraGranted ? const Color(0xFF166534) : const Color(0xFF991B1B),
-+                        ),
-+                      ),
+                     decoration: BoxDecoration(
+                       color: const Color(0xFFDCFCE7),
+                       borderRadius: BorderRadius.circular(8),
+                     ),
+                     child: const Text(
+                       'Camera hoạt động',
+                       style: TextStyle(
+                         fontFamily: 'Ubuntu',
+                         fontSize: 10,
+                         fontWeight: FontWeight.w500,
+                         color: Color(0xFF166534),
+                       ),
+                     ),
+                     decoration: BoxDecoration(
+                       color: _cameraGranted ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                       borderRadius: BorderRadius.circular(8),
+                     ),
+                     child: Text(
+                       _cameraGranted ? 'Camera hoạt động' : 'Camera bị tắt',
+                       style: TextStyle(
+                         fontFamily: 'Ubuntu',
+                         fontSize: 10,
+                         fontWeight: FontWeight.w500,
+                         color: _cameraGranted ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                       ),
+                     ),
                      ),
                    ),
                  ],
@@ -385,15 +385,15 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
      // Choose which item is active: Quét QR index = 1
      return Scaffold(
        backgroundColor: Colors.white,
--      appBar: PreferredSize(
--        preferredSize: const Size.fromHeight(56),
--        child: _buildAppBar(),
--      ),
-+      // reuse shared header widget
-+      appBar: PreferredSize(
-+        preferredSize: const Size.fromHeight(80),
-+        child: const Header(),
-+      ),
+     appBar: PreferredSize(
+       preferredSize: const Size.fromHeight(56),
+       child: _buildAppBar(),
+     ),
+     // reuse shared header widget
+     appBar: PreferredSize(
+       preferredSize: const Size.fromHeight(80),
+       child: const Header(),
+     ),
        body: SafeArea(
          child: Center(
            child: _buildFrameCard(),

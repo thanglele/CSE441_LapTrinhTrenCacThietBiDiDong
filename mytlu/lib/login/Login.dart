@@ -5,7 +5,7 @@ import 'package:local_auth/local_auth.dart';
 
 import 'package:mytlu/login/ForgetPassword.dart';
 import 'package:mytlu/services/user_session.dart';
-import 'package:mytlu/screens/home_page_lecture.dart';
+import 'package:mytlu/giaodienlichhoc/screens/student_page.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? userName;
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => StudentPage()),
       );
     } else {
       _showErrorSnackBar("Xác thực thất bại. Vui lòng thử lại.");
@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => StudentPage()),
       );
     } else {
       // TODO: Hiển thị lỗi đăng nhập
