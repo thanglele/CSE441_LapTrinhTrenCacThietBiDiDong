@@ -5,7 +5,7 @@ import 'package:local_auth/local_auth.dart';
 
 import 'package:mytlu/login/ForgetPassword.dart';
 import 'package:mytlu/services/user_session.dart';
-import 'package:mytlu/Dashboard.dart';
+import 'package:mytlu/screens/home_page_lecture.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? userName;
