@@ -78,7 +78,20 @@ flutter:
           weight: 700
         - asset: assets/fonts/Ubuntu/Ubuntu-Italic.ttf
           style: italic
-
+    # - family: Roboto
+    #   fonts:
+    #     - asset: assets/fonts/Roboto/Roboto-Regular.ttf
+    #     - asset: assets/fonts/Roboto/Roboto-Bold.ttf
+    #       weight: 700
+    #     - asset: assets/fonts/Roboto/Roboto-Italic.ttf
+    #       style: italic
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/montserrat/Montserrat-Regular.ttf
+        - asset: assets/fonts/montserrat/Montserrat-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/montserrat/Montserrat-Italic.ttf
+          style: italic
 flutter_launcher_icons:
   android: true
   ios: true

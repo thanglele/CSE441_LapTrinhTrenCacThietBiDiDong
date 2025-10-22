@@ -94,6 +94,6 @@ class UserSession {
     // Lưu file và trả về đường dẫn
     print("Đang tải ảnh từ $imageUrl...");
     // Giả lập đường dẫn đã lưu
-    return "assets/images/avatar_rabbit.png"; // <-- Tạm thời trả về asset
+    return "assets/images/avatar_default.png"; // <-- Tạm thời trả về asset
   }
 }

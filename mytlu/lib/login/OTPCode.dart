@@ -16,7 +16,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
       width: 55,
       height: 60,
       textStyle: TextStyle(
-        fontFamily: 'Ubuntu',
+        fontFamily: 'Montserrat',
         fontSize: 20,
         color: Colors.black,
       ),
@@ -63,7 +63,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                 child: Text(
                   'My TLU',
                   style: TextStyle(
-                    fontFamily: 'Ubuntu',
+                    fontFamily: 'Montserrat',
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: const Color.fromRGBO(0, 19, 122, 1),
@@ -88,7 +88,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                       child: Text(
                         "Quên mật khẩu?",
                         style: TextStyle(
-                          fontFamily: 'Ubuntu',
+                          fontFamily: 'Montserrat',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -107,7 +107,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                       child: Text(
                         "Nhập mã OTP xác nhận được gửi qua Email",
                         style: TextStyle(
-                          fontFamily: 'Ubuntu',
+                          fontFamily: 'Montserrat',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -142,7 +142,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ForgetPasswordScreen(),
@@ -153,7 +153,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                         child: Text(
                           'Nhập lại Email',
                           style: TextStyle(
-                            fontFamily: 'Ubuntu',
+                            fontFamily: 'Montserrat',
                             color: Colors.black,
                             fontSize: 18,
                           ),
@@ -180,7 +180,7 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                         child: Text(
                           'Gửi lại mã OTP',
                           style: TextStyle(
-                            fontFamily: 'Ubuntu',
+                            fontFamily: 'Montserrat',
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

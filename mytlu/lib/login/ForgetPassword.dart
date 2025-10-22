@@ -41,7 +41,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                 child: Text(
                   'My TLU',
                   style: TextStyle(
-                    fontFamily: 'Ubuntu',
+                    fontFamily: 'Montserrat',
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: const Color.fromRGBO(0, 19, 122, 1),
@@ -66,7 +66,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                       child: Text(
                         "Quên mật khẩu?",
                         style: TextStyle(
-                          fontFamily: 'Ubuntu',
+                          fontFamily: 'Montserrat',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -85,7 +85,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                       child: Text(
                         "Nhập Email để lấy mã OTP của bạn",
                         style: TextStyle(
-                          fontFamily: 'Ubuntu',
+                          fontFamily: 'Montserrat',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white
@@ -103,7 +103,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                     ),
                     child: TextField(
                       style: TextStyle(
-                        fontFamily: 'Ubuntu',
+                        fontFamily: 'Montserrat',
                         color: Colors.black,
                         fontSize: 20,
                       ),
@@ -126,7 +126,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                       // Nút Gửi mã OTP
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => OTPCodeScreen(),
@@ -143,7 +143,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                         child: Text(
                           'Gửi mã OTP',
                           style: TextStyle(
-                            fontFamily: 'Ubuntu',
+                            fontFamily: 'Montserrat',
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

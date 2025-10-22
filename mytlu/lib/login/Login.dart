@@ -95,9 +95,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (authenticated) {
       print("Xác thực thành công!");
 
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => StudentPage()),
+        (route) => false,
       );
     } else {
       _showErrorSnackBar("Xác thực thất bại. Vui lòng thử lại.");
@@ -125,14 +126,15 @@ class _LoginScreenState extends State<LoginScreen> {
         fullName: "Nguyễn Thị Dinh", // (Lấy từ API)
         studentCode: "123456", // (Lấy từ API)
         password: password, // (Lưu lại mật khẩu)
-        avatarUrl: "http://example.com/avatar.png", // (Lấy từ API)
+        avatarUrl: "https://thanglele.cloud/img/user.png", // (Lấy từ API)
       );
 
       // 3. Điều hướng đến màn hình chính
       if (!mounted) return;
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => StudentPage()),
+        (route) => false,
       );
     } else {
       // TODO: Hiển thị lỗi đăng nhập
@@ -171,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   'My TLU',
                   style: TextStyle(
-                    fontFamily: 'Ubuntu',
+                    fontFamily: 'Montserrat',
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: const Color.fromRGBO(0, 19, 122, 1),
@@ -219,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     isPassword: true,
                     isVisible: _isPasswordVisible,
                     onToggleVisibility: _togglePasswordVisibility,
-                    controller:_passwordController,
+                    controller: _passwordController,
                   ),
 
                   SizedBox(height: 30),
@@ -243,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           'Đăng nhập',
                           style: TextStyle(
-                            fontFamily: 'Ubuntu',
+                            fontFamily: 'Montserrat',
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -278,27 +280,52 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: 5),
                   Container(
                     width: 379.0,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ForgetPasswordScreen(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ForgetPasswordScreen(),
+                              ),
+                            );
+                          },
+                          style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                          child: Text(
+                            'Quên mật khẩu?',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              color: Colors.black,
+                              fontSize: 18,
                             ),
-                          );
-                        },
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        child: Text(
-                          'Quên mật khẩu?',
-                          style: TextStyle(
-                            fontFamily: 'Ubuntu',
-                            color: Colors.black,
-                            fontSize: 18,
                           ),
                         ),
-                      ),
+
+                        if (widget.userName != null)
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginScreen(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Text(
+                              'Tài khoản khác?',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Colors.black, // (Màu này bạn đang dùng)
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -368,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text(
             "Xin chào!",
             style: TextStyle(
-              fontFamily: 'Ubuntu',
+              fontFamily: 'Montserrat',
               fontSize: 40,
               fontWeight: FontWeight.bold,
               color: const Color.fromRGBO(0, 19, 122, 1),
@@ -391,7 +418,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(
                 "Xin chào $name",
                 style: TextStyle(
-                  fontFamily: 'Ubuntu',
+                  fontFamily: 'Montserrat',
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -452,7 +479,7 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: controller,
         obscureText: isPassword ? !isVisible : false,
         style: TextStyle(
-          fontFamily: 'Ubuntu',
+          fontFamily: 'Montserrat',
           color: Colors.black,
           fontSize: 28,
         ),
@@ -461,7 +488,7 @@ class _LoginScreenState extends State<LoginScreen> {
           hintText: hintText,
 
           hintStyle: TextStyle(
-            fontFamily: 'Ubuntu',
+            fontFamily: 'Montserrat',
             color: Colors.black54,
             fontSize: 25,
           ),

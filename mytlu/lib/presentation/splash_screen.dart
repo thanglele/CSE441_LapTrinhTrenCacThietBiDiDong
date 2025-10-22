@@ -102,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               'My TLU',
               style: TextStyle(
-                fontFamily: 'Ubuntu',
+                fontFamily: 'Montserrat',
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: const Color.fromRGBO(25, 49, 175, 1),
