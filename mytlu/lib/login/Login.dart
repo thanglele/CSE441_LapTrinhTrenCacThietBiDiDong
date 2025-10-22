@@ -1,23 +1,27 @@
-import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
+import 'package:mytlu/presentation/splash_screen.dart';
 import 'package:mytlu/login/ForgetPassword.dart';
 import 'package:mytlu/services/user_session.dart';
 import 'package:mytlu/giaodienlichhoc/screens/student_page.dart';
+import 'package:mytlu/giaodienlichhoc/screens/scan_qr_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? userName;
   final String? userAvatarAsset;
-  const LoginScreen({Key? key, this.userName, this.userAvatarAsset})
+  final bool permissionsGranted;
+  const LoginScreen({Key? key, this.userName, this.userAvatarAsset, required this.permissionsGranted})
     : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   bool _isPasswordVisible = false;
 
   final LocalAuthentication auth = LocalAuthentication();
@@ -28,17 +32,88 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // --- 2. KHỞI TẠO CONTROLLERS ---
+    
+    WidgetsBinding.instance.addObserver(this);
+
     _studentCodeController = TextEditingController();
     _passwordController = TextEditingController();
+
+    if (!widget.permissionsGranted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showPermissionErrorDialog();
+      });
+    }
+  }
+
+  void _showPermissionErrorDialog() {
+    // Đóng dialog cũ nếu có (để tránh lỗi)
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Thiếu quyền truy cập'),
+          content: Text('Vui lòng cấp quyền Vị trí và Camera trong Cài đặt để tiếp tục.'),
+          actions: [
+            TextButton(
+              child: Text('ĐI TỚI CÀI ĐẶT'),
+              onPressed: () {
+                openAppSettings(); // Mở Cài đặt của app
+                // Không đóng dialog, để khi quay lại app vẫn thấy
+              },
+            ),
+            TextButton(
+              child: Text('THOÁT'),
+              onPressed: () {
+                SystemNavigator.pop(); // Vẫn dùng lệnh này (thoát về Home)
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
-    // --- 3. HỦY CONTROLLERS ---
+    WidgetsBinding.instance.removeObserver(this);
     _studentCodeController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    // Kiểm tra nếu người dùng vừa quay lại app
+    if (state == AppLifecycleState.resumed) {
+      // Chỉ kiểm tra nếu chúng ta biết quyền đã bị thiếu
+      if (!widget.permissionsGranted) {
+        // Kiểm tra lại trạng thái quyền
+        final locationStatus = await Permission.location.status;
+        final cameraStatus = await Permission.camera.status;
+
+        if (locationStatus.isGranted && cameraStatus.isGranted) {
+          // TỐT! Người dùng đã cấp quyền.
+          // Khởi động lại app bằng cách điều hướng về SplashScreen
+          if (mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const SplashScreen()),
+              (route) => false, // Xóa hết stack
+            );
+          }
+        } else {
+          // Vẫn chưa cấp quyền. Hiển thị lại dialog
+          _showPermissionErrorDialog();
+        }
+      }
+    }
   }
 
   void _showErrorSnackBar(String message) {
@@ -54,6 +129,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _authenticateWithBiometrics() async {
+    final bool hasPermissions = await _checkPermissions();
+    if (!hasPermissions) return; // Dừng lại nếu không có quyền
+
     bool authenticated = false;
     try {
       final bool canAuthenticate =
@@ -111,7 +189,25 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  Future<bool> _checkPermissions() async {
+    // Lấy trạng thái hiện tại (không yêu cầu)
+    final locationStatus = await Permission.location.status;
+    final cameraStatus = await Permission.camera.status;
+
+    if (locationStatus.isGranted && cameraStatus.isGranted) {
+      return true; // OK, có đủ quyền
+    }
+
+    // Nếu thiếu quyền, hiển thị dialog lỗi
+    // (Dialog này đã có logic mở Cài đặt và Thoát)
+    _showPermissionErrorDialog();
+    return false; // Báo lỗi, ngăn logic tiếp theo
+  }
+
   void _handleLogin() async {
+    final bool hasPermissions = await _checkPermissions();
+    if (!hasPermissions) return; // Dừng lại nếu không có quyền
+
     String username = _studentCodeController.text;
     String password = _passwordController.text;
 
@@ -309,7 +405,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
+                                  builder: (context) => const LoginScreen(permissionsGranted: true),
                                 ),
                               );
                             },
@@ -336,7 +432,12 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Xử lý logic Quét QR
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ScanQRScreen(),
+            ),
+          );
         },
         backgroundColor: Color(0xFF0A2A9B),
         elevation: 4.0,

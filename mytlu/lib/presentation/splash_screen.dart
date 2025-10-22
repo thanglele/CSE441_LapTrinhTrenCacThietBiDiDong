@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mytlu/services/user_session.dart';
 import 'package:mytlu/login/login.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -17,77 +19,52 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    _initializeAndNavigate(); // Đổi tên hàm
   }
 
-  _checkLoginStatus() async {
-    await Future.delayed(Duration(seconds: 3)); // Đợi 3 giây
+  // HÀM MỚI: Yêu cầu quyền
+  Future<bool> _requestPermissions() async {
+    // Yêu cầu cả 2 quyền cùng lúc
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+      Permission.camera,
+    ].request();
 
-    // Kiểm tra session
-    UserProfile? user = await _session.getUserProfile();
+    // Kiểm tra xem CẢ HAI quyền đã được cấp chưa
+    bool locationGranted = statuses[Permission.location] == PermissionStatus.granted;
+    bool cameraGranted = statuses[Permission.camera] == PermissionStatus.granted;
+    
+    return locationGranted && cameraGranted;
+  }
+
+  // HÀM CHÍNH: Sửa lại
+  _initializeAndNavigate() async {
+    // Chạy song song 3 tác vụ: Yêu cầu quyền, Đợi 3s, Kiểm tra session
+    final results = await Future.wait([
+      _requestPermissions(),
+      Future.delayed(Duration(seconds: 3)), // Giữ 3 giây delay
+      _session.getUserProfile(),
+    ]);
+
+    // Lấy kết quả
+    final bool permissionsGranted = results[0] as bool;
+    final UserProfile? user = results[2] as UserProfile?;
 
     if (!mounted) return;
 
-    if (user != null) {
-      // TRƯỜNG HỢP 1: ĐÃ CÓ SESSION
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoginScreen(
-            userName: user.fullName,
-            userAvatarAsset: user.avatarPath,
-          ),
+    // 2. ĐIỀU HƯỚNG SANG LOGIN (Luôn luôn)
+    // Truyền trạng thái quyền và thông tin user
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(
+          permissionsGranted: permissionsGranted,
+          userName: user?.fullName,
+          userAvatarAsset: user?.avatarPath,
         ),
-      );
-
-    } else {
-      // TRƯỜNG HỢP 2: CHƯA CÓ SESSION
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ),
-      );
-    }
+      ),
+    );
   }
-
-  // _navigateToLogin() async {
-  //   await Future.delayed(Duration(seconds: 3));
-
-  //   String? savedUserName = await _getSavedUserName(); // Hàm giả định
-  //   String? savedAvatar = await _getSavedAvatar(); // Hàm giả định
-
-  //   if (mounted) {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) {
-  //           // Nếu không có tên, gọi LoginScreen bình thường
-  //           if (savedUserName == null) {
-  //             return const LoginScreen();
-  //           }
-  //           // Nếu có tên, truyền tên và avatar vào
-  //           else {
-  //             return LoginScreen(
-  //               userName: savedUserName,
-  //               userAvatarAsset: savedAvatar,
-  //             );
-  //           }
-  //         },
-  //       ),
-  //     );
-  //   }
-  // }
-
-  // Future<String?> _getSavedUserName() async {
-  //   return "Nguyễn Thị Dinh";
-  //   // return null;
-  // }
-
-  // Future<String?> _getSavedAvatar() async {
-  //   //return "assets/images/avatar_rabbit.png";
-  //   return null;
-  // }
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mytlu/login/OTPCode.dart';
+import 'package:mytlu/giaodienlichhoc/screens/scan_qr_screen.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({Key? key}) : super(key: key);
@@ -160,6 +161,12 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ScanQRScreen(),
+            ),
+          );
           // TODO: Xử lý logic Quét QR
         },
         backgroundColor: Color(0xFF0A2A9B),
