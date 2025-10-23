@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\MyTLUServer.csproj": {}
+    "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\mytluserver\\MyTLUServer.csproj": {}
   },
   "projects": {
-    "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\MyTLUServer.csproj": {
+    "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\mytluserver\\MyTLUServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\MyTLUServer.csproj",
+        "projectUniqueName": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\mytluserver\\MyTLUServer.csproj",
         "projectName": "MyTLUServer",
-        "projectPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\MyTLUServer.csproj",
+        "projectPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\mytluserver\\MyTLUServer.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\obj\\",
+        "outputPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\mytluserver\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,6 +51,20 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
@@ -75,7 +89,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
