@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -31,11 +35,24 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-23T02:08:21.859Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "EmailService.cs",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\EmailService.cs",
               "RelativeDocumentMoniker": "Services\\EmailService.cs",
-              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\EmailService.cs*",
-              "RelativeToolTip": "Services\\EmailService.cs*",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\EmailService.cs",
+              "RelativeToolTip": "Services\\EmailService.cs",
               "ViewState": "AgIAAEcAAAAAAAAAAADwv1kAAABxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-23T01:15:35.116Z",
@@ -43,7 +60,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "IEmailService.cs",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Interfaces\\IEmailService.cs",
               "RelativeDocumentMoniker": "Interfaces\\IEmailService.cs",
@@ -51,12 +68,11 @@
               "RelativeToolTip": "Interfaces\\IEmailService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-23T01:14:58.743Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-23T01:14:58.743Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
@@ -64,8 +80,7 @@
               "RelativeToolTip": "Data\\AppDbContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-23T01:11:26.335Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-23T01:11:26.335Z"
             }
           ]
         }
