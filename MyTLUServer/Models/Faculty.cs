@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyTLUServer.Models;
+namespace MyTLUServer.Domain.Models;
 
 [Table("faculties")]
 [Index("FacultyName", Name = "UQ__facultie__22BC13FB33FEDEFA", IsUnique = true)]

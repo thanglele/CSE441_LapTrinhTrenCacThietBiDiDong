@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyTLUServer.Models;
+namespace MyTLUServer.Domain.Models;
 
 [Table("majors")]
 [Index("MajorName", Name = "UQ__majors__B2815F7AA8862F7D", IsUnique = true)]

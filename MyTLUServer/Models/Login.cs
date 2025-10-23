@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyTLUServer.Models;
+namespace MyTLUServer.Domain.Models;
 
 [Table("login")]
 [Index("Email", Name = "UQ__login__AB6E6164EEF18533", IsUnique = true)]

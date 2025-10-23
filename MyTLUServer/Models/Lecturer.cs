@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyTLUServer.Models;
+namespace MyTLUServer.Domain.Models;
 
 [Table("lecturers")]
 public partial class Lecturer

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using MyTLUServer.Models;
+using MyTLUServer.Domain.Models;
 
-namespace MyTLUServer.Data;
+namespace MyTLUServer.Infrastructure.Data;
 
 public partial class AppDbContext : DbContext
 {
@@ -45,10 +45,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<StudentIdentification> StudentIdentifications { get; set; }
 
     public virtual DbSet<Subject> Subjects { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=remote.thanglele.cloud;Database=MyTLU;User Id=sa;Password=mdq1jCu0Zy@2SkS5MF!q;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
