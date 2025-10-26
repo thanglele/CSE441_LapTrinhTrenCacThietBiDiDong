@@ -34,23 +34,12 @@ namespace MyTLUServer.Application.DTOs
         public string DepartmentName { get; set; }
         public string Degree { get; set; }
     }
-    
-    // --- DTOs MỚI CHO RESET MẬT KHẨU ---
 
     // DTO cho yêu cầu gửi OTP
     public class OtpRequestDto
     {
         // Chỉ chấp nhận Username
         public string Username { get; set; }
-    }
-
-    // DTO cho yêu cầu đặt lại mật khẩu
-    public class ResetPasswordRequestDto
-    {
-        // Chỉ chấp nhận Username
-        public string Username { get; set; }
-        public string Otp { get; set; }
-        public string NewPassword { get; set; }
     }
 
     // DTO chung cho lỗi
@@ -64,6 +53,36 @@ namespace MyTLUServer.Application.DTOs
     {
         public string Code { get; set; } = "PASSWORD_NOT_SET";
         public string Message { get; set; } = "Tài khoản chưa thiết lập mật khẩu. Vui lòng sử dụng chức năng 'Quên mật khẩu' để tạo mật khẩu mới.";
+    }
+    
+    // DTO cho yêu cầu đổi mật khẩu (khi đã đăng nhập)
+    public class ChangePasswordRequestDto
+    {
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
+    }
+
+    // DTO cho yêu cầu xác thực OTP
+    public class VerifyOtpRequestDto
+    {
+        public string Username { get; set; }
+        public string Otp { get; set; }
+    }
+
+    // DTO cho phản hồi xác thực OTP thành công
+    public class VerifyOtpResponseDto
+    {
+        public string ResetToken { get; set; }
+    }
+
+    // DTO cho yêu cầu đặt lại mật khẩu
+    public class ResetPasswordRequestDto
+    {
+        public string Username { get; set; }
+        // Xóa OTP, thay bằng ResetToken
+        // public string Otp { get; set; } 
+        public string ResetToken { get; set; }
+        public string NewPassword { get; set; }
     }
 }
 

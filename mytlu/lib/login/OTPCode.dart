@@ -1,16 +1,112 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
+import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:mytlu/config/api_config.dart';
 import 'package:mytlu/login/ForgetPassword.dart';
+import 'package:mytlu/login/reset_password_screen.dart';
 import 'package:mytlu/giaodienlichhoc/screens/scan_qr_screen.dart';
 
 class OTPCodeScreen extends StatefulWidget {
-  const OTPCodeScreen({Key? key}) : super(key: key);
+  final bool permissionsGranted;
+  final String username; // Nhận username (MSV) từ màn hình trước
+
+  const OTPCodeScreen({Key? key, required this.permissionsGranted, required this.username}) : super(key: key);
 
   @override
   _OTPCodeScreenState createState() => _OTPCodeScreenState();
 }
 
 class _OTPCodeScreenState extends State<OTPCodeScreen> {
+  final TextEditingController _pinController = TextEditingController();
+  final FocusNode _pinFocusNode = FocusNode();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _pinController.dispose();
+    _pinFocusNode.dispose();
+    super.dispose();
+  }
+
+  // 3. HÀM HIỂN THỊ LỖI
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  // 4. HÀM XỬ LÝ API
+  Future<void> _handleVerifyOtp(String otp) async {
+    if (otp.length < 6) {
+      _showErrorSnackBar('Vui lòng nhập đủ 6 số OTP.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Dùng Base URL toàn cục, không dùng localhost
+    final String url = '${ApiConfig.baseUrl}/api/v1/auth/verify-otp';
+    final Map<String, String> headers = {
+      'accept': 'text/plain',
+      'Content-Type': 'application/json',
+    };
+    final Map<String, String> body = {
+      'username': widget.username,
+      'otp': otp,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      if (response.statusCode == 200) {
+        // THÀNH CÔNG (200)
+        final String resetToken = responseBody['resetToken'];
+        
+        if (!mounted) return;
+        // Chuyển sang màn hình Đặt lại mật khẩu
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResetPasswordScreen(
+              permissionsGranted: widget.permissionsGranted,
+              username: widget.username,
+              resetToken: resetToken, // Truyền token mới
+            ),
+          ),
+        );
+      } else if (response.statusCode == 400) {
+        // LỖI (400)
+        _showErrorSnackBar(responseBody['message']);
+      } else {
+        _showErrorSnackBar('Lỗi ${response.statusCode}: ${responseBody['message'] ?? 'Lỗi không xác định'}');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Lỗi kết nối mạng: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
@@ -121,17 +217,17 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                     width: 379.0,
                     child: Pinput(
                       length: 6,
+                      controller: _pinController,
+                      focusNode: _pinFocusNode,
                       defaultPinTheme: defaultPinTheme,
                       focusedPinTheme: focusedPinTheme,
-                      submittedPinTheme:
-                          defaultPinTheme,
+                      submittedPinTheme: defaultPinTheme,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                       keyboardType: TextInputType.number,
-
+                      
+                      // Tự động gọi API khi nhập xong
                       onCompleted: (pin) {
-                        print('Đã nhập xong OTP: $pin');
-                        // TODO: Xử lý logic gửi OTP
+                        _handleVerifyOtp(pin);
                       },
                     ),
                   ),
@@ -142,17 +238,20 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ForgetPasswordScreen(),
-                            ),
-                          );
-                        },
+                        // Vô hiệu hóa nút khi đang loading
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ForgetPasswordScreen(permissionsGranted: widget.permissionsGranted),
+                                  ),
+                                );
+                              },
                         style: TextButton.styleFrom(padding: EdgeInsets.zero),
                         child: Text(
-                          'Nhập lại Email',
+                          'Nhập lại Mã Sinh Viên',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
                             color: Colors.black,
@@ -166,11 +265,13 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Nút Gửi mã OTP
                       ElevatedButton(
-                        onPressed: () {
-                          // TODO: Xử lý logic Gửi lại mã OTP
-                        },
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                _pinFocusNode.unfocus(); // Tắt bàn phím
+                                _handleVerifyOtp(_pinController.text);
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF0A2A9B),
                           fixedSize: Size(180, 60),
@@ -178,15 +279,18 @@ class _OTPCodeScreenState extends State<OTPCodeScreen> {
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        child: Text(
-                          'Gửi lại mã OTP',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        // Hiển thị loading
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                'Xác thực OTP',
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ],
                   ),

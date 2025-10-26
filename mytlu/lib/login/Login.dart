@@ -1,9 +1,13 @@
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
+import 'package:mytlu/config/api_config.dart';
 import 'package:mytlu/presentation/splash_screen.dart';
 import 'package:mytlu/login/ForgetPassword.dart';
 import 'package:mytlu/services/user_session.dart';
@@ -14,8 +18,12 @@ class LoginScreen extends StatefulWidget {
   final String? userName;
   final String? userAvatarAsset;
   final bool permissionsGranted;
-  const LoginScreen({Key? key, this.userName, this.userAvatarAsset, required this.permissionsGranted})
-    : super(key: key);
+  const LoginScreen({
+    Key? key,
+    this.userName,
+    this.userAvatarAsset,
+    required this.permissionsGranted,
+  }) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -23,6 +31,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
 
   final LocalAuthentication auth = LocalAuthentication();
 
@@ -32,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    
+
     WidgetsBinding.instance.addObserver(this);
 
     _studentCodeController = TextEditingController();
@@ -50,14 +59,16 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text('Thiếu quyền truy cập'),
-          content: Text('Vui lòng cấp quyền Vị trí và Camera trong Cài đặt để tiếp tục.'),
+          content: Text(
+            'Vui lòng cấp quyền Vị trí và Camera trong Cài đặt để tiếp tục.',
+          ),
           actions: [
             TextButton(
               child: Text('ĐI TỚI CÀI ĐẶT'),
@@ -171,15 +182,20 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (!mounted) return;
 
     if (authenticated) {
-      print("Xác thực thành công!");
+      _showErrorSnackBar("Đang đăng nhập bằng vân tay...");
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => StudentPage()),
-        (route) => false,
-      );
+      final credentials = await UserSession().getSavedCredentials();
+      final String? username = credentials['username'];
+      final String? password = credentials['password'];
+
+      if (username != null && password != null) {
+        // Gọi hàm login trung tâm
+        await _performLogin(username, password);
+      } else {
+        _showErrorSnackBar("Lỗi: Không tìm thấy thông tin đăng nhập đã lưu.");
+      }
     } else {
-      _showErrorSnackBar("Xác thực thất bại. Vui lòng thử lại.");
+      _showErrorSnackBar("Xác thực vân tay thất bại.");
     }
   }
 
@@ -204,36 +220,150 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     return false; // Báo lỗi, ngăn logic tiếp theo
   }
 
-  void _handleLogin() async {
+  Future<void> _performLogin(String username, String password) async {
+    // Kiểm tra quyền (bắt buộc)
     final bool hasPermissions = await _checkPermissions();
-    if (!hasPermissions) return; // Dừng lại nếu không có quyền
+    if (!hasPermissions) return;
 
-    String username = _studentCodeController.text;
-    String password = _passwordController.text;
+    // Kiểm tra rỗng
+    if (username.isEmpty || password.isEmpty) {
+      _showErrorSnackBar("Vui lòng nhập Mã sinh viên và Mật khẩu.");
+      return;
+    }
 
-    // 1. Gọi API để xác thực...
-    // (Giả sử API trả về thành công và thông tin user)
-    bool loginSuccess = true; // (Kết quả giả định)
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (loginSuccess) {
-      // 2. LƯU SESSION LẠI
-      await UserSession().saveSession(
-        username: username,
-        fullName: "Nguyễn Thị Dinh", // (Lấy từ API)
-        studentCode: "123456", // (Lấy từ API)
-        password: password, // (Lưu lại mật khẩu)
-        avatarUrl: "https://thanglele.cloud/img/user.png", // (Lấy từ API)
+    // Dùng biến toàn cục
+    final String url = '${ApiConfig.baseUrl}/api/v1/auth/login';
+    final Map<String, String> headers = {
+      'accept': 'text/plain',
+      'Content-Type': 'application/json',
+    };
+    final Map<String, String> body = {
+      'username': username,
+      'password': password,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(body),
       );
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      // 3. Điều hướng đến màn hình chính
-      if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => StudentPage()),
-        (route) => false,
-      );
+      if (response.statusCode == 200) {
+        final String token = responseBody['token'];
+        final String userRole = responseBody['userRole'];
+
+        try {
+          final userProfileData = await _fetchUserProfile(token);
+          final String apiFullName = userProfileData['fullName'];
+          final String apiAvatarUrl =
+              "http://example.com/avatar.png"; // TODO: Cần API cho Avatar
+
+          // Lưu session (BAO GỒM CẢ MẬT KHẨU)
+          await UserSession().saveSession(
+            token: token,
+            userRole: userRole,
+            username: username,
+            fullName: apiFullName,
+            studentCode: username,
+            avatarUrl: apiAvatarUrl,
+            password: password, // <-- LƯU LẠI MẬT KHẨU
+          );
+
+          if (!mounted) return;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const StudentPage()),
+            (Route<dynamic> route) => false,
+          );
+        } catch (e) {
+          _showErrorSnackBar(e.toString());
+        }
+      } else if (response.statusCode == 401) {
+        final String message = responseBody['message'];
+        _showErrorSnackBar(message);
+      } else if (response.statusCode == 428) {
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ForgetPasswordScreen(
+              permissionsGranted: widget.permissionsGranted,
+            ),
+          ),
+        );
+      } else {
+        _showErrorSnackBar(
+          'Lỗi: ${response.statusCode}. ${responseBody['message'] ?? ''}',
+        );
+      }
+    } catch (e) {
+      _showErrorSnackBar('Lỗi kết nối mạng: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // SỬA LẠI HÀM NÀY
+  void _handleLogin() async {
+    String studentCode;
+    final String password = _passwordController.text;
+
+    // 1. KIỂM TRA XEM LẤY USERNAME TỪ ĐÂU
+    if (widget.userName != null) {
+      // Đang ở màn hình "Xin chào", lấy MSV (username) từ storage
+      final credentials = await UserSession().getSavedCredentials();
+      studentCode = credentials['username'] ?? "";
+
+      if (studentCode.isEmpty) {
+        _showErrorSnackBar("Lỗi: Không tìm thấy Mã sinh viên đã lưu.");
+        return;
+      }
     } else {
-      // TODO: Hiển thị lỗi đăng nhập
+      // Đang ở màn hình đăng nhập chuẩn, lấy MSV từ ô text
+      studentCode = _studentCodeController.text;
+    }
+
+    // 2. Gọi hàm login trung tâm (code này đã đúng)
+    await _performLogin(studentCode, password);
+  }
+
+  Future<Map<String, dynamic>> _fetchUserProfile(String token) async {
+    final String url = '${ApiConfig.baseUrl}/api/v1/auth/me';
+
+    // 1. Thêm "Bearer " vào token (theo yêu cầu của bạn)
+    final String authToken = 'Bearer $token';
+
+    final Map<String, String> headers = {
+      'accept': 'text/plain',
+      'Authorization': authToken,
+    };
+
+    try {
+      final response = await http.get(Uri.parse(url), headers: headers);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      if (response.statusCode == 200) {
+        // Trả về dữ liệu user (VD: { "fullName": "...", ... })
+        return responseBody;
+      } else {
+        // Nếu lỗi (401, 404), ném ra lỗi để _handleLogin bắt
+        throw Exception(
+          'Lỗi lấy thông tin User: ${responseBody['title'] ?? 'Không xác định'}',
+        );
+      }
+    } catch (e) {
+      // Ném ra lỗi mạng
+      throw Exception('Lỗi mạng khi lấy thông tin User: $e');
     }
   }
 
@@ -338,38 +468,44 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                             borderRadius: BorderRadius.circular(30.0),
                           ),
                         ),
-                        child: Text(
-                          'Đăng nhập',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                'Đăng nhập',
+                                style: TextStyle(
+                                  fontFamily: 'Ubuntu',
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
 
                       SizedBox(width: 10), // Khoảng cách giữa 2 nút
                       // Nút Vân tay
-                      InkWell(
-                        onTap: () {
-                          _authenticateWithBiometrics();
-                        },
-                        borderRadius: BorderRadius.circular(31.5), // bo tròn
-                        child: Container(
-                          width: 63.0,
-                          height: 63.0,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF0F0F0), // Màu nền xám nhạt/trắng
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.fingerprint,
-                            color: Colors.black, // Màu icon vân tay
-                            size: 35.0, // Kích thước icon
-                          ),
+                      if (widget.userName != null)
+                        Row(
+                          children: [
+                            SizedBox(width: 10), // Khoảng cách
+                            InkWell(
+                              onTap: _authenticateWithBiometrics,
+                              borderRadius: BorderRadius.circular(31.5),
+                              child: Container(
+                                width: 63.0,
+                                height: 63.0,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF0F0F0),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.fingerprint,
+                                  color: Colors.black,
+                                  size: 35.0,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
                     ],
                   ),
 
@@ -384,7 +520,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ForgetPasswordScreen(),
+                                builder: (context) => ForgetPasswordScreen(
+                                  permissionsGranted: widget.permissionsGranted,
+                                ),
                               ),
                             );
                           },
@@ -405,7 +543,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(permissionsGranted: true),
+                                  builder: (context) => const LoginScreen(
+                                    permissionsGranted: true,
+                                  ),
                                 ),
                               );
                             },
@@ -434,9 +574,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => ScanQRScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => ScanQRScreen()),
           );
         },
         backgroundColor: Color(0xFF0A2A9B),

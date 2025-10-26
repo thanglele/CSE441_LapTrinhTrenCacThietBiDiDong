@@ -66,7 +66,7 @@ namespace MyTLUServer.Application.Services
             bool isValid = false;
             try
             {
-                isValid = BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash);
+                isValid = await Task.Run(() => BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash));
             }
             catch (Exception ex)
             {
@@ -87,6 +87,53 @@ namespace MyTLUServer.Application.Services
                 Token = token,
                 UserRole = user.UserRole
             };
+        }
+
+        #endregion
+
+        #region Nghiệp vụ Đổi Mật khẩu (Đã đăng nhập)
+
+        /// <summary>
+        /// Thay đổi mật khẩu khi người dùng đã đăng nhập
+        /// </summary>
+        public async Task<bool> ChangePasswordAsync(string username, ChangePasswordRequestDto changeRequest)
+        {
+            var user = await _context.Logins
+                .FirstOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
+            {
+                return false; // Lỗi: User không tồn tại
+            }
+
+            // 1. Xác thực mật khẩu CŨ
+            bool isCurrentPasswordValid = false;
+            try
+            {
+                // Dùng Task.Run để bảo vệ server
+                isCurrentPasswordValid = await Task.Run(() =>
+                    BCrypt.Net.BCrypt.Verify(changeRequest.CurrentPassword, user.PasswordHash)
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ChangePassword] Password verification error for user {user.Username}: {ex.Message}");
+                isCurrentPasswordValid = false;
+            }
+
+            if (!isCurrentPasswordValid)
+            {
+                return false; // Sai mật khẩu hiện tại
+            }
+
+            // 2. Hash và cập nhật mật khẩu MỚI
+            int workFactor = 12; // Đảm bảo dùng work factor chuẩn
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changeRequest.NewPassword, workFactor);
+
+            _context.Logins.Update(user);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         #endregion
@@ -131,20 +178,53 @@ namespace MyTLUServer.Application.Services
         }
 
         /// <summary>
-        /// Xác thực OTP và đặt lại mật khẩu mới
+        /// Xác thực OTP và trả về ResetToken
+        /// </summary>
+        public async Task<string> VerifyOtpAsync(VerifyOtpRequestDto verifyRequest)
+        {
+            // 1. Kiểm tra OTP
+            if (!_cache.TryGetValue(verifyRequest.Username, out string cachedOtp))
+            {
+                // OTP hết hạn hoặc không tồn tại
+                return null;
+            }
+
+            if (cachedOtp != verifyRequest.Otp)
+            {
+                return null; // Sai OTP
+            }
+
+            // 2. OTP hợp lệ. Xóa OTP cũ.
+            _cache.Remove(verifyRequest.Username);
+
+            // 3. Tạo ResetToken mới
+            var resetToken = Guid.NewGuid().ToString();
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+
+            // Key mới để lưu token, ví dụ: "reset_student123"
+            _cache.Set($"reset_{verifyRequest.Username}", resetToken, cacheEntryOptions);
+
+            return resetToken;
+        }
+
+
+        /// <summary>
+        /// Xác thực ResetToken và đặt lại mật khẩu mới
         /// </summary>
         public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto resetRequest)
         {
-            // 1. Kiểm tra OTP
-            if (!_cache.TryGetValue(resetRequest.Username, out string cachedOtp))
+            // 1. Kiểm tra ResetToken
+            string cacheKey = $"reset_{resetRequest.Username}";
+            if (!_cache.TryGetValue(cacheKey, out string cachedToken))
             {
-                // OTP hết hạn hoặc không tồn tại (do nhập sai username)
+                // Token hết hạn hoặc không tồn tại
                 return false;
             }
 
-            if (cachedOtp != resetRequest.Otp)
+            if (cachedToken != resetRequest.ResetToken)
             {
-                return false; // Sai OTP
+                return false; // Sai ResetToken
             }
 
             // 2. Tìm User
@@ -153,20 +233,19 @@ namespace MyTLUServer.Application.Services
 
             if (user == null)
             {
-                // Lỗi (hiếm khi xảy ra nếu OTP tồn tại, trừ khi user bị xóa)
                 return false;
             }
 
             // 3. Hash mật khẩu mới
-            // Sử dụng BCrypt để hash mật khẩu
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetRequest.NewPassword);
+            int workFactor = 12; // Luôn dùng work factor chuẩn
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetRequest.NewPassword, workFactor);
 
             // 4. Lưu vào DB
             _context.Logins.Update(user);
             await _context.SaveChangesAsync();
 
-            // 5. Xóa OTP khỏi cache (vì đã được sử dụng)
-            _cache.Remove(resetRequest.Username);
+            // 5. Xóa ResetToken khỏi cache (vì đã được sử dụng)
+            _cache.Remove(cacheKey);
 
             return true;
         }

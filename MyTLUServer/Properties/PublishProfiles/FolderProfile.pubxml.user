@@ -3,7 +3,18 @@
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>D:\Website\Web\MyTLU</_PublishTargetUrl>
-    <History>True|2025-10-23T02:09:24.7907761Z||;False|2025-10-23T09:09:15.1326779+07:00||;True|2025-10-23T09:07:02.8695191+07:00||;</History>
+    <History>True|2025-10-26T10:27:10.5333096Z||;True|2025-10-26T16:02:02.2751542+07:00||;True|2025-10-26T15:35:36.5627650+07:00||;True|2025-10-26T14:50:32.1522600+07:00||;True|2025-10-26T14:24:06.3815411+07:00||;True|2025-10-26T14:23:57.2109553+07:00||;True|2025-10-26T14:18:24.7232811+07:00||;True|2025-10-26T14:16:59.0195965+07:00||;True|2025-10-26T14:14:17.8235482+07:00||;True|2025-10-23T09:09:24.7907761+07:00||;False|2025-10-23T09:09:15.1326779+07:00||;True|2025-10-23T09:07:02.8695191+07:00||;</History>
     <LastFailureDetails />
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
   </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Server=127.0.0.1%3bDatabase=MyTLU%3bUser Id=sa%3bPassword=mdq1jCu0Zy%402SkS5MF!q%3bTrusted_Connection=False%3bTrustServerCertificate=True%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="MyTLUServer.Infrastructure.Data.AppDbContext">
+      <Value>Server=127.0.0.1%3bDatabase=MyTLU%3bUser Id=sa%3bPassword=mdq1jCu0Zy%402SkS5MF!q%3bTrusted_Connection=False%3bTrustServerCertificate=True%3b</Value>
+    </EFMigrations>
+  </ItemGroup>
 </Project>

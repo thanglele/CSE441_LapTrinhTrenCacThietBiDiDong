@@ -1,13 +1,9 @@
-// Controllers/AuthController.cs
-// Xóa validation cho Email
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using MyTLUServer.Application.DTOs;
+using MyTLUServer.Application.Exceptions;
 using MyTLUServer.Application.Interfaces;
-using MyTLUServer.Application.Exceptions; // Thêm
-using System; // Thêm
+using System.Security.Claims;
 
 namespace MyTLUServer.API.Controllers
 {
@@ -93,7 +89,31 @@ namespace MyTLUServer.API.Controllers
         }
 
         /// <summary>
-        /// Đặt lại mật khẩu bằng OTP
+        /// Xác thực OTP và lấy ResetToken
+        /// </summary>
+        [HttpPost("verify-otp")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(VerifyOtpResponseDto), 200)]
+        [ProducesResponseType(typeof(ErrorResponseDto), 400)]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequestDto verifyRequest)
+        {
+            if (string.IsNullOrEmpty(verifyRequest.Username) || string.IsNullOrEmpty(verifyRequest.Otp))
+            {
+                return BadRequest(new ErrorResponseDto { Message = "Username và OTP là bắt buộc." });
+            }
+
+            var resetToken = await _authService.VerifyOtpAsync(verifyRequest);
+
+            if (resetToken == null)
+            {
+                return BadRequest(new ErrorResponseDto { Message = "OTP không hợp lệ hoặc đã hết hạn." });
+            }
+
+            return Ok(new VerifyOtpResponseDto { ResetToken = resetToken });
+        }
+
+        /// <summary>
+        /// Đặt lại mật khẩu bằng ResetToken
         /// </summary>
         [HttpPost("reset-password")]
         [AllowAnonymous]
@@ -101,18 +121,46 @@ namespace MyTLUServer.API.Controllers
         [ProducesResponseType(typeof(ErrorResponseDto), 400)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetRequest)
         {
-            // Validation: Username là bắt buộc
-            if (string.IsNullOrEmpty(resetRequest.Username))
+            if (string.IsNullOrEmpty(resetRequest.Username) ||
+                string.IsNullOrEmpty(resetRequest.ResetToken) ||
+                string.IsNullOrEmpty(resetRequest.NewPassword))
             {
-                return BadRequest(new ErrorResponseDto { Message = "Vui lòng cung cấp Tên đăng nhập." });
+                return BadRequest(new ErrorResponseDto { Message = "Username, ResetToken và Mật khẩu mới là bắt buộc." });
             }
 
             var success = await _authService.ResetPasswordAsync(resetRequest);
             if (!success)
             {
-                return BadRequest(new ErrorResponseDto { Message = "OTP không hợp lệ hoặc đã hết hạn." });
+                return BadRequest(new ErrorResponseDto { Message = "Mã reset không hợp lệ hoặc đã hết hạn." });
             }
             return Ok(new { Message = "Mật khẩu đã được cập nhật thành công." });
+        }
+
+        /// <summary>
+        /// Đổi mật khẩu (khi đã đăng nhập)
+        /// </summary>
+        [HttpPost("change-password")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(ErrorResponseDto), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changeRequest)
+        {
+            // Lấy username từ JWT Token
+            var username = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(username))
+            {
+                return Unauthorized(); // Lỗi token
+            }
+
+            var success = await _authService.ChangePasswordAsync(username, changeRequest);
+
+            if (!success)
+            {
+                return BadRequest(new ErrorResponseDto { Message = "Mật khẩu hiện tại không chính xác." });
+            }
+
+            return Ok(new { Message = "Đổi mật khẩu thành công." });
         }
     }
 }

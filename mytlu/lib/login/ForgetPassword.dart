@@ -1,15 +1,113 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:mytlu/config/api_config.dart';
 import 'package:mytlu/login/OTPCode.dart';
 import 'package:mytlu/giaodienlichhoc/screens/scan_qr_screen.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({Key? key}) : super(key: key);
+  final bool permissionsGranted; // Nhận quyền từ LoginScreen
+
+  const ForgetPasswordScreen({Key? key, required this.permissionsGranted})
+    : super(key: key);
 
   @override
-  _ForgetScreenState createState() => _ForgetScreenState();
+  State<ForgetPasswordScreen> createState() => _ForgetPasswordScreenState();
 }
 
-class _ForgetScreenState extends State<ForgetPasswordScreen> {
+class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+  late TextEditingController _studentCodeController;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _studentCodeController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _studentCodeController.dispose();
+    super.dispose();
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  Future<void> _handleRequestReset() async {
+    final String studentCode = _studentCodeController.text;
+    if (studentCode.isEmpty) {
+      _showErrorSnackBar("Vui lòng nhập Mã sinh viên.");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final String url = '${ApiConfig.baseUrl}/api/v1/auth/request-reset';
+    final Map<String, String> headers = {
+      'accept': '*/*',
+      'Content-Type': 'application/json',
+    };
+    final Map<String, String> body = {'username': studentCode};
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      if (response.statusCode == 200) {
+        // THÀNH CÔNG (200)
+        if (!mounted) return;
+
+        // Hiển thị thông báo thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(responseBody['message']),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Chuyển sang màn hình Nhập OTP (theo yêu cầu)
+        // Dùng pushReplacement để tránh bị luẩn quẩn (như đã bàn)
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OTPCodeScreen(
+              permissionsGranted: widget.permissionsGranted, // Truyền quyền
+              username: studentCode, // Truyền MSV sang
+            ),
+          ),
+        );
+      } else if (response.statusCode == 400) {
+        // LỖI (400)
+        _showErrorSnackBar(responseBody['message']);
+      } else {
+        _showErrorSnackBar(
+          'Lỗi ${response.statusCode}: ${responseBody['message'] ?? 'Lỗi không xác định'}',
+        );
+      }
+    } catch (e) {
+      _showErrorSnackBar('Lỗi kết nối mạng: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,12 +182,12 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        "Nhập Email để lấy mã OTP của bạn",
+                        "Nhập mã sinh viên để lấy mã OTP của bạn",
                         style: TextStyle(
                           fontFamily: 'Montserrat',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white
+                          color: Colors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -103,13 +201,15 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     child: TextField(
+                      controller: _studentCodeController,
+                      keyboardType: TextInputType.text,
                       style: TextStyle(
                         fontFamily: 'Montserrat',
                         color: Colors.black,
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Nhập email đã đăng ký',
+                        hintText: 'Mã sinh viên',
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 20.0,
@@ -126,14 +226,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                     children: [
                       // Nút Gửi mã OTP
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OTPCodeScreen(),
-                            ),
-                          );
-                        },
+                        onPressed: _isLoading ? null : _handleRequestReset,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF0A2A9B),
                           fixedSize: Size(180, 60),
@@ -141,15 +234,17 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        child: Text(
-                          'Gửi mã OTP',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                'Gửi mã OTP',
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ],
                   ),
@@ -163,9 +258,7 @@ class _ForgetScreenState extends State<ForgetPasswordScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => ScanQRScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => ScanQRScreen()),
           );
           // TODO: Xử lý logic Quét QR
         },

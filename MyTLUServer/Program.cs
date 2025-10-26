@@ -1,7 +1,4 @@
-﻿// Program.cs
-// Cập nhật để thêm MemoryCache (lưu OTP) và EmailService (gửi mail)
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,13 +8,18 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using MyTLUServer.Application.Interfaces;
 using MyTLUServer.Application.Services;
-using MyTLUServer.Infrastructure.Data; // Giả sử DbContext của bạn ở đây
+using MyTLUServer.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// *** THÊM MỤC 1: ĐĂNG KÝ DBCONTEXT ***
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+if(builder.Environment.IsDevelopment() == true)
+{
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DevelopConnection")));
+}
+else
+{
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PublishConnection")));
+}    
 
 // *** THÊM MỤC 2: ĐĂNG KÝ MEMORY CACHE VÀ CÁC DỊCH VỤ ***
 builder.Services.AddMemoryCache(); // Thêm dịch vụ Memory Cache

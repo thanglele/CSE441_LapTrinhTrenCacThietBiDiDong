@@ -23,8 +23,20 @@ namespace MyTLUServer.Application.Interfaces
         Task<bool> RequestPasswordResetAsync(OtpRequestDto otpRequest);
 
         /// <summary>
-        /// Xác thực OTP và đặt mật khẩu mới.
+        /// Xác thực OTP.
+        /// Trả về ResetToken nếu OTP hợp lệ.
+        /// Trả về null nếu OTP không hợp lệ.
+        /// </summary>
+        Task<string> VerifyOtpAsync(VerifyOtpRequestDto verifyRequest);
+
+        /// <summary>
+        /// Đặt mật khẩu mới bằng ResetToken.
         /// </summary>
         Task<bool> ResetPasswordAsync(ResetPasswordRequestDto resetRequest);
+
+        /// <summary>
+        /// Thay đổi mật khẩu khi người dùng đã đăng nhập.
+        /// </summary>
+        Task<bool> ChangePasswordAsync(string username, ChangePasswordRequestDto changeRequest);
     }
 }
