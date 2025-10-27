@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:mytlu/config/api_config.dart';
 import 'package:mytlu/presentation/splash_screen.dart';
@@ -225,6 +226,19 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     final bool hasPermissions = await _checkPermissions();
     if (!hasPermissions) return;
 
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _showErrorSnackBar("Vui lòng bật GPS/Dịch vụ vị trí để đăng nhập.");
+        // (Tùy chọn: Mở cài đặt vị trí cho người dùng)
+        await Geolocator.openLocationSettings();
+        return;
+      }
+    } catch (e) {
+      _showErrorSnackBar("Lỗi khi kiểm tra dịch vụ vị trí: $e");
+      return;
+    }
+
     // Kiểm tra rỗng
     if (username.isEmpty || password.isEmpty) {
       _showErrorSnackBar("Vui lòng nhập Mã sinh viên và Mật khẩu.");
@@ -235,6 +249,26 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       _isLoading = true;
     });
 
+    String loginPosition;
+    try {
+      // Lấy vị trí (độ chính xác trung bình, timeout 10 giây)
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: Duration(seconds: 10),
+      );
+      // Format tọa độ thành chuỗi "latitude, longitude"
+      loginPosition = "${position.latitude}, ${position.longitude}";
+      
+      print('Tọa độ đã lấy: $loginPosition');
+
+    } catch (e) {
+      _showErrorSnackBar("Không thể lấy tọa độ thiết bị: $e");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
     // Dùng biến toàn cục
     final String url = '${ApiConfig.baseUrl}/api/v1/auth/login';
     final Map<String, String> headers = {
@@ -244,6 +278,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     final Map<String, String> body = {
       'username': username,
       'password': password,
+      'loginPosition': loginPosition,
     };
 
     try {
@@ -262,7 +297,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           final userProfileData = await _fetchUserProfile(token);
           final String apiFullName = userProfileData['fullName'];
           final String apiAvatarUrl =
-              "http://example.com/avatar.png"; // TODO: Cần API cho Avatar
+              "http://example.com/avatar.png";
 
           // Lưu session (BAO GỒM CẢ MẬT KHẨU)
           await UserSession().saveSession(
@@ -272,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
             fullName: apiFullName,
             studentCode: username,
             avatarUrl: apiAvatarUrl,
-            password: password, // <-- LƯU LẠI MẬT KHẨU
+            password: password,
           );
 
           if (!mounted) return;

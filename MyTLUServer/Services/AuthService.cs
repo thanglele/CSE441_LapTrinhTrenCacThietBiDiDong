@@ -80,8 +80,25 @@ namespace MyTLUServer.Application.Services
                 return null; // Sai mật khẩu
             }
 
+            bool needsSave = false;
+
+            if (user.LoginPosition != loginRequest.LoginPosition)
+            {
+                user.LoginPosition = loginRequest.LoginPosition;
+                user.UpdatedAt = DateTime.UtcNow;
+                needsSave = true;
+            }
+
+            // 3. Thực hiện lưu CSDL MỘT LẦN
+            if (needsSave)
+            {
+                _context.Logins.Update(user);
+                // Đảm bảo lưu thành công trước khi trả token
+                await _context.SaveChangesAsync();
+            }
+
             // Tạo token nếu mật khẩu hợp lệ
-            var token = GenerateJwtToken(user);
+            string token = GenerateJwtToken(user);
             return new LoginResponseDto
             {
                 Token = token,

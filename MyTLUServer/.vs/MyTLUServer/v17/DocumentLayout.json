@@ -11,12 +11,16 @@
       "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\models\\login.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:models\\login.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,11 +30,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 1173,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Login.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Models\\Login.cs",
+              "RelativeDocumentMoniker": "Models\\Login.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Models\\Login.cs",
+              "RelativeToolTip": "Models\\Login.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAA5wC8AAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T13:50:34.058Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -40,14 +57,14 @@
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
               "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Controllers\\AuthController.cs",
               "RelativeToolTip": "Controllers\\AuthController.cs",
-              "ViewState": "AgIAAGYAAAAAAAAAAAAcwGAAAAA9AAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAQwC0AAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-26T08:56:04.949Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "IAuthService.cs",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Interfaces\\IAuthService.cs",
               "RelativeDocumentMoniker": "Interfaces\\IAuthService.cs",
@@ -55,18 +72,17 @@
               "RelativeToolTip": "Interfaces\\IAuthService.cs",
               "ViewState": "AgIAABIAAAAAAAAAAAAowBYAAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-26T08:54:49.049Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-26T08:54:49.049Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "AuthDtos.cs",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\DTOs\\AuthDtos.cs",
               "RelativeDocumentMoniker": "DTOs\\AuthDtos.cs",
               "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\DTOs\\AuthDtos.cs",
               "RelativeToolTip": "DTOs\\AuthDtos.cs",
-              "ViewState": "AgIAAD0AAAAAAAAAAAA8wCoAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-26T08:54:15.605Z",
               "EditorCaption": ""
@@ -79,7 +95,7 @@
               "RelativeDocumentMoniker": "Services\\AuthService.cs",
               "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\AuthService.cs",
               "RelativeToolTip": "Services\\AuthService.cs",
-              "ViewState": "AgIAAMcAAAAAAAAAAAAwwBEAAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAEAAAAAAAAAAAAAiwFcAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-26T08:25:53.121Z",
               "EditorCaption": ""

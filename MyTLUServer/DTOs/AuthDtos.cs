@@ -7,6 +7,7 @@ namespace MyTLUServer.Application.DTOs
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        public string? LoginPosition { get; set; }
     }
 
     // DTO cho phản hồi đăng nhập thành công

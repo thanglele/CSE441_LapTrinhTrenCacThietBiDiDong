@@ -42,6 +42,11 @@ public partial class Login
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
 
+    [Column("updated_pos")]
+    [StringLength(255)]
+    [Unicode(false)]
+    public string? LoginPosition { get; set; }
+
     [InverseProperty("LecturerCodeNavigation")]
     public virtual Lecturer? Lecturer { get; set; }
 
