@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66bd2de137f9c501cc00ddb2f65da18c1463cfea")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88c866afab1b58b13bd8f2135303c1938c8461c4")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

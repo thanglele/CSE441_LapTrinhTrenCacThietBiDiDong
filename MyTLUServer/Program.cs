@@ -27,6 +27,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IGeoIpService, MockGeoIpService>();
+builder.Services.AddScoped<IDeanService, DeanService>();
 builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
 builder.Services.AddHttpContextAccessor();
 
