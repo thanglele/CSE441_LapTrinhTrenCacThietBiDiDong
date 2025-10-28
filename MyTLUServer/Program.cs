@@ -22,13 +22,28 @@ else
 }    
 
 // *** THÊM MỤC 2: ĐĂNG KÝ MEMORY CACHE VÀ CÁC DỊCH VỤ ***
-builder.Services.AddMemoryCache(); // Thêm dịch vụ Memory Cache
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
-
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IGeoIpService, MockGeoIpService>();
+builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddHttpClient<IFaceRecognitionService, FaceRecognitionService>(client =>
+{
+    // Đọc BaseUrl từ appsettings.json
+    string baseUrl = builder.Configuration.GetSection("FaceRecService:BaseUrl").Value;
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        throw new InvalidOperationException("FaceRecService:BaseUrl is not configured in appsettings.json");
+    }
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30); // Đặt timeout
+});
 
 // 3. Cấu hình Swagger
 builder.Services.AddSwaggerGen(options =>

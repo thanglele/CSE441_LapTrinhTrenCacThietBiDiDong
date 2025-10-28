@@ -97,6 +97,27 @@ namespace MyTLUServer.Application.Services
                 await _context.SaveChangesAsync();
             }
 
+            string faceStatus = "n/a"; // n/a cho Giảng viên, admin...
+            if (user.UserRole == "student")
+            {
+                // Tìm bản ghi 'active' (đã duyệt)
+                var isActive = await _context.FaceData
+                    .AnyAsync(fd => fd.StudentCode == user.Username && fd.IsActive == true && fd.UploadStatus == "verified");
+
+                if (isActive)
+                {
+                    faceStatus = "verified";
+                }
+                else
+                {
+                    // Nếu không active, kiểm tra xem có đang 'chờ duyệt' không
+                    var isPending = await _context.FaceData
+                        .AnyAsync(fd => fd.StudentCode == user.Username && fd.UploadStatus == "uploaded");
+
+                    faceStatus = isPending ? "pending" : "none"; // "none" nếu chưa có gì
+                }
+            }
+
             // Tạo token nếu mật khẩu hợp lệ
             string token = GenerateJwtToken(user);
             return new LoginResponseDto

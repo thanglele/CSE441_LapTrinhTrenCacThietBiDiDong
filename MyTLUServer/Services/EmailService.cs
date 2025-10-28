@@ -17,10 +17,10 @@ namespace MyTLUServer.Application.Services
         public SmtpEmailService(IConfiguration configuration)
         {
             var smtpSettings = configuration.GetSection("SmtpSettings");
-            _host = smtpSettings["Host"];
-            _port = int.Parse(smtpSettings["Port"]);
-            _from = smtpSettings["From"];
-            _pass = smtpSettings["Password"];
+            _host = smtpSettings["Host"] ?? string.Empty;
+            _port = int.Parse(smtpSettings["Port"] ?? "587"); // Thêm port mặc định
+            _from = smtpSettings["From"] ?? string.Empty;
+            _pass = smtpSettings["Password"] ?? string.Empty;
         }
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
@@ -31,6 +31,12 @@ namespace MyTLUServer.Application.Services
 
         public async Task SendOtpEmailAsync(string toEmail, string otp)
         {
+            if (string.IsNullOrEmpty(_host) || string.IsNullOrEmpty(_from) || string.IsNullOrEmpty(_pass))
+            {
+                Console.WriteLine("[SmtpEmailService] SMTP settings are missing.");
+                return;
+            }
+
             try
             {
                 MailMessage mail = new MailMessage();
@@ -40,11 +46,11 @@ namespace MyTLUServer.Application.Services
                 mail.To.Add(toEmail);
                 mail.Subject = $"Đây là mã xác minh của bạn: {otp}";
                 mail.IsBodyHtml = true;
-                mail.Body = GetHtmlBody(otp); // Gọi hàm lấy template
+                mail.Body = GetHtmlBody(otp);
 
                 SmtpServer.Port = _port;
                 SmtpServer.Credentials = new NetworkCredential(_from, _pass);
-                SmtpServer.EnableSsl = true; // Bắt buộc cho Gmail
+                SmtpServer.EnableSsl = true;
 
                 await SmtpServer.SendMailAsync(mail);
             }

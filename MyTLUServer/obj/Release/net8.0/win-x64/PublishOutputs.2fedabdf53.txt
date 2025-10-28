@@ -343,6 +343,7 @@ F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Relea
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Microsoft.OpenApi.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Microsoft.SqlServer.Server.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
+F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Newtonsoft.Json.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\win-x64\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll

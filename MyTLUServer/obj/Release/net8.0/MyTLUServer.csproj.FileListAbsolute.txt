@@ -172,3 +172,4 @@ F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Relea
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\MyTLUServer.pdb
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\MyTLUServer.genruntimeconfig.cache
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Release\net8.0\ref\MyTLUServer.dll
+F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Release\net8.0\Newtonsoft.Json.dll

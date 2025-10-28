@@ -172,3 +172,4 @@ F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\mytluserver\bin\Debug
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Debug\net8.0\BCrypt.Net-Next.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Debug\net8.0\Newtonsoft.Json.dll

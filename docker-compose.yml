@@ -4,6 +4,13 @@ version: "3.8"
 
 services:
   # Tên của dịch vụ, bạn có thể đặt tên tùy ý.
+  mytlu-ai:
+    build:
+      context: ./face-ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    restart: unless-stopped
   sql-server-db:
     # Sử dụng hình ảnh chính thức của Microsoft SQL Server 2022 cho Linux.
     image: mcr.microsoft.com/mssql/server:2022-latest
