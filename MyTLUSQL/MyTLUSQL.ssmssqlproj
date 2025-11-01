@@ -50,8 +50,8 @@
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
         <FileNode Name="Data.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:127.0.0.1:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>127.0.0.1</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:remote.thanglele.cloud:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>remote.thanglele.cloud</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>Data.sql</FullPath>
         </FileNode>
@@ -62,26 +62,26 @@
           <FullPath>Init.sql</FullPath>
         </FileNode>
         <FileNode Name="login.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:127.0.0.1:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>127.0.0.1</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:remote.thanglele.cloud:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>remote.thanglele.cloud</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>login.sql</FullPath>
         </FileNode>
         <FileNode Name="student_details.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:127.0.0.1:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>127.0.0.1</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:remote.thanglele.cloud:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>remote.thanglele.cloud</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>student_details.sql</FullPath>
         </FileNode>
         <FileNode Name="student_identification.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:127.0.0.1:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>127.0.0.1</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:remote.thanglele.cloud:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>remote.thanglele.cloud</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>student_identification.sql</FullPath>
         </FileNode>
         <FileNode Name="Students.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:127.0.0.1:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>127.0.0.1</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:remote.thanglele.cloud:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>remote.thanglele.cloud</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>Students.sql</FullPath>
         </FileNode>
