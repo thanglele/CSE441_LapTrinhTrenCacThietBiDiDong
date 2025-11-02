@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// Đây là Header "động" dùng chung cho các màn hình của Sinh viên.
-/// Nó yêu cầu "cha" của nó (ví dụ: StudentDashboard)
-/// phải cung cấp thông tin sinh viên để hiển thị.
 class StudentHeader extends StatelessWidget {
   // 1. ĐỊNH NGHĨA CÁC THAM SỐ ĐẦU VÀO
   final String studentCode;
   final String fullName;
-  final String? avatarUrl; // String? (có thể null, nên ta dùng '?' )
+  final String? avatarUrl;
 
-  // 2. YÊU CẦU TRUYỀN CÁC THAM SỐ NÀY KHI GỌI WIDGET
-  // (Sử dụng cú pháp super.key để tránh cảnh báo)
+
   const StudentHeader({
     super.key,
     required this.studentCode,
@@ -56,7 +52,7 @@ class StudentHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
 
-                  // 3. SỬ DỤNG DỮ LIỆU ĐỘNG ĐƯỢC TRUYỀN VÀO
+                  //  SỬ DỤNG DỮ LIỆU ĐỘNG ĐƯỢC TRUYỀN VÀO
                   Text(
                     "MSV: $studentCode", // <-- Lấy từ biến
                     style: TextStyle(
@@ -86,20 +82,18 @@ class StudentHeader extends StatelessWidget {
 
                   // 4. XỬ LÝ LOGIC HIỂN THỊ AVATAR
                   CircleAvatar(
-                    radius: 16, // Kích thước avatar
+                    radius: 16,
                     backgroundColor: Colors.white24, // Màu nền khi chờ tải
 
                     // Nếu avatarUrl CÓ GIÁ TRỊ VÀ KHÔNG RỖNG -> dùng NetworkImage
                     backgroundImage: (avatarUrl != null && avatarUrl!.isNotEmpty)
                         ? NetworkImage(avatarUrl!)
-                        : null, // Nếu không, để là null
+                        : null,
 
-                    // Nếu backgroundImage là null (tức là không có ảnh)
-                    // -> Hiển thị icon thay thế
                     child: (avatarUrl == null || avatarUrl!.isEmpty)
                         ? Icon(
                       Icons.person_outline, // Icon avatar phù hợp
-                      size: 20, // Kích thước icon
+                      size: 20,
                       color: Colors.white70,
                     )
                         : null, // Nếu có ảnh thì không cần child
