@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-// IMPORT CÁC THÀNH PHẦN (VỎ)
+
 import 'package:mytlu/Students/common_widgets/student_header.dart';
 import 'package:mytlu/Students/common_widgets/student_footer.dart';
 
-//  IMPORT LOGIC ĐỂ GỌI API HEADER
+
 import 'package:mytlu/Students/profile/models/student_profile.dart';
 import 'package:mytlu/Students/profile/services/profile_service.dart';
 
-//  IMPORT 4 MÀN HÌNH CON (TƯƠNG ỨNG 4 TAB)
+
 import 'package:mytlu/Students/profile/screens/profile_menu_screen.dart';
 
-
+import 'package:mytlu/Students/theme/app_theme.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -42,7 +42,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Theme(
+        data: AppTheme.lightTheme,
+      child: Scaffold(
       // 1. HEADER (Luôn cố định ở trên)
 
       appBar: PreferredSize(
@@ -69,7 +71,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         ),
       ),
 
-      // 2. NỘI DUNG (SỬA LẠI BODY)
+      // 2. NỘI DUNG
       body: FutureBuilder<StudentProfile>(
         future: _profileFuture,
         builder: (context, snapshot) {
@@ -115,6 +117,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
       bottomNavigationBar: AppFooter(
         currentIndex: _currentIndex,
         onTap: _onSwitchTab, // Dùng hàm callback
+      ),
       ),
     );
   }
