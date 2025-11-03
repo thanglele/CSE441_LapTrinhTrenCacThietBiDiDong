@@ -29,6 +29,26 @@ builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IGeoIpService, MockGeoIpService>();
 builder.Services.AddScoped<IDeanService, DeanService>();
 builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IDeanService, DeanService>();
+builder.Services.AddScoped<IStudentAffairsService, StudentAffairsService>();
+builder.Services.AddScoped<IAcademicService, AcademicService>();
+builder.Services.AddScoped<IReportingService, ReportingService>();
+builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
+builder.Services.AddScoped<IGeoIpService, MockGeoIpService>(); // Dùng Mock (giả lập)
+// builder.Services.AddScoped<IGeoIpService, GeoIpService>(); // (Khi triển khai thật)
+builder.Services.AddHttpClient<IFaceRecognitionService, FaceRecognitionService>(client =>
+{
+    string? baseUrl = builder.Configuration["FaceRecService:BaseUrl"];
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        throw new InvalidOperationException("FaceRecService:BaseUrl is not configured in appsettings.json");
+    }
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
