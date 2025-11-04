@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - My TLU</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    @vite(['resources/css/login.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -12,11 +12,11 @@
 <div class="container">
 
     <div class="left-panel">
-        <div></div>
+        <img src="{{ asset('img/logo-tlu.png') }}" alt="Logo Đại học Thủy Lợi" class="top-logo">
 
         <div class="main-branding">
             <div class="system-logo">
-                <img src="{{ asset('image/logo-mytlu.jpg') }}" alt="My TLU Logo">
+                <img src="{{ asset('img/logo-mytlu.png') }}" alt="My TLU Logo">
                 <span>My TLU</span>
             </div>
             <h1>HỆ THỐNG QUẢN LÝ ĐIỂM DANH BẰNG NHẬN DIỆN KHUÔN MẶT TRƯỜNG ĐẠI HỌC THỦY LỢI</h1>
@@ -52,6 +52,7 @@
                     <label for="password">Mật khẩu:</label>
                     <div class="password-wrapper">
                         <input type="password" id="password" name="password" placeholder="Mật khẩu..." required>
+
                         <span class="toggle-password" id="togglePassword">
                                 <i class="fa-solid fa-eye"></i>
                             </span>
@@ -63,7 +64,7 @@
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">Ghi nhớ đăng nhập.</label>
                     </div>
-                    <a href="#">Quên mật khẩu</a>
+                    <a href="{{ route('password.request') }}">Quên mật khẩu</a>
                 </div>
 
                 <button type="submit" class="login-button">Đăng nhập</button>
@@ -73,7 +74,7 @@
                 <p>(*) Đăng nhập bằng tài khoản/mật khẩu của trang khai báo thông tin</p>
                 <p>(*) Email + điện thoại hỗ trợ:</p>
                 <p><a href="mailto:Ngotm@tlu.edu.vn">Ngotm@tlu.edu.vn</a> - 0392513985</p>
-
+                <p><a href="#">Hướng dẫn sử dụng <i class="fa-regular fa-file-alt"></i></a></p>
             </div>
             <p class="copyright">© 2025 Đại học Thủy Lợi.</p>
         </div>
