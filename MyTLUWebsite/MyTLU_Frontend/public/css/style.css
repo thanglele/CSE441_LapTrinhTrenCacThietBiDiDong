@@ -18,7 +18,7 @@ body, html {
     flex: 1;
     /* !!! BẠN SẼ CHÈN ẢNH NỀN VÀO ĐÂY !!! */
     /* (Đặt ảnh của bạn tại 'public/img/login-bg.jpg') */
-    background-image: url('../img/login-bg.jpg');
+    /*background-image: url('../image/logo-mytlu.jpg');*/
     background-size: cover;
     background-position: center;
     position: relative;
@@ -266,4 +266,532 @@ body, html {
     margin-bottom: 20px;
     text-align: left;
     font-size: 14px;
+}
+/*DASHBOARD*/
+/*======================================================
+  CÁC BIẾN MÀU VÀ CSS CHO LAYOUT CHUNG
+======================================================*/
+:root {
+    --primary-color: #1931AF;
+    --primary-light: #e9eefe;
+    --text-color: #333;
+    --text-light: #666;
+    --border-color: #e8e8e8;
+    --bg-light: #f4f4f7;
+    --white: #ffffff;
+    --sidebar-width: 260px;
+    --header-height: 70px;
+}
+
+/* Ghi đè body cho các trang trong app */
+body {
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden; /* Ngăn cuộn ngang */
+}
+
+
+/*======================================================
+  LAYOUT CHÍNH (SIDEBAR + CONTENT)
+======================================================*/
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--primary-color);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 25px;
+    gap: 15px;
+    height: var(--header-height);
+    box-sizing: border-box;
+}
+
+.sidebar-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    background-color: var(--white);
+    padding: 5px;
+    object-fit: contain;
+}
+
+.sidebar-title {
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-title span {
+    font-size: 18px;
+    font-weight: bold;
+}
+.sidebar-title strong {
+    font-size: 14px;
+    font-weight: 300;
+    opacity: 0.8;
+}
+
+/* Menu */
+.sidebar-nav {
+    flex-grow: 1;
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+}
+
+.nav-item {
+    margin: 0 15px 5px 15px;
+}
+
+.nav-item a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 8px;
+    gap: 15px;
+    transition: background-color 0.3s;
+}
+
+.nav-item a i {
+    width: 20px; /* Căn icon thẳng hàng */
+    text-align: center;
+}
+
+.nav-item a span {
+    flex-grow: 1;
+}
+
+.nav-item:hover a {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active a {
+    background-color: var(--white);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Menu con */
+.nav-item.has-submenu .submenu {
+    list-style: none;
+    padding-left: 30px; /* Thụt vào */
+    margin: 5px 0 10px 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+.nav-item.has-submenu.open .submenu {
+    max-height: 200px; /* (Tăng nếu cần) */
+}
+.nav-item.has-submenu .submenu a {
+    padding: 8px 20px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+.nav-item.has-submenu .submenu a:hover {
+    opacity: 1;
+}
+.submenu-arrow {
+    font-size: 12px;
+    transition: transform 0.3s;
+}
+.nav-item.has-submenu.open .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+/* User */
+.sidebar-user {
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+.user-avatar {
+    font-size: 40px;
+    opacity: 0.8;
+}
+.user-info span {
+    font-weight: 600;
+}
+.user-info a {
+    color: var(--white);
+    font-size: 13px;
+    opacity: 0.7;
+    text-decoration: none;
+}
+.user-info a:hover {
+    opacity: 1;
+}
+
+/* Main Content Wrapper */
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    display: flex;
+    flex-direction: column;
+}
+
+.top-header {
+    height: var(--header-height);
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.notification-bell {
+    font-size: 20px;
+    color: var(--text-light);
+    text-decoration: none;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.header-user i {
+    font-size: 32px;
+    color: var(--text-light);
+}
+.header-user span {
+    font-weight: 600;
+    color: var(--text-color);
+}
+.header-user small {
+    color: var(--text-light);
+}
+
+.content {
+    padding: 30px;
+    flex-grow: 1;
+}
+
+.content-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+/*======================================================
+  CSS CHO CÁC COMPONENT CỦA DASHBOARD
+======================================================*/
+
+/* 3 Cards Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Layout Grid Dashboard */
+.dashboard-grid {
+    display: grid;
+    /* 3 cột, 2 cột đầu chiếm 1 phần, cột 3 chiếm 0.8 phần */
+    grid-template-columns: 1fr 1fr 0.8fr;
+    gap: 25px;
+    align-items: start; /* Căn các card lên trên */
+}
+
+/* Card chung */
+.card {
+    background-color: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    /* Đảm bảo card không bị vỡ */
+    min-width: 0;
+}
+
+/* Card cho bảng điểm danh (chiếm full 3 cột) */
+.card-full-width {
+    grid-column: 1 / -1; /* Chiếm toàn bộ chiều rộng */
+}
+
+.card-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+.card-header span {
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+.card-body {
+    padding: 20px 25px;
+    flex-grow: 1;
+}
+.card-footer {
+    padding: 15px 25px;
+    border-top: 1px solid var(--border-color);
+    background-color: #fcfcfc;
+    text-align: center;
+}
+
+.btn {
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* Lớp học hôm nay */
+.session-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+.session-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.session-item:first-child {
+    padding-top: 0;
+}
+.session-info {
+    display: flex;
+    flex-direction: column;
+}
+.session-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.session-room, .session-time {
+    font-size: 13px;
+    color: var(--text-light);
+}
+.status-tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+.status-tag.live {
+    background-color: #f6ffed;
+    color: #52c41a;
+}
+.status-tag.upcoming {
+    background-color: #fffbe6;
+    color: #faad14;
+}
+.status-tag.finished {
+    background-color: #f0f0f0;
+    color: #8c8c8c;
+}
+
+/* Lớp đang giảng dạy */
+.class-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.class-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+.class-item:last-child { border-bottom: none; }
+.class-info { display: flex; flex-direction: column; }
+.class-name { font-weight: 600; }
+.class-code { font-size: 13px; color: var(--text-light); }
+.class-tag {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Thao tác nhanh */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: box-shadow 0.3s, border-color 0.3s;
+    background-color: var(--white);
+}
+.action-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.action-card i {
+    font-size: 28px;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+.action-card span {
+    font-weight: 500;
+}
+
+/* Bảng điểm danh */
+.view-all {
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+.view-all i {
+    font-size: 12px;
+}
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+.data-table th {
+    background-color: #f9f9f9;
+    color: var(--text-light);
+    font-weight: 500;
+    white-space: nowrap;
+}
+.data-table tbody tr:hover {
+    background-color: #fdfdfd;
+}
+
+/* Responsive (Đơn giản) */
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr; /* 2 cột */
+    }
+    /* Cột 3 (sidebar) rớt xuống */
+    .dashboard-sidebar {
+        grid-column: 1 / -1;
+    }
+    .quick-actions {
+        flex-direction: row; /* Dàn hàng ngang */
+    }
+    .action-card {
+        flex-grow: 1;
+    }
+}
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: 1fr; /* Chồng các card stats */
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* 1 cột */
+    }
+    .quick-actions {
+        flex-direction: column;
+    }
+
+    /* Ẩn sidebar trên mobile (cần JS để toggle) */
+    .sidebar {
+        position: fixed;
+        left: -100%; /* Ẩn đi */
+        transition: left 0.3s ease;
+    }
+    .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+    /* (Bạn sẽ cần thêm 1 nút ở header và JS để bật/tắt sidebar) */
 }

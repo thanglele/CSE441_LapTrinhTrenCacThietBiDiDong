@@ -24,12 +24,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-
-        // ==========================================================
-        // THÊM DÒNG NÀY VÀO CUỐI MẢNG:
-        // ==========================================================
         'auth.custom' => \App\Http\Middleware\EnsureUserIsAuthenticated::class,
     ];
 
-    // ... (phần còn lại của file) ...
 }
