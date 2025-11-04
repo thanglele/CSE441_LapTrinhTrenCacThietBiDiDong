@@ -2,7 +2,7 @@
 using MyTLUServer.Application.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using System;
 namespace MyTLUServer.Application.Interfaces
 {
     public interface ISessionService
@@ -12,11 +12,11 @@ namespace MyTLUServer.Application.Interfaces
         /// </summary>
         Task<IEnumerable<MyScheduleDto>> GetMyScheduleAsync(string studentUsername);
 
+    
         /// <summary>
         /// (Sinh viên) Lấy lịch học theo ngày
-        /// </summary>
         Task<IEnumerable<MyScheduleDto>> GetMyScheduleByDateAsync(string studentCode, DateTime selectedDate);
-
+        
         /// <summary>
         /// Lấy chi tiết buổi học
         /// </summary>

@@ -6,7 +6,8 @@ using MyTLUServer.Application.Interfaces;
 using MyTLUServer.Application.Exceptions;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
+using System.Collections.Generic; 
+using System; 
 [ApiController]
 [Route("api/v1/sessions")]
 [Authorize]
@@ -33,20 +34,24 @@ public class SessionController : ControllerBase
     }
 
     /// <summary>
-    /// (Sinh viên) Lấy lịch học của sinh viên theo ngày được chọn
+    /// (Sinh viên) Lấy lịch học của sinh viên cho một NGÀY CỤ THỂ
     /// </summary>
-    [HttpGet("my-schedule-by-date")]
-    [Authorize(Roles = "student,lecturer")] // Chỉ Sinh viên và Giảng viên
+    [HttpGet("my-schedule-by-date")] // <-- Tên đường dẫn (Route) mới
+    [Authorize(Roles = "student")]   // <-- Vẫn yêu cầu Role "student"
     [ProducesResponseType(typeof(IEnumerable<MyScheduleDto>), 200)]
     public async Task<IActionResult> GetMyScheduleByDate([FromQuery] DateTime selectedDate)
     {
         var studentUsername = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(studentUsername)) return Unauthorized("Token không hợp lệ.");
+        
+        // Controller GỌI Service (Bộ não) - hàm mới
         var schedule = await _sessionService.GetMyScheduleByDateAsync(studentUsername, selectedDate);
-        return Ok(schedule);
+        
+        return Ok(schedule); // Trả về 200 OK + JSON
     }
 
     // --- CÁC ENDPOINT CHUNG VÀ CỦA GIẢNG VIÊN (đã code) ---
-    
+
     /// <summary>
     /// Lấy thông tin chi tiết một buổi học
     /// </summary>
@@ -77,6 +82,7 @@ public class SessionController : ControllerBase
             return StatusCode(403, new ErrorResponseDto { Message = ex.Message });
         }
     }
+
 
     /// <summary>
     /// (Giảng viên) Đóng điểm danh...

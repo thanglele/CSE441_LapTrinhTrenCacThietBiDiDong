@@ -61,36 +61,53 @@ namespace MyTLUServer.Application.Services
         /// </summary>
         public async Task<IEnumerable<MyScheduleDto>> GetMyScheduleByDateAsync(string studentCode, DateTime selectedDate)
         {
-            // SỬA DÒNG NÀY: Thay vì 'DateTime.Today', dùng 'selectedDate'
             var dateToFind = DateOnly.FromDateTime(selectedDate);
 
-            // Lấy các lớp mà SV đã đăng ký (Copy y hệt hàm trên)
-            var enrolledClassCodes = _context.Enrollments
-                .Where(e => e.StudentCode == studentCode) // (Bỏ 'enrolled' nếu CSDL cho phép)
-                .Select(e => e.ClassCode);
-
-            // Lấy các buổi học THEO NGÀY CỤ THỂ của các lớp đó
-            var schedule = await _context.ClassSessions
-                // SỬA DÒNG NÀY: Thay 'today' bằng 'dateToFind'
-                .Where(s => enrolledClassCodes.Contains(s.ClassCode) && s.SessionDate == dateToFind)
-                .Include(s => s.ClassCodeNavigation) // Join Classes
-                .Select(s => new MyScheduleDto
-                {
-                    // (Copy y hệt phần Select ở trên)
-                    ClassSessionId = s.Id,
-                    ClassName = s.ClassCodeNavigation.ClassName ?? s.Title ?? "N/A",
-                    SessionTitle = s.Title ?? "Buổi học",
-                    StartTime = s.SessionDate.Value.ToDateTime(s.StartTime.Value),
-                    EndTime = s.SessionDate.Value.ToDateTime(s.EndTime.Value),
-                    Location = s.SessionLocation ?? "N/A",
-                    AttendanceStatus = _context.AttendanceRecords
-                                        .Where(ar => ar.ClassSessionId == s.Id && ar.StudentCode == studentCode)
-                                        .Select(ar => ar.AttendanceStatus)
-                                        .FirstOrDefault() ?? "pending"
-                })
+            // 1. Lấy mã lớp SV đăng ký
+            var myClassCodes = await _context.Enrollments
+                .Where(e => e.StudentCode == studentCode && e.EnrollmentStatus == "enrolled")
+                .Select(e => e.ClassCode)
+                .Distinct() 
                 .ToListAsync();
 
-            return schedule;
+            // 2. Lấy session theo ngày
+            var sessions = await _context.ClassSessions
+                .Where(s => myClassCodes.Contains(s.ClassCode) && 
+                            s.SessionDate.HasValue && // KIỂM TRA NULL
+                            s.SessionDate.Value == dateToFind) // Lọc theo ngày
+                .Include(s => s.ClassCodeNavigation) // Join Classes
+                .OrderBy(s => s.StartTime) 
+                .ToListAsync();
+
+            // 3. Chuyển sang DTO (JSON) - AN TOÀN HƠN
+            return sessions.Select(s => new MyScheduleDto
+            {
+                ClassSessionId = s.Id,
+                
+                // KIỂM TRA NULL (cho ClassName)
+                ClassName = s.ClassCodeNavigation != null 
+                                ? s.ClassCodeNavigation.ClassName 
+                                : (s.Title ?? "N/A"),
+                
+                SessionTitle = s.Title ?? "Buổi học",
+                
+                // KIỂM TRA NULL (cho StartTime/EndTime)
+                StartTime = (s.SessionDate.HasValue && s.StartTime.HasValue)
+                                ? s.SessionDate.Value.ToDateTime(s.StartTime.Value)
+                                : DateTime.MinValue, // Gán giá trị mặc định nếu null
+                
+                EndTime = (s.SessionDate.HasValue && s.EndTime.HasValue)
+                                ? s.SessionDate.Value.ToDateTime(s.EndTime.Value)
+                                : DateTime.MinValue, // Gán giá trị mặc định nếu null
+
+                Location = s.SessionLocation ?? "N/A",
+                
+                // Sub-query (giữ nguyên)
+                AttendanceStatus = _context.AttendanceRecords
+                                    .Where(ar => ar.ClassSessionId == s.Id && ar.StudentCode == studentCode)
+                                    .Select(ar => ar.AttendanceStatus)
+                                    .FirstOrDefault() ?? "pending"
+            });
         }
         
 
