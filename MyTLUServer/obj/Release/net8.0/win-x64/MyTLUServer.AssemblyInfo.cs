@@ -14,7 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< Updated upstream
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88c866afab1b58b13bd8f2135303c1938c8461c4")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a27a7d6b9df3f0dfd96d56e0d200b7bff7e2bdf4")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

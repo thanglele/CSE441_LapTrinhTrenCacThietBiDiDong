@@ -3,12 +3,41 @@
   "WorkspaceRootPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\",
   "Documents": [
     {
+<<<<<<< Updated upstream
       "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+=======
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\services\\studentaffairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:services\\studentaffairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\controllers\\studentaffairscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:controllers\\studentaffairscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\interfaces\\istudentaffairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:interfaces\\istudentaffairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\dtos\\studentdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:dtos\\studentdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+>>>>>>> Stashed changes
     }
   ],
   "DocumentGroupContainers": [
@@ -27,6 +56,7 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+<<<<<<< Updated upstream
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -35,10 +65,86 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-10-31T19:37:20.927Z",
+=======
+              "Title": "StudentAffairsService.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\StudentAffairsService.cs",
+              "RelativeDocumentMoniker": "Services\\StudentAffairsService.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\StudentAffairsService.cs",
+              "RelativeToolTip": "Services\\StudentAffairsService.cs",
+              "ViewState": "AgIAAH8AAAAAAAAAAAAqwJkAAABhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-06T08:31:52.847Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "StudentAffairsController.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Controllers\\StudentAffairsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\StudentAffairsController.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Controllers\\StudentAffairsController.cs",
+              "RelativeToolTip": "Controllers\\StudentAffairsController.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAUwF0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-06T08:30:30.158Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IStudentAffairsService.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Interfaces\\IStudentAffairsService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IStudentAffairsService.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Interfaces\\IStudentAffairsService.cs",
+              "RelativeToolTip": "Interfaces\\IStudentAffairsService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-06T08:29:55.496Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "StudentDtos.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\DTOs\\StudentDtos.cs",
+              "RelativeDocumentMoniker": "DTOs\\StudentDtos.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\DTOs\\StudentDtos.cs",
+              "RelativeToolTip": "DTOs\\StudentDtos.cs",
+              "ViewState": "AgIAAEoAAAAAAAAAAAA6wFUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-06T08:29:32.518Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AuthDtos.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\DTOs\\AuthDtos.cs",
+              "RelativeDocumentMoniker": "DTOs\\AuthDtos.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\DTOs\\AuthDtos.cs",
+              "RelativeToolTip": "DTOs\\AuthDtos.cs",
+              "ViewState": "AgIAADsAAAAAAAAAAAA3wBYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-03T10:36:44.127Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\AuthService.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\AuthService.cs",
+              "RelativeToolTip": "Services\\AuthService.cs",
+              "ViewState": "AgIAAGUBAAAAAAAAAAAqwG4BAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-03T10:30:30.428Z",
+>>>>>>> Stashed changes
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs",
@@ -49,6 +155,17 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-31T16:06:20.828Z",
               "EditorCaption": ""
+=======
+              "DocumentIndex": 6,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
+              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Controllers\\AuthController.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAAAowD4AAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-03T10:29:43.313Z"
+>>>>>>> Stashed changes
             }
           ]
         }

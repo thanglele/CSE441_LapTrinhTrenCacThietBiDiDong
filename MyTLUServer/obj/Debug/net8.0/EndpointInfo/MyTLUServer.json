@@ -1436,6 +1436,225 @@
                 }
               }
             }
+<<<<<<< Updated upstream
+=======
+          }
+        }
+      }
+    },
+    "/api/v1/reports/department/{deptCode}/attendance-summary": {
+      "get": {
+        "tags": [
+          "Reporting"
+        ],
+        "parameters": [
+          {
+            "name": "deptCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeptAttendanceSummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeptAttendanceSummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeptAttendanceSummaryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/faculty/{facultyCode}/attendance-summary": {
+      "get": {
+        "tags": [
+          "Reporting"
+        ],
+        "parameters": [
+          {
+            "name": "facultyCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyAttendanceSummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyAttendanceSummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyAttendanceSummaryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+>>>>>>> Stashed changes
+          }
+        }
+      }
+    },
+    "/api/v1/reports/session-history": {
+      "get": {
+        "tags": [
+          "Reporting"
+        ],
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lecturerCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "classCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deptCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSessionHistoryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSessionHistoryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSessionHistoryDto"
+                }
+              }
+            }
           }
         }
       }
@@ -1547,6 +1766,74 @@
         }
       }
     },
+    "/api/v1/students": {
+      "post": {
+        "tags": [
+          "StudentAffairs"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStudentDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStudentDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStudentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/students/{studentCode}/profile": {
       "get": {
         "tags": [
@@ -1579,6 +1866,26 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StudentFullProfileDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1622,8 +1929,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1638,6 +1945,26 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProfilePhotoUploadResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
                 }
               }
             }
@@ -1873,6 +2200,27 @@
         },
         "additionalProperties": false
       },
+<<<<<<< Updated upstream
+=======
+      "ClassAttendanceRateDto": {
+        "type": "object",
+        "properties": {
+          "classCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "className": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendanceRate": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+>>>>>>> Stashed changes
       "ClassSession": {
         "type": "object",
         "properties": {
@@ -1983,6 +2331,106 @@
         },
         "additionalProperties": false
       },
+      "CreateStudentDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "gender": {
+            "type": "string",
+            "nullable": true
+          },
+          "adminClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "majorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "intakeYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "admissionDecision": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicStatus1": {
+            "type": "string",
+            "nullable": true
+          },
+          "ethnicity": {
+            "type": "string",
+            "nullable": true
+          },
+          "religion": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "fatherFullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fatherPhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "motherFullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "motherPhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "placeOfBirth": {
+            "type": "string",
+            "nullable": true
+          },
+          "nationalId": {
+            "type": "string",
+            "nullable": true
+          },
+          "idIssueDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "idIssuePlace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "Curriculum": {
         "type": "object",
         "properties": {
@@ -2065,6 +2513,34 @@
         },
         "additionalProperties": false
       },
+<<<<<<< Updated upstream
+=======
+      "DeptAttendanceSummaryDto": {
+        "type": "object",
+        "properties": {
+          "departmentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalClasses": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallAttendanceRate": {
+            "type": "string",
+            "nullable": true
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassAttendanceRateDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+>>>>>>> Stashed changes
       "Enrollment": {
         "type": "object",
         "properties": {
@@ -2238,6 +2714,34 @@
         },
         "additionalProperties": false
       },
+<<<<<<< Updated upstream
+=======
+      "FacultyAttendanceSummaryDto": {
+        "type": "object",
+        "properties": {
+          "facultyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalClasses": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallAttendanceRate": {
+            "type": "string",
+            "nullable": true
+          },
+          "departments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeptAttendanceSummaryDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+>>>>>>> Stashed changes
       "GenerateSessionsResponseDto": {
         "type": "object",
         "properties": {
@@ -2589,6 +3093,35 @@
         },
         "additionalProperties": false
       },
+      "PaginatedSessionHistoryDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionHistoryItemDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PasswordNotSetErrorDto": {
         "type": "object",
         "properties": {
@@ -2658,6 +3191,48 @@
           "newPassword": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SessionHistoryItemDto": {
+        "type": "object",
+        "properties": {
+          "classSessionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sessionTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "classCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "className": {
+            "type": "string",
+            "nullable": true
+          },
+          "lecturerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sessionStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sessionStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalEnrolled": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPresent": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

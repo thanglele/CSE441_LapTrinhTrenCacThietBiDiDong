@@ -775,6 +775,145 @@
   },
   {
     "ContainingType": "MyTLUServer.API.Controllers.ReportingController",
+<<<<<<< Updated upstream
+=======
+    "Method": "GetDepartmentSummary",
+    "RelativePath": "api/v1/reports/department/{deptCode}/attendance-summary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deptCode",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "semester",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MyTLUServer.Application.DTOs.DeptAttendanceSummaryDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "MyTLUServer.Application.DTOs.ErrorResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "MyTLUServer.API.Controllers.ReportingController",
+    "Method": "GetFacultySummary",
+    "RelativePath": "api/v1/reports/faculty/{facultyCode}/attendance-summary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "facultyCode",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "semester",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MyTLUServer.Application.DTOs.FacultyAttendanceSummaryDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "MyTLUServer.Application.DTOs.ErrorResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "MyTLUServer.API.Controllers.ReportingController",
+    "Method": "GetSessionHistory",
+    "RelativePath": "api/v1/reports/session-history",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "startDate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "endDate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "lecturerCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "classCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "deptCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MyTLUServer.Application.DTOs.PaginatedSessionHistoryDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "MyTLUServer.API.Controllers.ReportingController",
+>>>>>>> Stashed changes
     "Method": "GetEligibilityExport",
     "RelativePath": "api/v1/reports/testing/eligibility-export",
     "HttpMethod": "GET",
@@ -874,6 +1013,41 @@
   },
   {
     "ContainingType": "MyTLUServer.API.Controllers.StudentAffairsController",
+    "Method": "CreateStudent",
+    "RelativePath": "api/v1/students",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MyTLUServer.Application.DTOs.CreateStudentDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MyTLUServer.Domain.Models.Student",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 201
+      },
+      {
+        "Type": "MyTLUServer.Application.DTOs.ErrorResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "MyTLUServer.API.Controllers.StudentAffairsController",
     "Method": "GetStudentProfile",
     "RelativePath": "api/v1/students/{studentCode}/profile",
     "HttpMethod": "GET",
@@ -895,6 +1069,15 @@
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
       }
     ]
   },
@@ -925,7 +1108,16 @@
           "application/json",
           "text/json"
         ],
-        "StatusCode": 200
+        "StatusCode": 201
+      },
+      {
+        "Type": "MyTLUServer.Application.DTOs.ErrorResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
       }
     ]
   }
