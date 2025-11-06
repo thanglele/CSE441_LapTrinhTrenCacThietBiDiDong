@@ -28,8 +28,8 @@ builder.Services.AddScoped<IGeoIpService, MockGeoIpService>();
 builder.Services.AddScoped<IDeanService, DeanService>();
 builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
-builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
-builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+//builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
+//builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 builder.Services.AddHttpContextAccessor();
 
