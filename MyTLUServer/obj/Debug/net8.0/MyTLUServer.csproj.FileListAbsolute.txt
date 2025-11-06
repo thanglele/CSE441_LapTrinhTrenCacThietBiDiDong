@@ -173,3 +173,15 @@ F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Debug
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Debug\net8.0\BCrypt.Net-Next.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\bin\Debug\net8.0\Newtonsoft.Json.dll
 F:\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.csproj.AssemblyReference.cache
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\rpswa.dswa.cache.json
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.AssemblyInfoInputs.cache
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.AssemblyInfo.cs
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.csproj.CoreCompileInputs.cache
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.MvcApplicationPartsAssemblyInfo.cs
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.MvcApplicationPartsAssemblyInfo.cache
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.sourcelink.json
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.dll
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\refint\MyTLUServer.dll
+D:\OneDrive - Thanglele\DATA-LEARNING\CSE441AndroidCoding\CSE441_LapTrinhTrenCacThietBiDiDong\MyTLUServer\obj\Debug\net8.0\MyTLUServer.pdb

@@ -1,10 +1,6 @@
-<<<<<<< Updated upstream
 ﻿// Application/Interfaces/IReportingService.cs
 using Microsoft.AspNetCore.Mvc;
-=======
-﻿using Microsoft.AspNetCore.Mvc;
 using MyTLUServer.Application.DTOs;
->>>>>>> Stashed changes
 using System.Collections.Generic;
 using System.Security.Claims; // Cần dùng ClaimsPrincipal
 using System.Threading.Tasks;
@@ -19,9 +15,6 @@ namespace MyTLUServer.Application.Interfaces
         /// </summary>
         Task<FileContentResult> ExportEligibilityAsync(List<string> classCodes, int minRate);
 
-<<<<<<< Updated upstream
-        // (Các hàm báo cáo khác cho DeptHead, DeanOffice sẽ ở đây)
-=======
         /// <summary>
         /// (Trưởng Bộ môn) Lấy báo cáo tổng hợp cho Bộ môn
         /// </summary>
@@ -45,6 +38,5 @@ namespace MyTLUServer.Application.Interfaces
             int page,
             int pageSize
         );
->>>>>>> Stashed changes
     }
 }

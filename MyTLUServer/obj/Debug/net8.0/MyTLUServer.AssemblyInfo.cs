@@ -14,11 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< Updated upstream
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4990c65549f19b76098d090580f3288e6d5448bb")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a27a7d6b9df3f0dfd96d56e0d200b7bff7e2bdf4")]
->>>>>>> Stashed changes
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0b248941d1676efaa8ad247b69463b8992489639")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyTLUServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

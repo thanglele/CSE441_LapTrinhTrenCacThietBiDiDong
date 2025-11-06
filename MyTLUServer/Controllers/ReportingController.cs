@@ -1,10 +1,7 @@
 ﻿// API/Controllers/ReportingController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< Updated upstream
-=======
 using MyTLUServer.Application.DTOs; // Cần DTOs
->>>>>>> Stashed changes
 using MyTLUServer.Application.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -46,8 +43,6 @@ namespace MyTLUServer.API.Controllers
             var file = await _reportingService.ExportEligibilityAsync(classCodes, minRate);
             return file; // Trả về file Excel/CSV
         }
-<<<<<<< Updated upstream
-=======
 
         /// <summary>
         /// (Trưởng Bộ môn) Lấy báo cáo tổng hợp điểm danh cho toàn bộ môn
@@ -120,6 +115,5 @@ namespace MyTLUServer.API.Controllers
 
             return Ok(result);
         }
->>>>>>> Stashed changes
     }
 }

@@ -1,20 +1,24 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\",
-<<<<<<< Updated upstream
+  "WorkspaceRootPath": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|d:\\onedrive - thanglele\\data-learning\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\services\\lecturerdashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:services\\lecturerdashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|f:\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|d:\\onedrive - thanglele\\data-learning\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\interfaces\\ilecturerdashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:interfaces\\ilecturerdashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|d:\\onedrive - thanglele\\data-learning\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|d:\\onedrive - thanglele\\data-learning\\cse441androidcoding\\cse441_laptrinhtrencacthietbididong\\mytluserver\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{79B11A6C-B710-4868-8557-15A16141CE23}|MyTLUServer.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
-=======
-  "Documents": [],
->>>>>>> Stashed changes
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -22,44 +26,63 @@
       "DocumentGroups": [
         {
           "DockedWidth": 1173,
-<<<<<<< Updated upstream
           "SelectedChildIndex": 1,
-=======
-          "SelectedChildIndex": -1,
->>>>>>> Stashed changes
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-<<<<<<< Updated upstream
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-31T19:37:20.927Z",
+              "Title": "LecturerDashboardService.cs",
+              "DocumentMoniker": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\LecturerDashboardService.cs",
+              "RelativeDocumentMoniker": "Services\\LecturerDashboardService.cs",
+              "ToolTip": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Services\\LecturerDashboardService.cs*",
+              "RelativeToolTip": "Services\\LecturerDashboardService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-06T13:57:35.345Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "F:\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAAAvAAAAAAAAAA==",
+              "Title": "ILecturerDashboardService.cs",
+              "DocumentMoniker": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Interfaces\\ILecturerDashboardService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\ILecturerDashboardService.cs",
+              "ToolTip": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Interfaces\\ILecturerDashboardService.cs*",
+              "RelativeToolTip": "Interfaces\\ILecturerDashboardService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-31T16:06:20.828Z",
+              "WhenOpened": "2025-11-06T13:57:20.844Z",
               "EditorCaption": ""
-=======
->>>>>>> Stashed changes
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-06T13:17:42.816Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\OneDrive - Thanglele\\DATA-LEARNING\\CSE441AndroidCoding\\CSE441_LapTrinhTrenCacThietBiDiDong\\MyTLUServer\\Program.cs*",
+              "RelativeToolTip": "Program.cs*",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB4AAABOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-06T13:17:42.958Z",
+              "EditorCaption": ""
             }
           ]
         }

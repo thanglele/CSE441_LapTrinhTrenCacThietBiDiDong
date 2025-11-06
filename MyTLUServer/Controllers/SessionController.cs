@@ -32,7 +32,22 @@ public class SessionController : ControllerBase
         return Ok(schedule);
     }
 
-    // --- CÁC ENDPOINT CHUNG VÀ CỦA GIẢNG VIÊN (đã code) ---
+    /// <summary>
+    /// (Sinh viên) Lấy lịch học của sinh viên cho một NGÀY CỤ THỂ
+    /// </summary>
+    [HttpGet("my-schedule-by-date")] // <-- Tên đường dẫn (Route) mới
+    [Authorize(Roles = "student")]   // <-- Vẫn yêu cầu Role "student"
+    [ProducesResponseType(typeof(IEnumerable<MyScheduleDto>), 200)]
+    public async Task<IActionResult> GetMyScheduleByDate([FromQuery] DateTime selectedDate)
+    {
+        var studentUsername = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(studentUsername)) return Unauthorized("Token không hợp lệ.");
+
+        // Controller GỌI Service (Bộ não) - hàm mới
+        var schedule = await _sessionService.GetMyScheduleByDateAsync(studentUsername, selectedDate);
+
+        return Ok(schedule); // Trả về 200 OK + JSON
+    }
 
     /// <summary>
     /// Lấy thông tin chi tiết một buổi học
