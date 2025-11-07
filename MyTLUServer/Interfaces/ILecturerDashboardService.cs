@@ -1,9 +1,9 @@
-//using MyTLUServer.Application.DTOs;
+using MyTLUServer.Application.DTOs;
 
-//namespace MyTLUServer.Interfaces 
-//{
-//    public interface ILecturerDashboardService
-//    {
-//        Task<LecturerDashboardDto> GetDashboardDataAsync(string lecturerCode);
-//    }
-//}
+namespace MyTLUServer.Interfaces 
+{
+   public interface ILecturerDashboardService
+   {
+       Task<LecturerDashboardDto> GetDashboardDataAsync(string lecturerCode);
+   }
+}
