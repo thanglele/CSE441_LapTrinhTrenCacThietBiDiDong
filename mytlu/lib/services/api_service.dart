@@ -1,19 +1,120 @@
 // File: lib/services/api_service.dart
 
 import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../config/api_config.dart'; // <<< Dùng cấu hình
-import '../models/class_detail_model.dart';
-import '../models/schedule_session_dto.dart';
 import 'package:intl/intl.dart';
 
+// Import chung
+import '../config/api_config.dart';
+import '../models/class_detail_model.dart';
+import '../models/schedule_session_dto.dart';
 import '../models/student_model.dart';
 import '../models/subject_model.dart';
+import 'package:mytlu/services/user_session.dart';
+import 'package:mytlu/core/errors/exceptions.dart';
+import '../models/class_model.dart'; // Import từ đồng đội
 
 class ApiService {
-  // Dùng ApiConfig và thêm path '/api/v1'
+  // ==== CẤU HÌNH CƠ BẢN ====
   static const String _apiPath = '/api/v1';
+  static const int _timeoutInSeconds = 20;
 
+  final UserSession _userSession = UserSession();
+
+  // ==========================
+  // === HÀM GET CHUNG ===
+  // ==========================
+  /// Dùng cho ProfileService, v.v...
+  Future<http.Response> getRequest(String endpoint) async {
+    final token = await _userSession.getToken();
+    if (token == null) {
+      throw ApiException(message: 'Token not found. User is not logged in.', statusCode: 401);
+    }
+
+    final url = Uri.parse('${ApiConfig.baseUrl}$endpoint');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: _timeoutInSeconds));
+
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw ApiException(message: 'Connection timed out.', statusCode: 504);
+    } on SocketException {
+      throw ApiException(message: 'No Internet or server is down.', statusCode: 503);
+    } catch (e) {
+      throw ApiException(message: 'An unknown error occurred: $e', statusCode: 0);
+    }
+  }
+
+  // ==========================
+  // === HÀM POST CHUNG ===
+  // ==========================
+  /// Dùng cho FaceUploadService, start-attendance, check-in...
+  Future<http.Response> postRequest(String endpoint, Map<String, dynamic> data) async {
+    final token = await _userSession.getToken();
+    if (token == null) {
+      throw ApiException(message: 'Token not found. User is not logged in.', statusCode: 401);
+    }
+
+    final url = Uri.parse('${ApiConfig.baseUrl}$endpoint');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(data),
+      ).timeout(const Duration(seconds: _timeoutInSeconds));
+
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw ApiException(message: 'Connection timed out.', statusCode: 504);
+    } on SocketException {
+      throw ApiException(message: 'No Internet or server is down.', statusCode: 503);
+    } catch (e) {
+      throw ApiException(message: 'An unknown error occurred: $e', statusCode: 0);
+    }
+  }
+
+  // ================================
+  // === HÀM XỬ LÝ PHẢN HỒI CHUNG ===
+  // ================================
+  http.Response _handleResponse(http.Response response) {
+    // 2xx: Thành công
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return response;
+    }
+
+    // 4xx, 5xx: Thất bại
+    String errorMessage = 'An error occurred.';
+    try {
+      final responseBody = json.decode(response.body);
+      errorMessage = responseBody['message'] ?? errorMessage;
+    } on FormatException {
+      errorMessage = response.body.isEmpty ? errorMessage : response.body;
+    } catch (_) {
+      errorMessage = response.body.isEmpty ? errorMessage : response.body;
+    }
+
+    throw ApiException(
+      message: errorMessage,
+      statusCode: response.statusCode,
+    );
+  }
+
+  // ==========================
+  // === API CỤ THỂ CŨ ===
+  // ==========================
 
   Future<List<Subject>> fetchMySubjects(String jwtToken) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-subjects');
@@ -29,8 +130,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final List jsonList = json.decode(response.body) as List;
-
-        // <<< LƯU Ý: Phải sử dụng Subject.fromJson(json) trong Model của bạn
         return jsonList.map((json) => Subject.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw Exception('Xác thực thất bại hoặc không có quyền truy cập.');
@@ -41,6 +140,7 @@ class ApiService {
       throw Exception('Lỗi kết nối mạng: $e');
     }
   }
+
   Future<List<ClassDetail>> fetchMyClasses(String jwtToken) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-classes');
 
@@ -55,7 +155,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final List jsonList = json.decode(response.body) as List;
-        // <<< LƯU Ý: Phải sử dụng ClassDetail.fromJson(json) >>>
         return jsonList.map((json) => ClassDetail.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load classes. Status: ${response.statusCode}');
@@ -65,16 +164,12 @@ class ApiService {
     }
   }
 
-  /// API (Thật) Lấy danh sách TẤT CẢ môn học của giảng viên (Lặp lại hàm SubjectManagement)
   Future<List<Subject>> fetchAllMySubjects(String jwtToken) async {
-    // Dùng lại endpoint SubjectManagement đã có, nhưng đặt tên khác cho rõ ràng
     return fetchMySubjects(jwtToken);
   }
-  Future<List<Student>> fetchStudentsInClass(String classCode, String jwtToken) async {
-    // Đảm bảo import Student model nếu chưa có
-    // import '../models/student_model.dart';
 
-    const String _apiPath = '/api/v1'; // Đảm bảo khai báo _apiPath hoặc dùng trực tiếp ApiConfig
+  Future<List<Student>> fetchStudentsInClass(String classCode, String jwtToken) async {
+    const String _apiPath = '/api/v1'; // giữ nguyên trùng khai báo
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/classes/$classCode/students');
 
     try {
@@ -88,21 +183,18 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final List jsonList = json.decode(response.body) as List;
-
-        // <<< LƯU Ý: Yêu cầu Model Student phải có Student.fromJson() >>>
         return jsonList.map((json) => Student.fromJson(json)).toList();
       } else if (response.statusCode == 403) {
         throw Exception('Lỗi 403: Bạn không có quyền truy cập danh sách sinh viên.');
-      }
-      else {
+      } else {
         throw Exception('Failed to load students. Status: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Lỗi kết nối mạng: $e');
     }
   }
+
   Future<List<ScheduleSession>> fetchTodayClasses(String jwtToken) async {
-    // URL được tạo từ Base URL + Path API + Endpoint
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/dashboard');
 
     try {
@@ -110,18 +202,16 @@ class ApiService {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwtToken', // Gửi token
+          'Authorization': 'Bearer $jwtToken',
         },
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List jsonList = data['todaySessions'] as List;
-
         return jsonList.map((json) => ScheduleSession.fromJson(json)).toList();
       } else if (response.statusCode == 401) {
-        throw Exception(
-            'Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.');
+        throw Exception('Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.');
       } else {
         throw Exception('Failed to load schedule. Status: ${response.statusCode}');
       }
@@ -129,26 +219,24 @@ class ApiService {
       throw Exception('Failed to connect to server: $e');
     }
   }
-  Future<List<ScheduleSession>> fetchScheduleByDate(String jwtToken, DateTime date) async {
-    // Định dạng ngày thành chuỗi 'YYYY-MM-DD' cho query parameter
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
-    // URL được tạo từ Base URL + Path API + Endpoint
-    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-schedule-by-date?selectedDate=$formattedDate');
+  Future<List<ScheduleSession>> fetchScheduleByDate(String jwtToken, DateTime date) async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final url = Uri.parse(
+      '${ApiConfig.baseUrl}$_apiPath/lecturer/my-schedule-by-date?selectedDate=$formattedDate',
+    );
 
     try {
       final response = await http.get(
         url,
         headers: {
-          'Authorization': 'Bearer $jwtToken', // Gửi token
+          'Authorization': 'Bearer $jwtToken',
           'Content-Type': 'application/json',
         },
       );
 
       if (response.statusCode == 200) {
-        // API này có thể trả về List trực tiếp
         final List jsonList = json.decode(response.body) as List;
-
         return jsonList.map((json) => ScheduleSession.fromJson(json)).toList();
       } else if (response.statusCode == 401) {
         throw Exception('Token không hợp lệ hoặc đã hết hạn.');
@@ -159,6 +247,7 @@ class ApiService {
       throw Exception('Failed to connect to server: $e');
     }
   }
+
   Future<void> startAttendance(String sessionId, String jwtToken) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/sessions/$sessionId/start-attendance');
 
@@ -167,25 +256,24 @@ class ApiService {
         url,
         headers: {
           'Authorization': 'Bearer $jwtToken',
-          // API này thường không cần body, nhưng vẫn nên khai báo Content-Type
           'Content-Type': 'application/json',
         },
       );
 
       if (response.statusCode == 200) {
-        // Thành công, không cần trả về gì (nếu bạn không cần mã QR từ đây)
         return;
       } else if (response.statusCode == 401) {
         throw Exception('Token không hợp lệ hoặc đã hết hạn.');
       } else {
-        // Xử lý các lỗi khác (ví dụ: 400 Bad Request nếu session đã kết thúc)
         final responseBody = json.decode(response.body);
-        final errorMessage = responseBody['message'] ?? 'Lỗi không xác định khi bắt đầu điểm danh.';
-        throw Exception('Failed to start attendance. Status: ${response.statusCode}. Lỗi: $errorMessage');
+        final errorMessage =
+            responseBody['message'] ?? 'Lỗi không xác định khi bắt đầu điểm danh.';
+        throw Exception(
+          'Failed to start attendance. Status: ${response.statusCode}. Lỗi: $errorMessage',
+        );
       }
     } catch (e) {
       throw Exception('Lỗi kết nối mạng: $e');
     }
   }
-// (Các hàm API khác như startAttendance sẽ được thêm vào đây)
 }
