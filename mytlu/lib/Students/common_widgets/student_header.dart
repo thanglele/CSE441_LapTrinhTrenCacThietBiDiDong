@@ -19,7 +19,7 @@ class StudentHeader extends StatelessWidget {
     // Container này dùng màu #407CDC và font Ubuntu (từ AppTheme)
     return Container(
       width: double.infinity,
-      height: 100,
+      height: 120,
       decoration: BoxDecoration(
         color: const Color(0xFF407CDC), // Màu #407CDC
         borderRadius: const BorderRadius.only(
