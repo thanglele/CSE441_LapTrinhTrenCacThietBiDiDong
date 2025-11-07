@@ -4,6 +4,7 @@ import '../models/class_model.dart';
 import '../services/api_service.dart';
 import 'create_qr_page.dart';
 import 'management/management_dashboard_page.dart';
+import 'statistics_page.dart';
 
 const Color tluPrimaryColor = Color(0xFF0D47A1);
 const Color tluAccentColor = Color(0xFF42A5F5);
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
     final List<Widget> _pages = [
       _buildHomePageContent(), // Gọi ở đây thì context đã hợp lệ
       const ManagementDashboardPage(),
-      const Center(child: Text('Trang Thống kê (chưa code)')),
+      const StatisticsPage(),
       const Center(child: Text('Trang Cá nhân (chưa code)')),
     ];
 
