@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/class_model.dart';
 import '../services/api_service.dart';
-import 'create_qr_page.dart';
+import 'home/create_qr_page.dart';
 import 'management/management_dashboard_page.dart';
-import 'statistics_page.dart';
+import 'statistical/statistics_page.dart';
+import 'profile/profile_page.dart';
 
 const Color tluPrimaryColor = Color(0xFF0D47A1);
 const Color tluAccentColor = Color(0xFF42A5F5);
@@ -53,7 +54,7 @@ class _HomePageState extends State<HomePage> {
       _buildHomePageContent(), // Gọi ở đây thì context đã hợp lệ
       const ManagementDashboardPage(),
       const StatisticsPage(),
-      const Center(child: Text('Trang Cá nhân (chưa code)')),
+      const ProfilePage(),
     ];
 
     return Scaffold(

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 const Color tluPrimaryColor = Color(0xFF0D47A1);
 const Color tluAccentColor = Color(0xFF42A5F5);
 
-// Dữ liệu giả lập cho buổi học được truyền từ trang Home (Giả định)
+// Dữ liệu giả lập cho buổi học được truyền từ trang statistical (Giả định)
 class SessionData {
   final String subjectName;
   final String room;
