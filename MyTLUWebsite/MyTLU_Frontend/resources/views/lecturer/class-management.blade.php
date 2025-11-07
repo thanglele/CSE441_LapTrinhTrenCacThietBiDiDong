@@ -1,10 +1,8 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này --}}
 @section('title', 'Quản lý lớp học')
 
-{{-- Phần nội dung chính của trang --}}
 @section('content')
 
     <h1 class="content-title">Quản lý lớp</h1>
@@ -12,10 +10,8 @@
     {{-- 1. KHUNG LỌC (4 CỘT) --}}
     <div class="card card-filter">
         <div class="card-body">
-            {{-- Lưới lọc này có 4 cột --}}
             <div class="filter-grid filter-grid-4-cols">
                 
-                {{-- Ô tìm kiếm --}}
                 <div class="filter-item">
                     <label for="search_class">Tìm kiếm</label>
                     <div class="input-group">
@@ -24,7 +20,6 @@
                     </div>
                 </div>
 
-                {{-- Ô lọc Môn học --}}
                 <div class="filter-item">
                     <label for="filter_subject">Lọc</label>
                     <div class="input-group">
@@ -38,9 +33,8 @@
                     </div>
                 </div>
 
-                {{-- Ô lọc Học kỳ --}}
                 <div class="filter-item">
-                    <label for="filter_semester" style="visibility: hidden;">Học kỳ</label> {{-- Ẩn label để căn hàng --}}
+                    <label for="filter_semester" style="visibility: hidden;">Học kỳ</label>
                     <div class="input-group">
                         <i class="fa-solid fa-calendar-week"></i>
                         <select id="filter_semester" class="form-control">
@@ -51,9 +45,8 @@
                     </div>
                 </div>
 
-                {{-- Ô lọc Trạng thái --}}
                 <div class="filter-item">
-                    <label for="filter_status" style="visibility: hidden;">Trạng thái</label> {{-- Ẩn label để căn hàng --}}
+                    <label for="filter_status" style="visibility: hidden;">Trạng thái</label>
                     <div class="input-group">
                         <i class="fa-solid fa-check-circle"></i>
                         <select id="filter_status" class="form-control">
@@ -64,7 +57,6 @@
                     </div>
                 </div>
 
-                {{-- Thêm 2 ô lọc ở hàng 2 --}}
                 <div class="filter-item">
                     <label for="filter_room">Tất cả các phòng học</label>
                     <div class="input-group">
@@ -77,7 +69,7 @@
                 </div>
 
                 <div class="filter-item">
-                    <label for="filter_type">Tất cả các trạng thái</label> {{-- Label này trong thiết kế bị sai --}}
+                    <label for="filter_type">Tất cả các loại hình</label>
                     <div class="input-group">
                         <i class="fa-solid fa-book"></i>
                         <select id="filter_type" class="form-control">

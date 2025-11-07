@@ -1,18 +1,15 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này --}}
 @section('title', 'Quản lý buổi học')
 
-{{-- Phần nội dung chính của trang --}}
 @section('content')
 
     <h1 class="content-title">Quản lý buổi học</h1>
 
-    {{-- 1. KHUNG LỌC (TÌM KIẾM VÀ DROPDOWN - 5 CỘT) --}}
+    {{-- 1. KHUNG LỌC --}}
     <div class="card card-filter">
         <div class="card-body">
-            {{-- Dùng CSS Grid 3 cột cho bộ lọc --}}
             <div class="filter-grid filter-grid-3-cols">
                 
                 {{-- Ô tìm kiếm --}}
@@ -68,9 +65,10 @@
     <div class="card card-full-width">
         <div class="card-header">
             <h3>Danh sách buổi học</h3>
-                <button type="button" class="btn btn-primary" data-modal-target="#addSessionModal">
-                    <i class="fa-solid fa-plus"></i> Thêm buổi học
-                </button>
+            {{-- SỬA: Nút Thêm buổi học đã được sửa thành <button> trong các bước trước --}}
+            <button type="button" class="btn btn-primary" data-modal-target="#addSessionModal">
+                <i class="fa-solid fa-plus"></i> Thêm buổi học
+            </button>
         </div>
         
         <div class="card-body">
@@ -80,7 +78,7 @@
                         <tr>
                             <th>Id</th>
                             <th>Tên lớp học</th>
-                            <th>Tên buổi</th> {{-- Buổi #1, #2... --}}
+                            <th>Tên buổi</th>
                             <th>Ngày</th>
                             <th>Thời gian bắt đầu</th>
                             <th>Thời gian kết thúc</th>
@@ -90,7 +88,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Dữ liệu giả lập --}}
                         @for ($i = 1; $i <= 3; $i++)
                         <tr>
                             <td>{{ 500 + $i }}</td>
@@ -102,6 +99,11 @@
                             <td>305-B5</td>
                             <td><span class="status-tag live">Đang diễn ra</span></td>
                             <td class="action-cell">
+                                {{-- NÚT: Quản lý điểm danh (chuyển trang) --}}
+                                <a href="{{ route('lecturer.attendance.details', ['sessionId' => 500 + $i]) }}" class="btn btn-icon btn-sm" title="Quản lý điểm danh">
+                                    <i class="fa-solid fa-clipboard-user"></i>
+                                </a>
+                                {{-- NÚT: Xóa (mở Modal) --}}
                                 <button type="button" class="btn btn-icon btn-sm text-danger" data-modal-target="#deleteSessionModal" title="Xóa buổi học">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>

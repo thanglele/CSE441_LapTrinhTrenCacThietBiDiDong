@@ -4,6 +4,7 @@
             <h2 class="modal-title">Xác nhận xóa buổi học</h2>
             <button type="button" class="close-modal">&times;</button>
         </div>
+        {{-- TODO: Sửa action="{{ route('...') }}" và truyền ID buổi học --}}
         <form action="#" method="POST">
             @csrf
             @method('DELETE')

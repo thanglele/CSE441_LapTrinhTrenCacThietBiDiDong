@@ -1,10 +1,8 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này --}}
-@section('title', 'Dashboard Giảng viên')
+@section('title', 'Trang chủ giảng viên')
 
-{{-- Phần nội dung chính của trang --}}
 @section('content')
 
     <h1 class="content-title">Trang chủ giảng viên</h1>
@@ -34,6 +32,7 @@
 
     <div class="dashboard-grid">
 
+        {{-- LỚP HỌC HÔM NAY --}}
         <div class="card">
             <div class="card-header">
                 <h3>Lớp học hôm nay</h3>
@@ -53,8 +52,7 @@
                             </div>
                             <div class="session-status">
                                 @php
-                                    // (Xử lý logic trạng thái dựa trên dữ liệu API)
-                                    $status = $session['attendanceStatus'] ?? 'pending'; // (pending, in_progress, completed)
+                                    $status = $session['attendanceStatus'] ?? 'pending';
                                     if ($status == 'pending' && \Carbon\Carbon::parse($session['startTime'])->isPast() && \Carbon\Carbon::parse($session['endTime'])->isFuture()) {
                                         $status = 'live';
                                     } elseif ($status == 'pending' && \Carbon\Carbon::parse($session['endTime'])->isPast()) {
@@ -77,10 +75,11 @@
                 </ul>
             </div>
             <div class="card-footer">
-                <a href="#" class="btn btn-primary">Đi tới quản lý buổi học</a>
+                <a href="{{ route('lecturer.sessions') }}" class="btn btn-primary">Đi tới quản lý buổi học</a>
             </div>
         </div>
 
+        {{-- LỚP HỌC ĐANG GIẢNG DẠY --}}
         <div class="card">
             <div class="card-header">
                 <h3>Lớp học đang giảng dạy</h3>
@@ -101,10 +100,11 @@
                 </ul>
             </div>
             <div class="card-footer">
-                <a href="#" class="btn btn-primary">Đi tới Quản lý lớp</a>
+                <a href="{{ route('lecturer.classes') }}" class="btn btn-primary">Đi tới Quản lý lớp</a>
             </div>
         </div>
 
+        {{-- THAO TÁC NHANH --}}
         <div class="dashboard-sidebar">
             <div class="card">
                 <div class="card-header">
@@ -112,11 +112,11 @@
                 </div>
                 <div class="card-body">
                     <div class="quick-actions">
-                        <a href="#" class="action-card">
+                        <a href="{{ route('lecturer.qrcode') }}" class="action-card">
                             <i class="fa-solid fa-qrcode"></i>
                             <span>Tạo mã QR</span>
                         </a>
-                        <a href="#" class="action-card">
+                        <a href="{{ route('lecturer.students') }}" class="action-card">
                             <i class="fa-solid fa-users"></i>
                             <span>Quản lý sinh viên</span>
                         </a>
@@ -129,6 +129,7 @@
             </div>
         </div>
 
+        {{-- ĐIỂM DANH GẦN ĐÂY --}}
         <div class="card card-full-width">
             <div class="card-header">
                 <h3>Điểm danh gần đây</h3>

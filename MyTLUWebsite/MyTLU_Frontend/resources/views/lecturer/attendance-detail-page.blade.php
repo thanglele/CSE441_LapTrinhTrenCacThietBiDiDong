@@ -1,10 +1,8 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này --}}
 @section('title', 'Quản lý điểm danh')
 
-{{-- Phần nội dung chính của trang --}}
 @section('content')
 
     <h1 class="content-title">Quản lý điểm danh</h1>
@@ -98,7 +96,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Dữ liệu giả lập --}}
                         @php
                             $students = [
                                 ['id' => '2251177226', 'name' => 'Nguyễn Văn A', 'status' => 'Đúng giờ', 'status_class' => 'present', 'time' => '07:58', 'method' => 'Face ID'],
@@ -128,7 +125,7 @@
                 </table>
             </div>
             
-            {{-- PHẦN PHÂN TRANG (PAGINATION) --}}
+            {{-- PHẦN PHÂN TRANG --}}
             <div class="pagination-container">
                 <span class="pagination-info">Hiển thị 1 – 10 / 5 kết quả</span>
                 <div class="pagination-links">

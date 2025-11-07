@@ -4,20 +4,20 @@
             <h2 class="modal-title">Chỉnh sửa sinh viên</h2>
             <button type="button" class="close-modal">&times;</button>
         </div>
+        {{-- TODO: THAY DẤU # BẰNG ROUTE CỦA API SỬA (Kèm ID sinh viên) --}}
         <form action="#" method="POST">
             @csrf
-            @method('PUT') {{-- Dùng method PUT/PATCH cho sửa --}}
+            @method('PUT')
             <div class="modal-body">
                 <div class="form-grid-modal">
                     <div class="form-item form-item-full-width">
                         <label for="edit_name">Tên sinh viên *</label>
-                        {{-- Ví dụ: Giả định lấy giá trị từ một biến Laravel $student['fullName'] --}}
                         <input type="text" id="edit_name" name="name" class="form-control" value="Nguyễn Thị Dinh"> 
                     </div>
                     
                     <div class="form-item">
                         <label for="edit_msv">Mã sinh viên *</label>
-                        <input type="text" id="edit_msv" name="msv" class="form-control" value="2251177226" readonly> {{-- Mã sinh viên thường là readonly --}}
+                        <input type="text" id="edit_msv" name="msv" class="form-control" value="2251177226" readonly>
                     </div>
                     <div class="form-item">
                         <label for="edit_class">Lớp *</label>

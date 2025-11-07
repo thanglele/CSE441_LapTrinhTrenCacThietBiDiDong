@@ -1,16 +1,13 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này (sẽ hiển thị trên tab trình duyệt) --}}
 @section('title', 'Quản lý môn học')
 
-{{-- Đây là phần nội dung chính sẽ được "đổ" vào file app.blade.php --}}
 @section('content')
 
-    {{-- Tiêu đề chính của trang --}}
     <h1 class="content-title">Quản lý môn</h1>
 
-    {{-- 1. KHUNG LỌC (TÌM KIẾM VÀ DROPDOWN) --}}
+    {{-- 1. KHUNG LỌC --}}
     <div class="card card-filter">
         <div class="card-body">
             <div class="filter-grid">
@@ -43,9 +40,6 @@
     <div class="card card-full-width">
         <div class="card-header">
             <h3>Danh sách môn học</h3>
-            {{-- Hiện tại thiết kế không có nút "Thêm", nên tôi ẩn đi
-            <a href="#" class="btn btn-primary">Thêm môn học mới</a> 
-            --}}
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -60,7 +54,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Dữ liệu giả lập. Sau này ta sẽ dùng @foreach lặp qua dữ liệu từ Controller --}}
+                        {{-- Dữ liệu giả lập --}}
                         <tr>
                             <td>CSE441</td>
                             <td>Lập trình Mobile</td>
@@ -92,7 +86,7 @@
                 </table>
             </div>
             
-            {{-- 3. PHẦN PHÂN TRANG (PAGINATION) --}}
+            {{-- PHẦN PHÂN TRANG (PAGINATION) --}}
             <div class="pagination-container">
                 <span class="pagination-info">Hiển thị 1 – 10 / 5 kết quả</span>
                 <div class="pagination-links">

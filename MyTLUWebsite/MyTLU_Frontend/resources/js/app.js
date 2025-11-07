@@ -4,7 +4,7 @@ import '../css/lecturer/lecturer.css';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Logic cho Menu Dropdown (Đã đúng)
+    // 1. Logic cho Menu Dropdown (Sidebar Submenus)
     document.querySelectorAll('.has-submenu > a').forEach(menu => {
         menu.addEventListener('click', function(e) {
             e.preventDefault();
@@ -13,17 +13,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
-    // Logic cho MODAL (ĐÃ PHỤC HỒI NỘI DUNG HÀM)
+    // 2. Logic cho MODAL (Thêm/Sửa/Xóa)
     const openButtons = document.querySelectorAll('[data-modal-target]');
     const closeButtons = document.querySelectorAll('.close-modal');
 
-    // Mở modal (khi click vào nút [data-modal-target])
+    // Mở modal
     openButtons.forEach(button => {
         button.addEventListener('click', function() {
             const modalId = this.getAttribute('data-modal-target');
             const modal = document.querySelector(modalId);
             if (modal) {
-                modal.style.display = 'block'; // <--- NỘI DUNG HÀM ĐƯỢC PHỤC HỒI
+                modal.style.display = 'block';
             }
         });
     });
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function() {
             const modal = this.closest('.modal');
             if (modal) {
-                modal.style.display = 'none'; // <--- NỘI DUNG HÀM ĐƯỢC PHỤC HỒI
+                modal.style.display = 'none';
             }
         });
     });

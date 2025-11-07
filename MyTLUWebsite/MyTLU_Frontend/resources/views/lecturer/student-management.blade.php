@@ -1,20 +1,17 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này --}}
 @section('title', 'Quản lý sinh viên')
 
-{{-- Phần nội dung chính của trang --}}
 @section('content')
 
     <h1 class="content-title">Quản lý sinh viên</h1>
 
-    {{-- 1. KHUNG LỌC (TÌM KIẾM VÀ DROPDOWN) --}}
+    {{-- 1. KHUNG LỌC --}}
     <div class="card card-filter">
         <div class="card-body">
-            <div class="filter-grid filter-grid-3-cols"> {{-- Lưới 3 cột --}}
+            <div class="filter-grid filter-grid-3-cols">
                 
-                {{-- Ô tìm kiếm --}}
                 <div class="filter-item">
                     <label for="search_student">Tìm kiếm</label>
                     <div class="input-group">
@@ -23,7 +20,6 @@
                     </div>
                 </div>
 
-                {{-- Ô lọc Lớp học --}}
                 <div class="filter-item">
                     <label for="filter_class">Lọc</label>
                     <div class="input-group">
@@ -35,9 +31,8 @@
                     </div>
                 </div>
 
-                {{-- Ô lọc Chuyên ngành --}}
                 <div class="filter-item">
-                    <label for="filter_major" style="visibility: hidden;">Chuyên ngành</label> {{-- Ẩn label để căn hàng --}}
+                    <label for="filter_major" style="visibility: hidden;">Chuyên ngành</label>
                     <div class="input-group">
                         <i class="fa-solid fa-graduation-cap"></i>
                         <select id="filter_major" class="form-control">
@@ -53,7 +48,7 @@
     {{-- 2. BẢNG DANH SÁCH SINH VIÊN --}}
     <div class="card card-full-width">
         <div class="card-header">
-            <h3>Danh sách sinh viên: Lớp 64KTPM3</h3> {{-- Sẽ được Controller truyền vào --}}
+            <h3>Danh sách sinh viên: Lớp 64KTPM3</h3>
             <div class="action-buttons-group">
                 <button type="button" class="btn btn-primary" data-modal-target="#addStudentModal">
                     <i class="fa-solid fa-plus"></i> Thêm sinh viên
@@ -128,11 +123,6 @@
 
 @endsection
 
-{{-- 
-|--------------------------------------------------------------------------
-| CODE MODAL (HỘP THOẠI)
-|--------------------------------------------------------------------------
---}}
 @push('modals')
     @include('lecturer.modals.add-student-modal')
     @include('lecturer.modals.edit-student-modal')

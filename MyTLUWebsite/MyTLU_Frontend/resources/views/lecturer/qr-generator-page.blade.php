@@ -1,10 +1,8 @@
 {{-- Kế thừa layout chính từ 'layouts.app' --}}
 @extends('layouts.app')
 
-{{-- Đặt tiêu đề cho trang này --}}
 @section('title', 'Tạo mã QR')
 
-{{-- Phần nội dung chính của trang --}}
 @section('content')
 
     <h1 class="content-title">Tạo mã QR</h1>
@@ -17,12 +15,12 @@
             <div class="card-header">
                 <h3>Thông tin buổi học:</h3>
             </div>
+            {{-- TODO: Sửa action="{{ route('...') }}" cho API tạo QR --}}
             <form action="#" method="POST" id="qrCreationForm">
                 @csrf
                 <div class="card-body form-grid-qr">
                     
                     {{-- Các trường thông tin (ReadOnly) --}}
-                    {{-- (Giả định dữ liệu này được truyền từ trang Quản lý buổi học sang) --}}
                     <div class="form-item form-item-full-width">
                         <label>Tên môn học</label>
                         <input type="text" class="form-control" value="CSE441.Mobile Dev" readonly>
@@ -44,7 +42,7 @@
                         <input type="text" class="form-control" value="20/09/2025" readonly>
                     </div>
 
-                    {{-- 1. THỜI GIAN ĐIỂM DANH (Dropdown) --}}
+                    {{-- THỜI GIAN ĐIỂM DANH (Dropdown) --}}
                     <div class="form-item form-item-full-width mt-3">
                         <label>Thời gian điểm danh</label>
                         <div class="input-time-group">
@@ -80,7 +78,6 @@
             <div class="card-body qr-content-area">
                 
                 <div id="qrPlaceholder" class="qr-placeholder">
-                    {{-- Mã QR sẽ được tạo ra ở đây bằng JS/API --}}
                     <p>Nhấn "Tạo QR" để bắt đầu phiên điểm danh.</p>
                 </div>
                 
