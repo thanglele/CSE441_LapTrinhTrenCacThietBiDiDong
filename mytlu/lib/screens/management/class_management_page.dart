@@ -1,23 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/subject_model.dart';
-
-class ClassDetail {
-  final String classCode;
-  final String subjectCode;
-  final String academicYear;
-  final String room;
-  final String type;
-  final int studentCount;
-
-  ClassDetail({
-    required this.classCode,
-    required this.subjectCode,
-    required this.academicYear,
-    required this.room,
-    required this.type,
-    required this.studentCount,
-  });
-}
+import '../../models/class_detail_model.dart';
+import 'student_management_page.dart';
 
 class ClassManagementPage extends StatefulWidget {
   final Subject subject;
@@ -220,7 +204,15 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // Truyền đối tượng ClassDetail (cls) sang trang mới
+                      builder: (context) => StudentManagementPage(classDetail: cls),
+                    ),
+                  );
+                },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
