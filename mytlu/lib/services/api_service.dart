@@ -1,60 +1,43 @@
-// lib/services/api_service.dart
+// File: lib/services/api_service.dart
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import '../models/class_model.dart';
+import '../config/api_config.dart'; // <<< Dùng cấu hình
+import '../models/schedule_session_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://your-dotnet-api.com/api/lecturer';
+  // Dùng ApiConfig và thêm path '/api/v1'
+  static const String _apiPath = '/api/v1';
 
-  // Dữ liệu giả lập
-  final List<Map<String, dynamic>> _dummyData = [
-    {
-      'classCode': '64KTPM3',
-      'subjectName': 'Mobile Dev',
-      'room': '305 - B5',
-      'lecturerName': 'Nguyễn Văn A',
-      'startTime': '08:00',
-      'endTime': '09:30',
-      'status': 'Đang diễn ra',
-    },
-    {
-      'classCode': '63PM-01',
-      'subjectName': 'Lập trình C++',
-      'room': '305 - B5',
-      'lecturerName': 'Nguyễn Văn B',
-      'startTime': '09:45',
-      'endTime': '11:00',
-      'status': 'Sắp diễn ra',
-    },
-    {
-      'classCode': '64TT-02',
-      'subjectName': 'Lập trình python',
-      'room': '401 - C1',
-      'lecturerName': 'Nguyễn Văn C',
-      'startTime': '07:00',
-      'endTime': '07:50',
-      'status': 'Đã kết thúc',
-    },
-  ];
+  /// API (Thật) Lấy lịch học hôm nay của Giảng viên
+  Future<List<ScheduleSession>> fetchTodayClasses(String jwtToken) async {
+    // URL được tạo từ Base URL + Path API + Endpoint
+    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/dashboard');
 
-  Future<List<ClassModel>> fetchClassesForDate(
-      String lecturerId, String jwtToken, DateTime date) async {
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken', // Gửi token
+        },
+      );
 
-    final formattedDate = DateFormat('yyyy-MM-dd').format(date);
-    final todayFormatted = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List jsonList = data['todaySessions'] as List;
 
-    // Giả lập độ trễ API
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (formattedDate == todayFormatted) {
-      // Trả về dữ liệu giả lập cho hôm nay
-      return _dummyData.map((json) => ClassModel.fromJson(json)).toList();
-    } else {
-      // Trả về dữ liệu rỗng nếu là ngày khác
-      return [];
+        return jsonList.map((json) => ScheduleSession.fromJson(json)).toList();
+      } else if (response.statusCode == 401) {
+        throw Exception(
+            'Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.');
+      } else {
+        throw Exception('Failed to load schedule. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to connect to server: $e');
     }
-
   }
+
+// (Các hàm API khác như startAttendance sẽ được thêm vào đây)
 }

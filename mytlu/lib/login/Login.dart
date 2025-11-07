@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const SplashScreen()),
-              (route) => false, // Xóa hết stack
+                  (route) => false, // Xóa hết stack
             );
           }
         } else {
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       );
       // Format tọa độ thành chuỗi "latitude, longitude"
       loginPosition = "${position.latitude}, ${position.longitude}";
-      
+
       print('Tọa độ đã lấy: $loginPosition');
 
     } catch (e) {
@@ -313,15 +313,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           if (!mounted) return;
           if (userRole == 'student')
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const StudentPage()),
-            (Route<dynamic> route) => false,
-          );
+              context,
+              MaterialPageRoute(builder: (context) => const StudentPage()),
+                  (Route<dynamic> route) => false,
+            );
           else
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
-              (Route<dynamic> route) => false,
+                  (Route<dynamic> route) => false,
             );
         } catch (e) {
           _showErrorSnackBar(e.toString());
@@ -472,7 +472,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                   if (widget.userName == null) SizedBox(height: 10),
 
                   if (widget.userName == null)
-                    // Ô nhập Mã sinh viên
+                  // Ô nhập Mã sinh viên
                     _buildTextField(
                       hintText: 'Mã sinh viên',
                       icon: Icons.person_outline,
@@ -513,14 +513,14 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                         child: _isLoading
                             ? CircularProgressIndicator(color: Colors.white)
                             : Text(
-                                'Đăng nhập',
-                                style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                          'Đăng nhập',
+                          style: TextStyle(
+                            fontFamily: 'Ubuntu',
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
 
                       SizedBox(width: 10), // Khoảng cách giữa 2 nút
@@ -783,12 +783,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
           suffixIcon: isPassword
               ? IconButton(
-                  icon: Icon(
-                    isVisible ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.black54,
-                  ),
-                  onPressed: onToggleVisibility,
-                )
+            icon: Icon(
+              isVisible ? Icons.visibility_off : Icons.visibility,
+              color: Colors.black54,
+            ),
+            onPressed: onToggleVisibility,
+          )
               : null,
         ),
       ),

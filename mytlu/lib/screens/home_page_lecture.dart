@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/class_model.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Đảm bảo đã import và gọi ở main.dart
+// Thay thế bằng đường dẫn chính xác của bạn
+import '../models/schedule_session_dto.dart';
 import '../services/api_service.dart';
+// <<< SỬA: Dùng UserSession để lấy token đã lưu
+import '../services/user_session.dart';
 import 'home/create_qr_page.dart';
-import 'management/management_dashboard_page.dart';
-import 'statistical/statistics_page.dart';
-import 'profile/profile_page.dart';
 
+// Màu sắc chính (Giữ nguyên)
 const Color tluPrimaryColor = Color(0xFF0D47A1);
 const Color tluAccentColor = Color(0xFF42A5F5);
 
+// =========================================================================
+// <<< SỬA 1: BỎ THAM SỐ TRUYỀN VÀO (jwtToken, lecturerName)
+// =========================================================================
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -17,92 +22,180 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// Dán đè toàn bộ class _HomePageState
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  DateTime _selectedDate = DateTime.now();
-  late Future<List<ClassModel>> _todayClassesFuture;
+  late Future<List<ScheduleSession>> _classesFuture;
   final ApiService _apiService = ApiService();
+  final UserSession _userSession = UserSession(); // Khởi tạo session service
 
-  final String _lecturerId = 'GV001';
-  final String _jwtToken = 'YOUR_ACTUAL_JWT_TOKEN';
-  final String _lecturerName = 'Nguyễn Thị Dinh';
+  DateTime _selectedDate = DateTime.now();
 
-  // === SỬA 1: XÓA 'late final List<Widget> _pages;' ở đây ===
+  // <<< SỬA 2: Biến State mới để lưu Token và Tên người dùng đã được tải
+  String? _jwtToken;
+  String? _lecturerName;
+  bool _isDataLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    // === SỬA 2: CHỈ khởi tạo dữ liệu, KHÔNG build widget ===
-    _todayClassesFuture =
-        _apiService.fetchClassesForDate(_lecturerId, _jwtToken, _selectedDate);
-    // (Xóa danh sách _pages khỏi đây)
+    // Bắt đầu quá trình tải token và dữ liệu ban đầu
+    _initializeData();
   }
 
-  void _loadClassesForSelectedDate(DateTime newDate) {
+  // =========================================================================
+  // <<< SỬA 3: HÀM KHỞI TẠO DỮ LIỆU CHÍNH
+  // =========================================================================
+  Future<void> _initializeData() async {
+    try {
+      final session = await _userSession.getSession(); // Lấy session đã lưu
+
+      if (session['token'] == null || session['fullName'] == null) {
+        // Nếu không có session hợp lệ, chuyển về màn hình Login
+        // TODO: Cần thêm logic điều hướng về LoginScreen nếu session null/hết hạn
+        print('Lỗi: Không tìm thấy Token hợp lệ. Cần chuyển về Login!');
+        return;
+      }
+
+      setState(() {
+        _jwtToken = session['token'];
+        _lecturerName = session['fullName'];
+        _isDataLoaded = true;
+      });
+
+      // Tải lịch học sau khi có token
+      _loadClassesForDate(_selectedDate);
+
+    } catch (e) {
+      print('Lỗi khởi tạo dữ liệu: $e');
+      // Xử lý lỗi (ví dụ: hiển thị thông báo)
+      setState(() {
+        _isDataLoaded = true; // Dù lỗi nhưng kết thúc tải
+        _classesFuture = Future.error('Lỗi tải dữ liệu người dùng: $e');
+      });
+    }
+  }
+
+
+  // =========================================================================
+  // HÀM TẢI DỮ LIỆU LỚP HỌC THEO NGÀY (Dùng _jwtToken đã tải)
+  // =========================================================================
+  void _loadClassesForDate(DateTime date) {
+    if (_jwtToken == null) return; // Bảo vệ nếu token chưa được tải
+
     setState(() {
-      _selectedDate = newDate;
-      _todayClassesFuture =
-          _apiService.fetchClassesForDate(_lecturerId, _jwtToken, _selectedDate);
+      _selectedDate = date;
+      // Gọi API với _jwtToken đã được tải (state)
+      _classesFuture = _apiService.fetchTodayClasses(_jwtToken!);
     });
+  }
+
+  // =========================================================================
+  // HÀM XỬ LÝ KHI NHẤN NÚT "TẠO QR" (Dùng _jwtToken đã tải)
+  // =========================================================================
+  Future<void> _handleStartAttendance(String sessionId) async {
+    if (_jwtToken == null) return; // Bảo vệ nếu token chưa được tải
+
+    try {
+      // 🔹 Giả sử bạn đã có dữ liệu buổi học lấy từ API hoặc danh sách hiển thị
+      final sessionData = SessionData(
+        subjectName: "Lập trình Flutter nâng cao",
+        room: "P305",
+        className: "D21CQCN04-B",
+        scheduleTime: "07:00 - 09:00",
+        date: "2025-11-08",
+      );
+
+      // 🟢 Điều hướng sang trang tạo QR và truyền dữ liệu
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CreateQrPage(sessionData: sessionData),
+        ),
+      );
+
+      print('👉 Đã chuyển sang trang tạo QR cho session $sessionId');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi khi mở trang tạo QR: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+
+  // Hàm helper tiện ích để so sánh ngày
+  bool _isSameDay(DateTime dateA, DateTime dateB) {
+    return dateA.year == dateB.year &&
+        dateA.month == dateB.month &&
+        dateA.day == dateB.day;
   }
 
   @override
   Widget build(BuildContext context) {
-    // === SỬA 3: KHAI BÁO _pages bên trong hàm build() ===
-    final List<Widget> _pages = [
-      _buildHomePageContent(), // Gọi ở đây thì context đã hợp lệ
-      const ManagementDashboardPage(),
-      const StatisticsPage(),
-      const ProfilePage(),
-    ];
+    // Hiển thị loading trong khi đang tải token và tên
+    if (!_isDataLoaded) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: tluPrimaryColor),
+        ),
+      );
+    }
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages, // Dùng danh sách _pages vừa tạo
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            // 1. App Bar
+            _buildCustomAppBar(context),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 2. Lịch giảng dạy
+                  const Text(
+                    'Lịch giảng dạy',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildTeachingSchedule(),
+
+                  const SizedBox(height: 20),
+
+                  // 3. Danh sách Lớp học
+                  Text(
+                    _isSameDay(_selectedDate, DateTime.now())
+                        ? 'Lớp học hôm nay'
+                        : 'Lớp học ngày ${DateFormat.Md('vi_VN').format(_selectedDate)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Hiển thị danh sách lớp học
+                  _buildClassesList(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+      // 4. Bottom Navigation Bar
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
-  Widget _buildHomePageContent() {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          _buildCustomAppBar(context),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Lịch giảng dạy',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                const SizedBox(height: 10),
-                _buildTeachingSchedule(),
-                const SizedBox(height: 20),
-                const Text(
-                  'Lớp học hôm nay',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                _buildClassesList(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  // =========================================================================
+  // WIDGET 1: CUSTOM APP BAR (Dùng _lecturerName)
+  // =========================================================================
   Widget _buildCustomAppBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
@@ -122,19 +215,15 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'My TLU',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('My TLU',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold)),
                 IconButton(
-                  icon: const Icon(Icons.notifications_none,
-                      color: Colors.white, size: 28),
-                  onPressed: () {},
-                ),
+                    icon: const Icon(Icons.notifications_none,
+                        color: Colors.white, size: 28),
+                    onPressed: () {}),
               ],
             ),
             const SizedBox(height: 20),
@@ -143,11 +232,13 @@ class _HomePageState extends State<HomePage> {
                 const CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.person, color: tluPrimaryColor, size: 35),
+                  backgroundImage:
+                  AssetImage('assets/images/avatar_placeholder.png'),
                 ),
                 const SizedBox(width: 15),
                 Text(
-                  _lecturerName,
+                  // <<< SỬA 4: Dùng tên đã tải (có thể là chuỗi rỗng nếu lỗi)
+                  _lecturerName ?? 'Loading...',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -162,28 +253,28 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // =========================================================================
+  // WIDGET 2: LỊCH GIẢNG DẠY (Lịch động 7 ngày)
+  // =========================================================================
   Widget _buildTeachingSchedule() {
-    List<DateTime> weekDays = List.generate(7, (index) {
-      return DateTime.now().add(Duration(days: index));
-    });
+    final List<DateTime> days = List.generate(
+      7,
+          (index) => DateTime.now().add(Duration(days: index)),
+    );
 
     return SizedBox(
       height: 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: weekDays.length,
+        itemCount: days.length,
         itemBuilder: (context, index) {
-          final date = weekDays[index];
-          final bool isActive = date.day == _selectedDate.day &&
-              date.month == _selectedDate.month &&
-              date.year == _selectedDate.year;
-
-          final String dayName =
-          DateFormat('EEE', 'vi').format(date).replaceAll('.', '');
-          final String dateNum = DateFormat('dd').format(date);
+          final date = days[index];
+          final bool isActive = _isSameDay(date, _selectedDate);
 
           return GestureDetector(
-            onTap: () => _loadClassesForSelectedDate(date),
+            onTap: () {
+              _loadClassesForDate(date);
+            },
             child: Container(
               width: 60,
               margin: const EdgeInsets.only(right: 8),
@@ -195,7 +286,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    dayName,
+                    DateFormat.E('vi_VN').format(date),
                     style: TextStyle(
                       color: isActive ? Colors.white : Colors.black87,
                       fontSize: 14,
@@ -203,19 +294,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    dateNum,
+                    DateFormat.d().format(date),
                     style: TextStyle(
                       color: isActive ? Colors.white : Colors.black,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${index + 1}',
-                    style: TextStyle(
-                      color: isActive ? Colors.white : Colors.black54,
-                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -227,9 +310,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // =========================================================================
+  // WIDGET 3: HIỂN THỊ DANH SÁCH LỚP HỌC (Dùng _lecturerName)
+  // =========================================================================
   Widget _buildClassesList() {
-    return FutureBuilder<List<ClassModel>>(
-      future: _todayClassesFuture,
+    return FutureBuilder<List<ScheduleSession>>(
+      future: _classesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -247,76 +333,112 @@ class _HomePageState extends State<HomePage> {
           );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(
-              child: Text('Ngày này không có lịch giảng dạy.',
-                  style: TextStyle(fontSize: 16)));
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Text('Không có lịch giảng dạy cho ngày này.',
+                    style: TextStyle(fontSize: 16)),
+              ));
         } else {
           final classes = snapshot.data!;
           return Column(
-            children: classes.map((cls) => ClassCard(data: cls)).toList(),
+            children: classes.map((cls) {
+              return ClassCard(
+                data: cls,
+                // <<< SỬA 5: Dùng tên đã tải (state)
+                lecturerName: _lecturerName ?? 'Giảng viên',
+                onStartAttendance: () =>
+                    _handleStartAttendance(cls.classSessionId.toString()),
+              );
+            }).toList(),
           );
         }
       },
     );
   }
 
+  // =========================================================================
+  // WIDGET 4: BOTTOM NAVIGATION BAR
+  // =========================================================================
   Widget _buildBottomNavBar() {
     return Container(
       decoration: const BoxDecoration(
         color: tluPrimaryColor,
       ),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.transparent,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Quản lý',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Thống kê',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Cá nhân',
-          ),
-        ],
+      child: SafeArea(
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: tluPrimaryColor,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white60,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Trang chủ',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today_outlined),
+              label: 'Quản lý',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.insert_chart_outlined),
+              label: 'Thống kê',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              label: 'Cá nhân',
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+// =========================================================================
+// WIDGET CLASSCARD (Giữ nguyên logic callback)
+// =========================================================================
 class ClassCard extends StatelessWidget {
-  final ClassModel data;
+  final ScheduleSession data;
+  final String lecturerName;
+  final VoidCallback onStartAttendance;
 
-  const ClassCard({super.key, required this.data});
+  const ClassCard({
+    super.key,
+    required this.data,
+    required this.lecturerName,
+    required this.onStartAttendance,
+  });
 
-  Color _getStatusColor(String status) {
-    if (status == 'Đang diễn ra') return Colors.green[700]!;
-    if (status == 'Sắp diễn ra') return Colors.orange[700]!;
-    return Colors.grey;
+  // ... (Hàm _getStatusInfo, _formatTime giữ nguyên)
+  Map<String, dynamic> _getStatusInfo(String status) {
+    if (status == 'in_progress') {
+      return {'text': 'Đang diễn ra', 'color': Colors.green[700]!};
+    }
+    if (status == 'pending') {
+      return {'text': 'Sắp diễn ra', 'color': Colors.orange[700]!};
+    }
+    return {'text': 'Đã kết thúc', 'color': Colors.grey};
   }
 
-  Widget _buildActionButton(String status, BuildContext context) {
-    bool isActive = status == 'Đang diễn ra' || status == 'Sắp diễn ra';
+  String _formatTime(DateTime start, DateTime end) {
+    return '${DateFormat('HH:mm').format(start)} - ${DateFormat('HH:mm').format(end)}';
+  }
 
+  Widget _buildActionButton(String status) {
+    bool isActive = status == 'in_progress' || status == 'pending';
     String buttonText;
     IconData buttonIcon;
 
-    if (status == 'Đã kết thúc' || status == 'Đã tạo') {
-      buttonText = status == 'Đã tạo' ? 'Đã tạo' : 'Đã kết thúc';
+    if (status == 'completed') {
+      buttonText = 'Đã kết thúc';
       buttonIcon = Icons.check_circle_outline;
     } else {
       buttonText = 'Tạo QR';
@@ -324,23 +446,7 @@ class ClassCard extends StatelessWidget {
     }
 
     return ElevatedButton.icon(
-      onPressed: isActive
-          ? () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (ctx) => CreateQrPage(
-              sessionData: SessionData(
-                subjectName: data.name,
-                room: data.room,
-                className: data.code,
-                scheduleTime: data.time,
-                date: DateFormat('dd/MM/yyyy').format(DateTime.now()),
-              ),
-            ),
-          ),
-        );
-      }
-          : null,
+      onPressed: isActive ? onStartAttendance : null,
       icon: Icon(buttonIcon, size: 16),
       label: Text(
         buttonText,
@@ -361,7 +467,7 @@ class ClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(data.status);
+    final statusInfo = _getStatusInfo(data.attendanceStatus);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -377,7 +483,7 @@ class ClassCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '${data.code}. ${data.name}',
+                    data.className,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -386,10 +492,10 @@ class ClassCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  data.status,
+                  statusInfo['text']!,
                   style: TextStyle(
                     fontSize: 12,
-                    color: statusColor,
+                    color: statusInfo['color']!,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -397,7 +503,7 @@ class ClassCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${data.room} • ${data.lecturer}',
+              '${data.location} • $lecturerName',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -412,7 +518,7 @@ class ClassCard extends StatelessWidget {
                     const Icon(Icons.access_time, size: 16, color: Colors.grey),
                     const SizedBox(width: 4),
                     Text(
-                      data.time,
+                      _formatTime(data.startTime, data.endTime),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[800],
@@ -420,7 +526,7 @@ class ClassCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                _buildActionButton(data.status, context),
+                _buildActionButton(data.attendanceStatus),
               ],
             ),
           ],

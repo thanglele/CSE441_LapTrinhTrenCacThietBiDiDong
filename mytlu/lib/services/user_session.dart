@@ -1,13 +1,11 @@
-// lib/services/user_session.dart
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// (Class UserProfile giữ nguyên)
 class UserProfile {
-  final String username; // Đây là mã sinh viên
+  final String username;
   final String fullName;
   final String studentCode;
-  final String avatarPath; 
+  final String avatarPath;
 
   UserProfile({
     required this.username,
@@ -18,9 +16,9 @@ class UserProfile {
 }
 
 class UserSession {
-  final _secureStorage = const FlutterSecureStorage();
-  
-  // Cập nhật các Key
+  static const _secureStorage = FlutterSecureStorage();
+
+  // Các key lưu trữ
   static const _keyToken = 'token';
   static const _keyUserRole = 'userRole';
   static const _keyUsername = 'username';
@@ -29,6 +27,9 @@ class UserSession {
   static const _keyStudentCode = 'studentCode';
   static const _keyAvatarPath = 'avatarPath';
 
+  // ============================================================
+  // SAVE SESSION (Sau khi đăng nhập thành công)
+  // ============================================================
   Future<void> saveSession({
     required String token,
     required String userRole,
@@ -38,47 +39,71 @@ class UserSession {
     required String avatarUrl,
     required String password,
   }) async {
-    
     String localAvatarPath = await _saveImageToLocal(avatarUrl);
 
-    // 1. LƯU DỮ LIỆU NHẠY CẢM
     await _secureStorage.write(key: _keyToken, value: token);
     await _secureStorage.write(key: _keyUserRole, value: userRole);
     await _secureStorage.write(key: _keyUsername, value: username);
     await _secureStorage.write(key: _keyFullName, value: fullName);
     await _secureStorage.write(key: _keyStudentCode, value: studentCode);
-    
-    // 3. LƯU LẠI MẬT KHẨU
     await _secureStorage.write(key: _keyPassword, value: password);
 
-    // 2. LƯU DỮ LIỆU THƯỜNG
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyAvatarPath, localAvatarPath);
+
+    print('✅ [UserSession] Đã lưu session cho $fullName');
   }
 
-  // --- HÀM KIỂM TRA & LẤY DỮ LIỆU (Đã cập nhật) ---
-  Future<UserProfile?> getUserProfile() async {
-    // Chỉ cần kiểm tra token
+  // ============================================================
+  // GET SESSION (Dùng trong HomePage)
+  // ============================================================
+  Future<Map<String, String?>> getSession() async {
     final token = await _secureStorage.read(key: _keyToken);
-    if (token == null) {
-      return null;
-    }
+    final fullName = await _secureStorage.read(key: _keyFullName);
 
-    // Lấy nốt thông tin còn lại
+    print('DEBUG (UserSession) token: $token, name: $fullName');
+    return {
+      'token': token,
+      'fullName': fullName,
+    };
+  }
+
+  // ============================================================
+  // GET USER PROFILE (Khi cần thông tin chi tiết)
+  // ============================================================
+  Future<UserProfile?> getUserProfile() async {
+    final token = await _secureStorage.read(key: _keyToken);
+    if (token == null) return null;
+
     final username = await _secureStorage.read(key: _keyUsername);
     final fullName = await _secureStorage.read(key: _keyFullName);
     final studentCode = await _secureStorage.read(key: _keyStudentCode);
     final prefs = await SharedPreferences.getInstance();
-    final avatarPath = prefs.getString(_keyAvatarPath);
+    final avatarPath = prefs.getString(_keyAvatarPath) ?? '';
 
     return UserProfile(
       username: username ?? '',
       fullName: fullName ?? '',
       studentCode: studentCode ?? '',
-      avatarPath: avatarPath ?? '', // Sửa thành rỗng nếu null
+      avatarPath: avatarPath,
     );
   }
 
+  // ============================================================
+  // GET TOKEN (Dành cho các API khác)
+  // ============================================================
+  Future<String?> getToken() async {
+    return await _secureStorage.read(key: _keyToken);
+  }
+
+  /// 👉 **Thêm hàm static để gọi nhanh**
+  static Future<String?> getJwtToken() async {
+    return await _secureStorage.read(key: _keyToken);
+  }
+
+  // ============================================================
+  // GET SAVED CREDENTIALS (username/password)
+  // ============================================================
   Future<Map<String, String?>> getSavedCredentials() async {
     final username = await _secureStorage.read(key: _keyUsername);
     final password = await _secureStorage.read(key: _keyPassword);
@@ -88,21 +113,21 @@ class UserSession {
     };
   }
 
-  // --- HÀM LẤY TOKEN (Hữu ích cho các lệnh gọi API khác) ---
-  Future<String?> getToken() async {
-    return await _secureStorage.read(key: _keyToken);
-  }
-  
-  // --- HÀM ĐĂNG XUẤT (Đã cập nhật) ---
+  // ============================================================
+  // CLEAR SESSION (Đăng xuất)
+  // ============================================================
   Future<void> clearSession() async {
-    await _secureStorage.deleteAll(); // Xóa hết token, username...
+    await _secureStorage.deleteAll();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyAvatarPath);
+    print('🧹 [UserSession] Đã xóa toàn bộ session');
   }
 
-  // (Hàm giả định, bạn cần package 'path_provider' và 'http' để làm thật)
+  // ============================================================
+  // GIẢ LẬP LƯU ẢNH LOCAL
+  // ============================================================
   Future<String> _saveImageToLocal(String imageUrl) async {
-    // ... (Giữ nguyên logic giả lập)
-    return "assets/images/avatar_default.png"; 
+    // TODO: Nếu cần thật sự tải ảnh, thêm http + path_provider
+    return "assets/images/avatar_default.png";
   }
 }
