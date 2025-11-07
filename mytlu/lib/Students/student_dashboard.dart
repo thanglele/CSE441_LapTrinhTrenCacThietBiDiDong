@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:mytlu/Students/attendance/screens/qr_scanner_screen.dart';
 
-// 1. IMPORT CÁC THÀNH PHẦN "VỎ" (Shell)
+// 1. IMPORT CÁC WIDGET CHUNG (HEADER / FOOTER)
 import 'package:mytlu/Students/common_widgets/student_header.dart';
 import 'package:mytlu/Students/common_widgets/student_footer.dart';
 
-// 2. IMPORT THEME (Để bọc)
+// 2. IMPORT THEME
 import 'package:mytlu/Students/theme/app_theme.dart';
 
-// 3. IMPORT LOGIC ĐỂ GỌI API HEADER
+// 3. IMPORT LOGIC LẤY PROFILE
 import 'package:mytlu/Students/profile/models/student_profile.dart';
 import 'package:mytlu/Students/profile/services/profile_service.dart';
 
-// 4. IMPORT 4 MÀN HÌNH CON (TỪ 4 FILE RIÊNG BIỆT)
+// 4. IMPORT 4 TAB CON
 import 'package:mytlu/Students/schedule/screens/schedule_screen.dart';
 import 'package:mytlu/Students/attendance/screens/qr_scanner_screen.dart';
 import 'package:mytlu/Students/history/screens/history_screen.dart';
 import 'package:mytlu/Students/profile/screens/profile_menu_screen.dart';
 
-
-/// Đây là màn hình "vỏ" (shell) chính của Sinh viên.
-/// Nó quản lý Header, Footer và việc chuyển đổi giữa 4 tab.
+/// Màn hình "vỏ" của sinh viên, quản lý Header, Footer và tab
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
 
@@ -28,21 +27,21 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
-  // --- NHIỆM VỤ 1: QUẢN LÝ TAB ---
-  int _currentIndex = 0; // Tab hiện tại (0 = Lịch học)
+  // Tab hiện tại: 0 = Lịch học
+  int _currentIndex = 0;
 
-  // --- NHIỆM VỤ 2: GỌI API CHO HEADER & CÁC TAB CON ---
+  // Dịch vụ lấy profile
   final ProfileService _profileService = ProfileService();
   late Future<StudentProfile> _profileFuture;
 
   @override
   void initState() {
     super.initState();
-    // Gọi API GET /auth/me 1 lần duy nhất khi mở màn hình này
+    // Gọi API lấy profile 1 lần khi mở dashboard
     _profileFuture = _profileService.getStudentProfile();
   }
 
-  // Hàm callback để chuyển tab (dùng cho nút back trong ProfileMenu)
+  /// Hàm callback để chuyển tab từ ProfileMenu hoặc Footer
   void _onSwitchTab(int index) {
     setState(() {
       _currentIndex = index;
@@ -51,81 +50,80 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    // === BỌC WIDGET BẰNG THEME CỦA STUDENT ===
     return Theme(
       data: AppTheme.lightTheme,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5), // Màu nền chung
+        backgroundColor: const Color(0xFFF5F5F5),
 
-        // 1. HEADER (Luôn cố định ở trên)
+        // HEADER (luôn cố định)
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120), // Chiều cao của Header
+          preferredSize: const Size.fromHeight(120),
           child: FutureBuilder<StudentProfile>(
-            future: _profileFuture, // Theo dõi hàm gọi API
+            future: _profileFuture,
             builder: (context, snapshot) {
-
-              // Khi đang tải hoặc bị lỗi, hiển thị Header chờ
               if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
-                return StudentHeader(
+                return const StudentHeader(
                   studentCode: "Loading...",
                   fullName: "Đang tải...",
                   avatarUrl: null,
                 );
               }
 
-              // Khi thành công, truyền dữ liệu thật vào Header
+              if (snapshot.hasError) {
+                return const StudentHeader(
+                  studentCode: "Error",
+                  fullName: "Lỗi tải profile",
+                  avatarUrl: null,
+                );
+              }
+
               final profile = snapshot.data!;
               return StudentHeader(
                 studentCode: profile.studentCode,
                 fullName: profile.fullName,
-                avatarUrl: profile.avatarUrl,
+                avatarUrl: null,
               );
             },
           ),
         ),
 
-        // 2. NỘI DUNG (Thay đổi theo tab)
-        // Body cũng phải "chờ" API /auth/me xong
-        // vì các tab con (như ProfileMenu) cần dữ liệu 'profile'
+        // BODY: IndexedStack giữ trạng thái tab
         body: FutureBuilder<StudentProfile>(
-            future: _profileFuture,
-            builder: (context, snapshot) {
+          future: _profileFuture,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-              // Nếu đang chờ API (lần đầu), chỉ hiển thị loading
-              if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-
-              // Nếu lỗi
-              if (snapshot.hasError) {
-                return Center(child: Text("Lỗi tải dữ liệu Profile: ${snapshot.error}"));
-              }
-
-              // Khi có dữ liệu, tạo danh sách tab
-              final profile = snapshot.data!;
-
-              final List<Widget> tabs = [
-                ScheduleScreen(),     // Index 0 (Lịch học)
-                QrScannerScreen(),    // Index 1 (Quét QR)
-                HistoryScreen(),      // Index 2 (Lịch sử)
-                ProfileMenuScreen(    // Index 3 (Hồ sơ - Truyền dữ liệu & callback)
-                  profile: profile,
-                  onSwitchTab: _onSwitchTab,
-                ),
-              ];
-
-              // Dùng IndexedStack để giữ trạng thái (state) của các tab
-              return IndexedStack(
-                index: _currentIndex,
-                children: tabs,
+            if (snapshot.hasError) {
+              return Center(
+                child: Text("Lỗi tải dữ liệu profile: ${snapshot.error}"),
               );
             }
+
+            final profile = snapshot.data!;
+
+            final List<Widget> tabs = [
+              const ScheduleScreen(),              // Tab 0: Lịch học
+              ScanQRScreen(onSwitchTab: _onSwitchTab),  // Tab 1: Quét mã
+              const HistoryScreen(),               // Tab 2: Lịch sử
+              ProfileMenuScreen(                   // Tab 3: Hồ sơ
+                profile: profile,
+                onSwitchTab: _onSwitchTab,
+              ),
+            ];
+
+            return IndexedStack(
+              index: _currentIndex,
+              children: tabs,
+            );
+          },
         ),
 
-        // 3. FOOTER (Luôn cố định ở dưới)
+        // FOOTER
         bottomNavigationBar: AppFooter(
           currentIndex: _currentIndex,
-          onTap: _onSwitchTab, // Dùng hàm callback
+          onTap: _onSwitchTab,
         ),
       ),
     );
