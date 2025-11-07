@@ -464,3 +464,58 @@
     justify-content: space-around;
     gap: 10px;
 }
+
+/*
+|--------------------------------------------------------------------------
+| CSS CHO TRANG QUẢN LÝ ĐIỂM DANH (CHI TIẾT)
+|--------------------------------------------------------------------------
+*/
+
+/* Header thông tin buổi học */
+.card-session-header {
+    margin-bottom: 1.5rem;
+    background-color: #f7f9fc;
+}
+
+.card-session-header .card-body {
+    padding: 1.5rem;
+}
+
+.session-info-grid {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+}
+
+.session-info-item {
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.session-info-item span {
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.session-info-item strong {
+    font-weight: 700;
+    color: #333;
+}
+
+/* Thêm màu cho các tag trạng thái mới */
+.status-tag.present {
+    background-color: #e6f7ec; /* Xanh lá nhạt */
+    color: #0d6832; /* Xanh lá đậm */
+}
+
+.status-tag.late {
+    background-color: #fff4e5; /* Vàng nhạt */
+    color: #b37400; /* Vàng đậm */
+}
+
+.status-tag.absent {
+    background-color: #f8d7da; /* Đỏ nhạt */
+    color: #721c24; /* Đỏ đậm */
+}

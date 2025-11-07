@@ -67,3 +67,8 @@ Route::get('/quan-ly-buoi-hoc', function () {
 Route::get('/tao-ma-qr', function () {
     return view('lecturer.qr-generator-page');
 })->name('lecturer.qrcode');
+
+Route::get('/bao-cao-diem-danh/{sessionId}', function ($sessionId) {
+    // Tạm thời hiển thị trang detail
+    return view('lecturer.attendance-detail-page');
+})->name('lecturer.attendance.details');

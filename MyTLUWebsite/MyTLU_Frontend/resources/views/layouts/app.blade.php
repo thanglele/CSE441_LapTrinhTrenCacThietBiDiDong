@@ -72,7 +72,7 @@
                 <ul class="submenu">
                     <li><a href="{{ route('lecturer.sessions') }}">Quản lý buổi học</a></li>
                     <li><a href="{{ route('lecturer.qrcode') }}">Tạo mã QR</a></li>
-                    <li><a href="#">Quản lý điểm danh</a></li>
+                    <li><a href="{{ route('lecturer.attendance.details', ['sessionId' => 1]) }}">Quản lý điểm danh</a></li>
                 </ul>
             </li>
             
