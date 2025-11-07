@@ -63,3 +63,7 @@ Route::get('/quan-ly-sinh-vien', function () {
 Route::get('/quan-ly-buoi-hoc', function () {
     return view('lecturer.session-management');
 })->name('lecturer.sessions');
+
+Route::get('/tao-ma-qr', function () {
+    return view('lecturer.qr-generator-page');
+})->name('lecturer.qrcode');

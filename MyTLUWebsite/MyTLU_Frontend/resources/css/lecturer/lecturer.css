@@ -376,3 +376,91 @@
 .btn-icon.text-danger:hover {
     color: #dc3545;
 }
+
+/*
+|--------------------------------------------------------------------------
+| CSS CHO TRANG TẠO MÃ QR
+|--------------------------------------------------------------------------
+*/
+
+/* Chia lưới 2 cột chính (Tỷ lệ 1fr / 1fr) */
+.qr-container-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Form layout bên trong cột Thông tin */
+.form-grid-qr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    padding-bottom: 20px;
+}
+
+/* Nhóm input thời gian (dropdown) */
+.input-time-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-time-group .form-control-small {
+    width: 100px; /* Giới hạn chiều rộng của dropdown thời gian */
+    text-align: center;
+}
+
+.time-separator {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Footer cho form tạo QR (để căn giữa nút) */
+.qr-action-footer {
+    display: flex;
+    justify-content: flex-start;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-icon-only {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Khung hiển thị Mã QR */
+.qr-display-card {
+    min-height: 400px;
+}
+
+.qr-content-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+    padding: 30px;
+}
+
+.qr-placeholder {
+    width: 250px;
+    height: 250px;
+    background-color: #f0f0f0;
+    border: 1px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    color: #888;
+}
+
+.qr-action-footer-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
