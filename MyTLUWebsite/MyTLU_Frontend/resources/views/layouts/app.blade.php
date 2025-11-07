@@ -70,7 +70,7 @@
                     <i class="fa-solid fa-chevron-down submenu-arrow"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a href="#">Quản lý buổi học</a></li>
+                    <li><a href="{{ route('lecturer.sessions') }}">Quản lý buổi học</a></li>
                     <li><a href="#">Tạo mã QR</a></li>
                     <li><a href="#">Quản lý điểm danh</a></li>
                 </ul>
@@ -115,16 +115,6 @@
 
 </div>
 
-<script>
-    // Logic Javascript để mở/đóng submenu
-    document.querySelectorAll('.has-submenu > a').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            e.preventDefault();
-            let parent = this.parentElement;
-            parent.classList.toggle('open');
-        });
-    });
-</script>
 @stack('modals')
 </body>
 </html>

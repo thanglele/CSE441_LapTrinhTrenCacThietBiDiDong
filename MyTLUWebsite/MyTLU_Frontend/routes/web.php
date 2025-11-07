@@ -59,3 +59,7 @@ Route::get('/quan-ly-lop/tao-moi', function () {
 Route::get('/quan-ly-sinh-vien', function () {
     return view('lecturer.student-management');
 })->name('lecturer.students');
+
+Route::get('/quan-ly-buoi-hoc', function () {
+    return view('lecturer.session-management');
+})->name('lecturer.sessions');

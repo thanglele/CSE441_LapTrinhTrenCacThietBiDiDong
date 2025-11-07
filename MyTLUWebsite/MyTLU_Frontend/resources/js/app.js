@@ -4,9 +4,7 @@ import '../css/lecturer/lecturer.css';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // === CODE NÀY ĐÃ ĐƯỢC ĐẶT TRONG DẤU NGOẶC NHỌN VÀ CHẠY ĐÚNG ===
-
-    // Logic cho Menu Dropdown (Nút QL Lớp & Môn học)
+    // Logic cho Menu Dropdown (Đã đúng)
     document.querySelectorAll('.has-submenu > a').forEach(menu => {
         menu.addEventListener('click', function(e) {
             e.preventDefault();
@@ -15,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
-    // Logic cho MODAL (Thêm/Sửa/Xóa sinh viên)
+    // Logic cho MODAL (ĐÃ PHỤC HỒI NỘI DUNG HÀM)
     const openButtons = document.querySelectorAll('[data-modal-target]');
     const closeButtons = document.querySelectorAll('.close-modal');
 
@@ -25,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const modalId = this.getAttribute('data-modal-target');
             const modal = document.querySelector(modalId);
             if (modal) {
-                modal.style.display = 'block';
+                modal.style.display = 'block'; // <--- NỘI DUNG HÀM ĐƯỢC PHỤC HỒI
             }
         });
     });
@@ -35,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function() {
             const modal = this.closest('.modal');
             if (modal) {
-                modal.style.display = 'none';
+                modal.style.display = 'none'; // <--- NỘI DUNG HÀM ĐƯỢC PHỤC HỒI
             }
         });
     });
