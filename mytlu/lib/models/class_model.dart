@@ -17,12 +17,14 @@ class ClassModel {
 
   factory ClassModel.fromJson(Map<String, dynamic> json) {
     return ClassModel(
-      code: json['code'] as String,
-      name: json['name'] as String,
-      room: json['room'] as String,
-      lecturer: json['lecturer'] as String,
-      time: '${json['startTime']} - ${json['endTime']}',
-      status: json['status'] as String,
+      code: (json['classCode'] as String?) ?? 'N/A',
+      name: (json['subjectName'] as String?) ?? 'Chưa cập nhật',
+      room: (json['room'] as String?) ?? 'N/A',
+      lecturer: (json['lecturerName'] as String?) ?? 'Giảng viên ẩn danh',
+
+      time: '${(json['startTime'] as String?) ?? '00:00'} - ${(json['endTime'] as String?) ?? '00:00'}',
+
+      status: (json['status'] as String?) ?? 'unknown',
     );
   }
 }
