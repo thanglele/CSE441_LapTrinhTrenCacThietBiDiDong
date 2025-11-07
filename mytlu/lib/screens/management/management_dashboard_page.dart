@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'subject_management_page.dart';
+import 'attendance_history_page.dart';
 
 class ManagementDashboardPage extends StatelessWidget {
   const ManagementDashboardPage({super.key});
@@ -47,7 +48,13 @@ class ManagementDashboardPage extends StatelessWidget {
               context: context,
               icon: Icons.checklist_rtl_outlined,
               label: 'Quản lý điểm danh',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AttendanceHistoryPage()),
+                );
+              },
             ),
           ],
         ),
