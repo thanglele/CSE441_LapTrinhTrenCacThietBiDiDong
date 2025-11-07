@@ -35,12 +35,24 @@ namespace MyTLUServer.Controllers
             {
                 return Unauthorized();
             }
-            
+
             // Gọi Service để thực hiện nghiệp vụ
             var dashboardData = await _dashboardService.GetDashboardDataAsync(lecturerCode);
-            
+
             // Trả về dữ liệu DTO
             return Ok(dashboardData);
+        }
+        [HttpGet("my-subjects")]
+        [ProducesResponseType(typeof(IEnumerable<LecturerSubjectDto>), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> GetMySubjects()
+        {
+            var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(lecturerCode)) return Unauthorized();
+            
+            var subjects = await _dashboardService.GetSubjectsAsync(lecturerCode);
+            return Ok(subjects);
         }
     }
 }

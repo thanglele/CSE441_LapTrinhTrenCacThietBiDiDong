@@ -108,4 +108,11 @@
         public int PresentCount { get; set; }
         public string AttendanceRate { get; set; } = null!;
     }
+    public class LecturerSubjectDto
+    {
+        public string SubjectCode { get; set; } = null!;
+        public string SubjectName { get; set; } = null!;
+        public int Credits { get; set; }
+        public string Description { get; set; } = null!;
+    }
 }

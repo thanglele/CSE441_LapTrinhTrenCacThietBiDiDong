@@ -74,7 +74,7 @@ namespace MyTLUServer.Infrastructure.Data.Repositories // (Namespace theo cấu 
                     Tag = $"{c.MaxStudents} SV"
                 }).ToListAsync();
         }
-        
+
         // 5. GetRecentAttendanceAsync (Sửa lỗi 'DateOnly?' to 'DateTime')
         public async Task<IEnumerable<RecentAttendanceDto>> GetRecentAttendanceAsync(string lecturerCode, int limit = 5)
         {
@@ -84,16 +84,16 @@ namespace MyTLUServer.Infrastructure.Data.Repositories // (Namespace theo cấu 
                           join s in _context.Subjects on c.SubjectCode equals s.SubjectCode
                           where c.LecturerCode == lecturerCode
                           orderby ar.CheckInTime descending
-                          select new RecentAttendanceDto 
+                          select new RecentAttendanceDto
                           {
                               Subject = s.SubjectName,
                               ClassCode = c.ClassCode,
                               SessionTitle = cs.Title,
-                              
+
                               // === SỬA LỖI (Nguồn: image_17463a.png) ===
                               // Chuyển đổi 'DateOnly?' sang 'DateTime'
-                              SessionDate = cs.SessionDate.HasValue 
-                                            ? cs.SessionDate.Value.ToDateTime(TimeOnly.MinValue) 
+                              SessionDate = cs.SessionDate.HasValue
+                                            ? cs.SessionDate.Value.ToDateTime(TimeOnly.MinValue)
                                             : DateTime.MinValue,
                               // =========================
 
@@ -101,6 +101,23 @@ namespace MyTLUServer.Infrastructure.Data.Repositories // (Namespace theo cấu 
                               PresentCount = 0, // (Tạm thời, cần logic đếm)
                               AttendanceRate = "0%" // (Tạm thời, cần logic đếm)
                           }).Take(limit).ToListAsync();
+        }
+        public async Task<IEnumerable<LecturerSubjectDto>> GetSubjectsAsync(string lecturerCode)
+        {
+            // Lấy các môn học (subjects) mà GV này dạy (Nguồn: 618)
+            var subjects = from c in _context.Classes
+                           join s in _context.Subjects on c.SubjectCode equals s.SubjectCode
+                           where c.LecturerCode == lecturerCode
+                           select new LecturerSubjectDto
+                           {
+                               SubjectCode = s.SubjectCode,
+                               SubjectName = s.SubjectName,
+                               Credits = s.Credits,
+                               Description = s.Description
+                           };
+            
+            // Dùng Distinct() để đảm bảo mỗi môn học chỉ xuất hiện 1 lần
+            return await subjects.Distinct().ToListAsync();
         }
     }
 }

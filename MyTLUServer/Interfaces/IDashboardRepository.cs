@@ -13,5 +13,6 @@ namespace MyTLUServer.Interfaces
         Task<IEnumerable<ScheduleSessionDto>> GetTodaySessionsAsync(string lecturerCode, DateTime today);
         Task<IEnumerable<TeachingClassDto>> GetTeachingClassesAsync(string lecturerCode);
         Task<IEnumerable<RecentAttendanceDto>> GetRecentAttendanceAsync(string lecturerCode, int limit = 5);
+        Task<IEnumerable<LecturerSubjectDto>> GetSubjectsAsync(string lecturerCode);
     }
 }

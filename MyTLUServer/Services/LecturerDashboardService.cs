@@ -16,30 +16,30 @@ namespace MyTLUServer.Application.Services // (Namespace Service của bạn)
         {
             _repository = repository;
         }
-        
+
         // ==========================================================
         // === HÀM NÀY ĐÃ ĐƯỢC SỬA (BỎ TASK.WHENALL) ===
         // ==========================================================
         public async Task<LecturerDashboardDto> GetDashboardDataAsync(string lecturerCode)
         {
             // 2. GỌI REPOSITORY (Chạy tuần tự)
-            
+
             // Lấy Lịch học hôm nay
             var todaySessions = await _repository.GetTodaySessionsAsync(lecturerCode, DateTime.Today);
-            
+
             // Lấy Lớp đang dạy
             var teachingClasses = await _repository.GetTeachingClassesAsync(lecturerCode);
-            
+
             // Lấy Điểm danh gần đây
             var recentAttendance = await _repository.GetRecentAttendanceAsync(lecturerCode, 5);
-            
+
             // Lấy Số lớp
             var totalClasses = await _repository.GetClassCountAsync(lecturerCode);
-            
+
             // Lấy Số SV
             var totalStudents = await _repository.GetStudentCountAsync(lecturerCode);
 
-            
+
             // 3. ÁNH XẠ (MAP) DỮ LIỆU
             var dashboardDto = new LecturerDashboardDto
             {
@@ -56,8 +56,11 @@ namespace MyTLUServer.Application.Services // (Namespace Service của bạn)
 
             return dashboardDto;
         }
+        public async Task<IEnumerable<LecturerSubjectDto>> GetSubjectsAsync(string lecturerCode)
+        {
+            // (Sau này bạn có thể thêm logic nghiệp vụ, filter... ở đây)
+            return await _repository.GetSubjectsAsync(lecturerCode);
+        }
 
-        // (Hàm GetStatsAsync() đã được gộp vào hàm trên
-        //  nên bạn có thể xóa nó nếu muốn)
     }
 }
