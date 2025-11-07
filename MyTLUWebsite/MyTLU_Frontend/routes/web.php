@@ -46,7 +46,7 @@ Route::post('/reset-password', [AuthController::class, 'handleResetPassword'])
 
 Route::get('/quan-ly-mon-hoc', function () {
     return view('lecturer.subject-management'); 
-})->name('subjects.index');
+})->name('lecturer.subjects');
 
 Route::get('/quan-ly-lop', function () {
     return view('lecturer.class-management'); 
@@ -55,3 +55,7 @@ Route::get('/quan-ly-lop', function () {
 Route::get('/quan-ly-lop/tao-moi', function () {
     return view('lecturer.class-create-form'); 
 })->name('lecturer.classes.create');
+
+Route::get('/quan-ly-sinh-vien', function () {
+    return view('lecturer.student-management');
+})->name('lecturer.students');
