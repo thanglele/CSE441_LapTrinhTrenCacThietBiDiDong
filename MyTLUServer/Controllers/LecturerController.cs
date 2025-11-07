@@ -50,9 +50,25 @@ namespace MyTLUServer.Controllers
         {
             var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(lecturerCode)) return Unauthorized();
-            
+
             var subjects = await _dashboardService.GetSubjectsAsync(lecturerCode);
             return Ok(subjects);
         }
+
+        [HttpGet("my-classes")]
+        [ProducesResponseType(typeof(IEnumerable<LecturerClassDto>), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> GetMyClasses()
+        {
+            var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(lecturerCode)) return Unauthorized();
+
+            // (Sau này bạn có thể truyền filter/search params từ Query vào đây)
+            var classes = await _dashboardService.GetClassesAsync(lecturerCode);
+            return Ok(classes);
+        }
+        
+        
     }
 }

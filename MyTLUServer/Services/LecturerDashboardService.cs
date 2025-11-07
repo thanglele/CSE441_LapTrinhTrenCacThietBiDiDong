@@ -61,6 +61,12 @@ namespace MyTLUServer.Application.Services // (Namespace Service của bạn)
             // (Sau này bạn có thể thêm logic nghiệp vụ, filter... ở đây)
             return await _repository.GetSubjectsAsync(lecturerCode);
         }
+        public async Task<IEnumerable<LecturerClassDto>> GetClassesAsync(string lecturerCode)
+        {
+            // (Sau này bạn có thể thêm logic nghiệp vụ, filter... ở đây)
+            return await _repository.GetClassesAsync(lecturerCode);
+        }
+        
 
     }
 }

@@ -115,4 +115,15 @@
         public int Credits { get; set; }
         public string Description { get; set; } = null!;
     }
+    public class LecturerClassDto
+    {
+        public string ClassCode { get; set; } = null!;
+        public string ClassName { get; set; } = null!;
+        public string AcademicYear { get; set; } = null!;
+        public string Semester { get; set; } = null!;
+        public int StudentCount { get; set; } // Sĩ số (Cần tính toán)
+        public string DefaultLocation { get; set; } = null!;
+        public string ClassType { get; set; } = null!;
+        public string ClassStatus { get; set; } = null!;
+    }
 }

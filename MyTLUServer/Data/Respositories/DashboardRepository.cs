@@ -115,9 +115,26 @@ namespace MyTLUServer.Infrastructure.Data.Repositories // (Namespace theo cấu 
                                Credits = s.Credits,
                                Description = s.Description
                            };
-            
+
             // Dùng Distinct() để đảm bảo mỗi môn học chỉ xuất hiện 1 lần
             return await subjects.Distinct().ToListAsync();
+        }
+        public async Task<IEnumerable<LecturerClassDto>> GetClassesAsync(string lecturerCode)
+        {
+            return await _context.Classes
+                .Where(c => c.LecturerCode == lecturerCode)
+                .Select(c => new LecturerClassDto
+                {
+                    ClassCode = c.ClassCode, // (Nguồn: 618)
+                    ClassName = c.ClassName, // (Nguồn: 618)
+                    AcademicYear = c.AcademicYear, // (Nguồn: 618)
+                    Semester = c.Semester, // (Nguồn: 618)
+                    // Đếm sĩ số (Join với bảng enrollments (Nguồn: 618))
+                    StudentCount = _context.Enrollments.Count(e => e.ClassCode == c.ClassCode), 
+                    DefaultLocation = c.DefaultLocation, // (Nguồn: 618)
+                    ClassType = c.ClassType, // (Nguồn: 618)
+                    ClassStatus = c.ClassStatus // (Nguồn: 618)
+                }).ToListAsync();
         }
     }
 }

@@ -6,5 +6,8 @@ namespace MyTLUServer.Interfaces
    {
         Task<LecturerDashboardDto> GetDashboardDataAsync(string lecturerCode);
         Task<IEnumerable<LecturerSubjectDto>> GetSubjectsAsync(string lecturerCode);
+        Task<IEnumerable<LecturerClassDto>> GetClassesAsync(string lecturerCode);
+
+        
    }
 }
