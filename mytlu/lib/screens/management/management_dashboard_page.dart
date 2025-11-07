@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'class_management_page.dart';
+import 'student_management_page.dart';
 import 'subject_management_page.dart';
 import 'attendance_history_page.dart';
 
@@ -36,13 +38,25 @@ class ManagementDashboardPage extends StatelessWidget {
               context: context,
               icon: Icons.school_outlined,
               label: 'Quản lý lớp học',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ClassManagementPage()), // Dùng ClassManagementPage
+                );
+              },
             ),
             _buildManagementButton(
               context: context,
               icon: Icons.people_outline,
               label: 'Quản lý sinh viên',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const StudentManagementPage()), // Dùng StudentManagementPage
+                );
+              },
             ),
             _buildManagementButton(
               context: context,

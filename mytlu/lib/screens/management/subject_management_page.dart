@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; // Cần thiết cho API Service
+import 'dart:convert';
 import 'class_management_page.dart';
 import '../../models/subject_model.dart';
-
+// <<< THÊM CÁC SERVICE >>>
+import '../../services/api_service.dart';
+import '../../services/user_session.dart';
 
 class SubjectManagementPage extends StatefulWidget {
   const SubjectManagementPage({super.key});
@@ -11,22 +15,67 @@ class SubjectManagementPage extends StatefulWidget {
 }
 
 class _SubjectManagementPageState extends State<SubjectManagementPage> {
-  // Danh sách dữ liệu giả lập
-  final List<Subject> _subjects = [
-    Subject(name: 'Học tăng cường', code: 'CSE321', credits: 3, classCount: 1),
-    Subject(name: 'Mạng máy tính', code: 'CSE1234', credits: 3, classCount: 2),
-    Subject(name: 'Kiến trúc máy tính', code: 'CSE123', credits: 3, classCount: 1),
-    Subject(name: 'Cấu trúc dữ liệu và giải thuật', code: 'CSE123', credits: 3, classCount: 1),
-  ];
+  late Future<List<Subject>> _subjectsFuture;
+  final ApiService _apiService = ApiService();
 
+  // Lưu token đã tải
+  String? _jwtToken;
+
+  // Danh sách dữ liệu giả lập (Đã bị loại bỏ)
+  // final List<Subject> _subjects = [...];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSubjectsData();
+  }
+
+  // =========================================================================
+  // TẢI TOKEN VÀ GỌI API THẬT
+  // =========================================================================
+  Future<void> _loadSubjectsData() async {
+    try {
+      final session = UserSession();
+      final token = await session.getToken();
+
+      if (token == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vui lòng đăng nhập lại để xem môn học.'), backgroundColor: Colors.red),
+          );
+        }
+        setState(() {
+          _subjectsFuture = Future.error('Token không khả dụng');
+        });
+        return;
+      }
+
+      setState(() {
+        _jwtToken = token;
+        // Bắt đầu gọi API thật
+        _subjectsFuture = _apiService.fetchMySubjects(token);
+      });
+
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _subjectsFuture = Future.error('Lỗi tải dữ liệu: $e');
+        });
+      }
+    }
+  }
+
+  // =========================================================================
+  // GIAO DIỆN CHÍNH (Sử dụng FutureBuilder)
+  // =========================================================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('Quản lý môn học', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF0D47A1), // Màu TLU
-        iconTheme: const IconThemeData(color: Colors.white), // Nút back màu trắng
+        backgroundColor: const Color(0xFF0D47A1),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -48,12 +97,29 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
             ),
             const SizedBox(height: 20),
 
-            // Danh sách môn học
+            // Danh sách môn học (SỬA: Dùng FutureBuilder)
             Expanded(
-              child: ListView.builder(
-                itemCount: _subjects.length,
-                itemBuilder: (context, index) {
-                  return _buildSubjectCard(_subjects[index]);
+              child: FutureBuilder<List<Subject>>(
+                future: _subjectsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF0D47A1)));
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Lỗi tải môn học: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Bạn chưa được phân công môn học nào.'));
+                  }
+
+                  final subjects = snapshot.data!;
+
+                  return ListView.builder(
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      return _buildSubjectCard(subjects[index]);
+                    },
+                  );
                 },
               ),
             ),
@@ -65,6 +131,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
 
   // Widget helper để xây dựng card cho mỗi môn học
   Widget _buildSubjectCard(Subject subject) {
+    // Lỗi 'subject' is required không xảy ra ở đây, mà ở nơi ClassManagementPage được định nghĩa.
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -84,6 +151,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
+                  // Giả sử Model Subject có credits và code
                   '${subject.code} • ${subject.credits} tín chỉ',
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
@@ -98,21 +166,22 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                   context,
                   MaterialPageRoute(
                     // Truyền môn học (subject) mà người dùng đã bấm
-                    builder: (context) => ClassManagementPage(subject: subject),
+                    builder: (context) => ClassManagementPage(),
                   ),
                 );
               },
               style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFFE3F2FD), // Màu xanh nhạt
+                backgroundColor: const Color(0xFFE3F2FD),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               child: Row(
                 children: [
                   Text(
+                    // Giả sử Model Subject có classCount
                     '${subject.classCount.toString().padLeft(2, '0')} lớp',
                     style: const TextStyle(
-                      color: Color(0xFF0D47A1), // Màu TLU
+                      color: Color(0xFF0D47A1),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

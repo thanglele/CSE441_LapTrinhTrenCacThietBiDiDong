@@ -10,6 +10,12 @@ import '../services/api_service.dart';
 import '../services/user_session.dart';
 import 'qr/create_qr_page.dart'; // Trang tạo QR
 
+// <<< THÊM CÁC TRANG ĐIỀU HƯỚNG MỚI >>>
+import 'management/management_dashboard_page.dart'; // Quản lý
+import 'profile/profile_page.dart';                 // Cá nhân
+import 'statistical/statistics_page.dart';           // Thống kê
+// ------------------------------------
+
 // Màu sắc chính (Giữ nguyên)
 const Color tluPrimaryColor = Color(0xFF0D47A1);
 const Color tluAccentColor = Color(0xFF42A5F5);
@@ -36,17 +42,26 @@ class _HomePageState extends State<HomePage> {
   String? _lecturerName;
   bool _isDataLoaded = false;
 
-  // <<< THÊM: Lưu trữ tóm tắt lịch (Số lượng lớp) cho 7 ngày
-  Map<String, int> _scheduleSummary = {}; // Key: 'YYYY-MM-DD', Value: Count
+  Map<String, int> _scheduleSummary = {};
+
+  // Danh sách nội dung (Widgets) cho các Tab
+  late final List<Widget> _widgetOptions;
 
   @override
   void initState() {
     super.initState();
+    // Khởi tạo danh sách Widget cho các tab
+    _widgetOptions = <Widget>[
+      _buildHomePageContent(), // Index 0: Trang chủ
+      const ManagementDashboardPage(), // Index 1: Quản lý
+      const StatisticsPage(), // Index 2: Thống kê
+      const ProfilePage(), // Index 3: Cá nhân
+    ];
     _initializeData();
   }
 
   // =========================================================================
-  // HÀM KHỞI TẠO DỮ LIỆU CHÍNH (TẢI TOKEN VÀ TÊN)
+  // HÀM KHỞI TẠO DỮ LIỆU CHÍNH (Đã sửa)
   // =========================================================================
   Future<void> _initializeData() async {
     try {
@@ -59,20 +74,21 @@ class _HomePageState extends State<HomePage> {
               const SnackBar(content: Text('Không tìm thấy session. Vui lòng đăng nhập!'))
           );
         }
-        return;
+        throw Exception('Không tìm thấy session');
       }
 
-      setState(() {
-        _jwtToken = session['token'];
-        _lecturerName = session['fullName'];
-        _isDataLoaded = true;
-      });
+      _jwtToken = session['token'];
+      final lecturerName = session['fullName'];
 
-      // 1. Tải lịch 7 ngày (sau khi có token)
       await _fetchScheduleSummary();
 
-      // 2. Tải lớp học cho ngày hôm nay (mặc định)
-      _loadClassesForDate(_selectedDate);
+      final initialClassesFuture = _apiService.fetchTodayClasses(_jwtToken!);
+
+      setState(() {
+        _lecturerName = lecturerName;
+        _isDataLoaded = true;
+        _classesFuture = initialClassesFuture;
+      });
 
     } catch (e) {
       debugPrint('Lỗi khởi tạo dữ liệu: $e');
@@ -84,26 +100,37 @@ class _HomePageState extends State<HomePage> {
   }
 
   // =========================================================================
-  // <<< HÀM MỚI: TẢI SỐ LƯỢNG LỚP TRONG 7 NGÀY TỚI >>>
+  // HÀM HELPER VÀ LỌC DỮ LIỆU
   // =========================================================================
+  Future<List<ScheduleSession>> _getClassesFutureForDate(DateTime date) {
+    if (_jwtToken == null) {
+      return Future.error('Chưa xác thực người dùng');
+    }
+    return _apiService.fetchScheduleByDate(_jwtToken!, date);
+  }
+
+  void _loadClassesForDate(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+      _classesFuture = _getClassesFutureForDate(date);
+    });
+  }
+
   Future<void> _fetchScheduleSummary() async {
     if (_jwtToken == null) return;
-
     final Map<String, int> summary = {};
     final DateTime now = DateTime.now();
 
-    // Tải cho 7 ngày tới (bao gồm hôm nay)
     for (int i = 0; i < 7; i++) {
       final date = now.add(Duration(days: i));
       final formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
       try {
-        // Gọi API mới (sử dụng fetchScheduleByDate đã thêm vào ApiService)
         final sessions = await _apiService.fetchScheduleByDate(_jwtToken!, date);
         summary[formattedDate] = sessions.length;
       } catch (e) {
         debugPrint('Lỗi tải lịch ngày $formattedDate: $e');
-        summary[formattedDate] = 0; // Đặt là 0 nếu có lỗi
+        summary[formattedDate] = 0;
       }
     }
 
@@ -114,48 +141,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
-  // =========================================================================
-  // HÀM TẢI DỮ LIỆU LỚP HỌC CHO NGÀY ĐƯỢC CHỌN
-  // =========================================================================
-  void _loadClassesForDate(DateTime date) {
-    if (_jwtToken == null) return;
-
-    setState(() {
-      _selectedDate = date;
-      // <<< SỬA: Dùng API mới để lấy đúng lịch của ngày được chọn
-      _classesFuture = _apiService.fetchScheduleByDate(_jwtToken!, date);
-    });
-  }
-
-  // =========================================================================
-  // HÀM XỬ LÝ KHI NHẤN NÚT "TẠO QR"
-  // =========================================================================
   Future<void> _handleStartAttendance(String sessionId) async {
     if (_jwtToken == null || !mounted) return;
 
     try {
-      // 1. TẢI THÔNG TIN SESSION CHI TIẾT
       final url = Uri.parse('https://mytlu.thanglele.cloud/api/v1/sessions/$sessionId');
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer $_jwtToken',
       });
 
       if (response.statusCode == 200) {
-        // final data = jsonDecode(response.body); // Dữ liệu chi tiết
-
-        // 2. ĐIỀU HƯỚNG SANG TRANG TẠO QR
         if (mounted) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              // CreateQrPage sẽ tự gọi API start-attendance
               builder: (_) => CreateQrPage(sessionId: sessionId),
             ),
           ).then((_) {
-            // 3. Tải lại danh sách sau khi quay lại (để cập nhật trạng thái)
             _loadClassesForDate(_selectedDate);
-            // 4. Tải lại tóm tắt lịch (cần thiết nếu trạng thái session ảnh hưởng đến số lượng lớp chưa hoàn thành)
             _fetchScheduleSummary();
           });
         }
@@ -180,115 +183,97 @@ class _HomePageState extends State<HomePage> {
         dateA.day == dateB.day;
   }
 
+  // =========================================================================
+  // WIDGET BUILD CHÍNH
+  // =========================================================================
+
   @override
   Widget build(BuildContext context) {
     if (!_isDataLoaded) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: tluPrimaryColor),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: tluPrimaryColor)));
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            _buildCustomAppBar(context),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Lịch giảng dạy', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54)),
-                  const SizedBox(height: 10),
-                  _buildTeachingSchedule(), // <<< ĐÃ SỬ DỤNG DỮ LIỆU THẬT
-                  const SizedBox(height: 20),
-                  Text(
-                    _isSameDay(_selectedDate, DateTime.now())
-                        ? 'Lớp học hôm nay'
-                        : 'Lớp học ngày ${DateFormat.Md('vi_VN').format(_selectedDate)}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildClassesList(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      // SỬ DỤNG _widgetOptions ĐỂ CHUYỂN ĐỔI NỘI DUNG
+      body: _widgetOptions[_selectedIndex],
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
   // =========================================================================
-  // WIDGET 2: LỊCH GIẢNG DẠY (ĐÃ SỬA ĐỂ DÙNG DỮ LIỆU THẬT)
+  // WIDGETS
   // =========================================================================
-  Widget _buildTeachingSchedule() {
-    final List<DateTime> days = List.generate(
-      7,
-          (index) => DateTime.now().add(Duration(days: index)),
-    );
 
-    return SizedBox(
-      height: 90,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: days.length,
-        itemBuilder: (context, index) {
-          final date = days[index];
-          final bool isActive = _isSameDay(date, _selectedDate);
-          final formattedDate = DateFormat('yyyy-MM-dd').format(date);
-
-          // <<< LẤY SỐ LƯỢNG LỚP TỪ STATE >>>
-          final int classCount = _scheduleSummary[formattedDate] ?? 0;
-
-          return GestureDetector(
-            onTap: () {
-              _loadClassesForDate(date);
-            },
-            child: Container(
-              width: 60,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: isActive ? tluAccentColor : Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    DateFormat.E('vi_VN').format(date),
-                    style: TextStyle(color: isActive ? Colors.white : Colors.black87, fontSize: 14),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    DateFormat.d().format(date),
-                    style: TextStyle(color: isActive ? Colors.white : Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  // <<< HIỂN THỊ SỐ LƯỢNG LỚP THẬT >>>
-                  Text(
-                    '$classCount',
-                    style: TextStyle(
-                      color: isActive ? Colors.white : Colors.black54,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
+  // WIDGET NỘI DUNG TRANG CHỦ (INDEX 0)
+  Widget _buildHomePageContent() {
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          _buildCustomAppBar(context),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Lịch giảng dạy', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54)),
+                const SizedBox(height: 10),
+                _buildTeachingSchedule(),
+                const SizedBox(height: 20),
+                Text(
+                  _isSameDay(_selectedDate, DateTime.now())
+                      ? 'Lớp học hôm nay'
+                      : 'Lớp học ngày ${DateFormat.Md('vi_VN').format(_selectedDate)}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                _buildClassesList(),
+              ],
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
 
-  // ... (Các widgets khác giữ nguyên) ...
+  // WIDGET BOTTOM NAVIGATION BAR (ĐÃ GÁN ĐIỀU HƯỚNG)
+  Widget _buildBottomNavBar() {
+    return Container(
+      decoration: const BoxDecoration(color: tluPrimaryColor),
+      child: SafeArea(
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+            // Tải lại dữ liệu Trang chủ nếu quay lại index 0
+            if (index == 0) {
+              _loadClassesForDate(DateTime.now());
+              _fetchScheduleSummary();
+            }
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: tluPrimaryColor,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white60,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
+            // Index 1
+            BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Quản lý'),
+            // Index 2
+            BottomNavigationBarItem(icon: Icon(Icons.insert_chart_outlined), label: 'Thống kê'),
+            // Index 3
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Cá nhân'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // WIDGET CUSTOM APP BAR
   Widget _buildCustomAppBar(BuildContext context) {
-    // Code giữ nguyên (sử dụng _lecturerName)
-    // ...
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
       decoration: const BoxDecoration(
@@ -316,9 +301,66 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // WIDGET LỊCH GIẢNG DẠY (Dùng dữ liệu thật)
+  Widget _buildTeachingSchedule() {
+    final List<DateTime> days = List.generate(
+      7,
+          (index) => DateTime.now().add(Duration(days: index)),
+    );
+
+    return SizedBox(
+      height: 90,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: days.length,
+        itemBuilder: (context, index) {
+          final date = days[index];
+          final bool isActive = _isSameDay(date, _selectedDate);
+          final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+          final int classCount = _scheduleSummary[formattedDate] ?? 0;
+
+          return GestureDetector(
+            onTap: () {
+              _loadClassesForDate(date);
+            },
+            child: Container(
+              width: 60,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: isActive ? tluAccentColor : Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    DateFormat.E('vi_VN').format(date),
+                    style: TextStyle(color: isActive ? Colors.white : Colors.black87, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat.d().format(date),
+                    style: TextStyle(color: isActive ? Colors.white : Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$classCount',
+                    style: TextStyle(
+                      color: isActive ? Colors.white : Colors.black54,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // WIDGET DANH SÁCH LỚP HỌC
   Widget _buildClassesList() {
-    // Code giữ nguyên (sử dụng _classesFuture)
-    // ...
     return FutureBuilder<List<ScheduleSession>>(
       future: _classesFuture,
       builder: (context, snapshot) {
@@ -346,32 +388,6 @@ class _HomePageState extends State<HomePage> {
           );
         }
       },
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    // Code giữ nguyên
-    // ...
-    return Container(
-      decoration: const BoxDecoration(color: tluPrimaryColor),
-      child: SafeArea(
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) { setState(() { _selectedIndex = index; }); },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: tluPrimaryColor,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white60,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Quản lý'),
-            BottomNavigationBarItem(icon: Icon(Icons.insert_chart_outlined), label: 'Thống kê'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Cá nhân'),
-          ],
-        ),
-      ),
     );
   }
 }

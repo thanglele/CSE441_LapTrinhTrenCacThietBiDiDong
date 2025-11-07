@@ -3,14 +3,104 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart'; // <<< Dùng cấu hình
+import '../models/class_detail_model.dart';
 import '../models/schedule_session_dto.dart';
 import 'package:intl/intl.dart';
+
+import '../models/student_model.dart';
+import '../models/subject_model.dart';
 
 class ApiService {
   // Dùng ApiConfig và thêm path '/api/v1'
   static const String _apiPath = '/api/v1';
 
-  /// API (Thật) Lấy lịch học hôm nay của Giảng viên
+  
+  Future<List<Subject>> fetchMySubjects(String jwtToken) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-subjects');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List jsonList = json.decode(response.body) as List;
+
+        // <<< LƯU Ý: Phải sử dụng Subject.fromJson(json) trong Model của bạn
+        return jsonList.map((json) => Subject.fromJson(json)).toList();
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        throw Exception('Xác thực thất bại hoặc không có quyền truy cập.');
+      } else {
+        throw Exception('Failed to load subjects. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi kết nối mạng: $e');
+    }
+  }
+  Future<List<ClassDetail>> fetchMyClasses(String jwtToken) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-classes');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List jsonList = json.decode(response.body) as List;
+        // <<< LƯU Ý: Phải sử dụng ClassDetail.fromJson(json) >>>
+        return jsonList.map((json) => ClassDetail.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load classes. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi kết nối mạng: $e');
+    }
+  }
+
+  /// API (Thật) Lấy danh sách TẤT CẢ môn học của giảng viên (Lặp lại hàm SubjectManagement)
+  Future<List<Subject>> fetchAllMySubjects(String jwtToken) async {
+    // Dùng lại endpoint SubjectManagement đã có, nhưng đặt tên khác cho rõ ràng
+    return fetchMySubjects(jwtToken);
+  }
+  Future<List<Student>> fetchStudentsInClass(String classCode, String jwtToken) async {
+    // Đảm bảo import Student model nếu chưa có
+    // import '../models/student_model.dart';
+
+    const String _apiPath = '/api/v1'; // Đảm bảo khai báo _apiPath hoặc dùng trực tiếp ApiConfig
+    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/classes/$classCode/students');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List jsonList = json.decode(response.body) as List;
+
+        // <<< LƯU Ý: Yêu cầu Model Student phải có Student.fromJson() >>>
+        return jsonList.map((json) => Student.fromJson(json)).toList();
+      } else if (response.statusCode == 403) {
+        throw Exception('Lỗi 403: Bạn không có quyền truy cập danh sách sinh viên.');
+      }
+      else {
+        throw Exception('Failed to load students. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi kết nối mạng: $e');
+    }
+  }
   Future<List<ScheduleSession>> fetchTodayClasses(String jwtToken) async {
     // URL được tạo từ Base URL + Path API + Endpoint
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/dashboard');
@@ -44,7 +134,7 @@ class ApiService {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
     // URL được tạo từ Base URL + Path API + Endpoint
-    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/sessions/my-schedule-by-date?date=$formattedDate');
+    final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-schedule-by-date?selectedDate=$formattedDate');
 
     try {
       final response = await http.get(

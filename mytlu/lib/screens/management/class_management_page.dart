@@ -1,62 +1,145 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../services/api_service.dart';
+import '../../services/user_session.dart';
+
 import '../../models/subject_model.dart';
 import '../../models/class_detail_model.dart';
 import 'student_management_page.dart';
 
 class ClassManagementPage extends StatefulWidget {
-  final Subject subject;
-
-  const ClassManagementPage({super.key, required this.subject});
+  const ClassManagementPage({super.key});
 
   @override
   State<ClassManagementPage> createState() => _ClassManagementPageState();
 }
 
 class _ClassManagementPageState extends State<ClassManagementPage> {
-  final List<ClassDetail> _classes = [
-    ClassDetail(
-      classCode: '64KTPM3',
-      subjectCode: 'CSE123.64KTPM3',
-      academicYear: '2025 - Học kỳ I',
-      room: '305 - B5',
-      type: 'Lý thuyết',
-      studentCount: 60,
-    ),
-    ClassDetail(
-      classCode: '64KTPM1',
-      subjectCode: 'CSE123.64KTPM1',
-      academicYear: '2025 - Học kỳ I',
-      room: '305 - B5',
-      type: 'Lý thuyết',
-      studentCount: 60,
-    ),
-    ClassDetail(
-      classCode: '64KTPM2',
-      subjectCode: 'CSE123.64KTPM2',
-      academicYear: '2025 - Học kỳ I',
-      room: '305 - B5',
-      type: 'Lý thuyết',
-      studentCount: 60,
-    ),
-  ];
+  final ApiService _apiService = ApiService();
 
-  final List<Subject> _allSubjects = [
-    Subject(name: 'Học tăng cường', code: 'CSE321', credits: 3, classCount: 1),
-    Subject(name: 'Mạng máy tính', code: 'CSE1234', credits: 3, classCount: 2),
-    Subject(name: 'Kiến trúc máy tính', code: 'CSE123', credits: 3, classCount: 1),
-  ];
+  // Biến State cho dữ liệu API
+  String? _jwtToken;
+  bool _isLoading = true;
+  Exception? _loadError;
 
-  late Subject _selectedSubject;
+  List<ClassDetail> _allClasses = [];
+  List<ClassDetail> _filteredClasses = [];
+  List<Subject> _allSubjects = []; // Danh sách môn học cho Dropdown
+
+  // Biến Filter
+  // <<< SỬA 2: Đặt là nullable (có thể null) vì nó phụ thuộc vào dữ liệu API >>>
+  Subject? _selectedSubject;
   String _selectedClassType = 'Tất cả lớp học';
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _selectedSubject = widget.subject;
+    // Không gán widget.subject nữa
+    _loadInitialData();
   }
+
+  // =========================================================================
+  // TẢI DỮ LIỆU BAN ĐẦU (Token, Môn học, Lớp học)
+  // =========================================================================
+  Future<void> _loadInitialData() async {
+    try {
+      final session = UserSession();
+      final token = await session.getToken();
+
+      if (token == null) {
+        throw Exception('Token không khả dụng. Vui lòng đăng nhập lại.');
+      }
+      _jwtToken = token;
+
+      // 1. Tải TẤT CẢ các môn học (cho Dropdown)
+      final subjects = await _apiService.fetchAllMySubjects(_jwtToken!);
+      // 2. Tải TẤT CẢ các lớp học của giảng viên
+      final classes = await _apiService.fetchMyClasses(_jwtToken!);
+
+      if (!mounted) return;
+
+      setState(() {
+        _allSubjects = subjects;
+        _allClasses = classes;
+        _isLoading = false;
+
+        // <<< SỬA 3: Chọn môn học đầu tiên (nếu có) làm giá trị mặc định >>>
+        if (subjects.isNotEmpty) {
+          _selectedSubject = subjects.first;
+        }
+
+        // Bắt đầu lọc lần đầu
+        _filterClasses();
+      });
+
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadError = e is Exception ? e : Exception(e.toString());
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // =========================================================================
+  // LOGIC LỌC DỮ LIỆU (Đã sửa để xử lý _selectedSubject là nullable)
+  // =========================================================================
+  void _filterClasses() {
+    // Chỉ lọc khi dữ liệu đã được tải và có môn học để lọc
+    if (_allSubjects.isEmpty || _selectedSubject == null) {
+      setState(() => _filteredClasses = []);
+      return;
+    }
+
+    setState(() {
+      _filteredClasses = _allClasses.where((cls) {
+
+        // Lọc theo Môn học (Chỉ hiển thị các lớp thuộc _selectedSubject)
+        final subjectMatch = cls.subjectCode.contains(_selectedSubject!.code);
+
+        // Lọc theo Loại lớp học
+        final typeMatch = _selectedClassType == 'Tất cả lớp học' || cls.type == _selectedClassType;
+
+        // Lọc theo Tìm kiếm
+        final searchMatch = _searchQuery.isEmpty ||
+            cls.classCode.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            cls.room.toLowerCase().contains(_searchQuery.toLowerCase());
+
+        return subjectMatch && typeMatch && searchMatch;
+      }).toList();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      // Giữ nguyên Loading
+      return Scaffold(
+        appBar: AppBar(title: const Text('Quản lý lớp học', style: TextStyle(color: Colors.white)), backgroundColor: const Color(0xFF0D47A1), iconTheme: const IconThemeData(color: Colors.white)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_loadError != null) {
+      // Giữ nguyên Lỗi
+      return Scaffold(
+        appBar: AppBar(title: const Text('Quản lý lớp học', style: TextStyle(color: Colors.white)), backgroundColor: const Color(0xFF0D47A1), iconTheme: const IconThemeData(color: Colors.white)),
+        body: Center(child: Text('Lỗi tải dữ liệu: ${_loadError!.toString()}')),
+      );
+    }
+
+    // Nếu không có môn học nào được phân công
+    if (_allSubjects.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Quản lý lớp học', style: TextStyle(color: Colors.white)), backgroundColor: const Color(0xFF0D47A1), iconTheme: const IconThemeData(color: Colors.white)),
+        body: const Center(child: Text('Bạn chưa được phân công môn học nào để quản lý.')),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -70,7 +153,8 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _selectedSubject.name,
+              // Hiển thị tên môn học đang được chọn
+              _selectedSubject != null ? _selectedSubject!.name : 'Chọn Môn học',
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -79,12 +163,14 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
             const SizedBox(height: 12),
             _buildFilterCard(),
             const SizedBox(height: 16),
+
+            // Danh sách lớp học
             ListView.builder(
-              itemCount: _classes.length,
+              itemCount: _filteredClasses.length,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                return _buildClassCard(_classes[index]);
+                return _buildClassCard(_filteredClasses[index]);
               },
             ),
             const SizedBox(height: 16),
@@ -93,6 +179,10 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
       ),
     );
   }
+
+  // =========================================================================
+  // WIDGETS
+  // =========================================================================
 
   Widget _buildFilterCard() {
     return Card(
@@ -106,6 +196,7 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<Subject>(
+                    // <<< SỬA 4: Sử dụng _selectedSubject là nullable >>>
                     value: _selectedSubject,
                     decoration: _inputDecoration('Môn học'),
                     items: _allSubjects.map((Subject subject) {
@@ -116,7 +207,8 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
                     }).toList(),
                     onChanged: (Subject? newValue) {
                       setState(() {
-                        _selectedSubject = newValue!;
+                        _selectedSubject = newValue;
+                        _filterClasses(); // Lọc lại khi đổi môn
                       });
                     },
                   ),
@@ -136,6 +228,7 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedClassType = newValue!;
+                        _filterClasses(); // Lọc lại khi đổi loại lớp
                       });
                     },
                   ),
@@ -147,6 +240,10 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
               decoration: _inputDecoration('Tìm kiếm').copyWith(
                 prefixIcon: const Icon(Icons.search),
               ),
+              onChanged: (value) {
+                _searchQuery = value;
+                _filterClasses(); // Lọc lại khi gõ tìm kiếm
+              },
             ),
           ],
         ),
@@ -208,7 +305,7 @@ class _ClassManagementPageState extends State<ClassManagementPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      // Truyền đối tượng ClassDetail (cls) sang trang mới
+                      // Truyền ClassDetail hợp lệ
                       builder: (context) => StudentManagementPage(classDetail: cls),
                     ),
                   );
