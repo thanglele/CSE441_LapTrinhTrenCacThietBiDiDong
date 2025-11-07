@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart'; // Cần cho việc định dạng ngày
 import '../../models/session_data.dart';
 import '../../services/user_session.dart';
-import 'qr_display_page.dart'; // Trang hiển thị QR
+import 'qr_display_page.dart';
 
 // Màu sắc phụ (Nếu cần)
 const Color tluAccentColor = Color(0xFF42A5F5);
@@ -24,23 +24,29 @@ class _CreateQrPageState extends State<CreateQrPage> {
   SessionData? _sessionData;
   Exception? _loadError;
 
-  // <<< THÊM: Biến State cho Dropdown Thời gian Điểm danh >>>
   late String _checkInTime;
   late String _checkOutTime;
 
   @override
   void initState() {
     super.initState();
-    // Giá trị khởi tạo tạm thời (sẽ được gán lại sau khi tải _sessionData)
     _checkInTime = "00:00";
     _checkOutTime = "00:00";
     _loadData();
   }
 
-  // ==========================================================
-  // HÀM 1: TẢI THÔNG TIN SESSION VÀ TOKEN
-  // ==========================================================
+  // Helper: Trích xuất HH:mm an toàn (Giữ nguyên từ lần sửa trước)
+  String _extractTimeSafely(String fullDateTimeString) {
+    final RegExp timeRegex = RegExp(r'(\d{2}:\d{2})');
+    final match = timeRegex.firstMatch(fullDateTimeString);
+    if (match != null) {
+      return match.group(0)!;
+    }
+    return '00:00';
+  }
+
   Future<void> _loadData() async {
+    // ... (Giữ nguyên logic tải dữ liệu và token) ...
     try {
       final session = UserSession();
       final token = await session.getToken();
@@ -59,14 +65,14 @@ class _CreateQrPageState extends State<CreateQrPage> {
         final data = jsonDecode(response.body);
         final sessionData = SessionData.fromJson(data);
 
-        // Định dạng thời gian (ví dụ: 2025-09-20T08:00:00 -> 08:00)
-        final String startTimeStr = sessionData.startTime.split('T')[1].substring(0, 5);
-        final String endTimeStr = sessionData.endTime.split('T')[1].substring(0, 5);
+        // Sử dụng helper để trích xuất thời gian an toàn
+        final String startTimeStr = _extractTimeSafely(sessionData.startTime);
+        final String endTimeStr = _extractTimeSafely(sessionData.endTime);
 
         setState(() {
           _sessionData = sessionData;
-          _checkInTime = startTimeStr; // Mặc định thời gian điểm danh = thời gian bắt đầu học
-          _checkOutTime = endTimeStr; // Mặc định thời gian kết thúc điểm danh = thời gian kết thúc học
+          _checkInTime = startTimeStr;
+          _checkOutTime = endTimeStr;
         });
       } else {
         throw Exception('Lỗi khi tải dữ liệu (${response.statusCode}): ${response.body}');
@@ -81,13 +87,9 @@ class _CreateQrPageState extends State<CreateQrPage> {
     }
   }
 
-  // ==========================================================
-  // HÀM 2: GỌI API BẮT ĐẦU ĐIỂM DANH (Cần truyền thời gian Dropdown)
-  // ==========================================================
   Future<void> _startAttendance() async {
+    // ... (Giữ nguyên logic _startAttendance) ...
     if (_jwtToken == null || _sessionData == null) return;
-
-    // TODO: THÊM LOGIC KIỂM TRA THỜI GIAN ĐIỂM DANH HỢP LỆ (checkInTime < checkOutTime)
 
     setState(() => _isLoading = true);
 
@@ -101,15 +103,9 @@ class _CreateQrPageState extends State<CreateQrPage> {
           'Authorization': 'Bearer $_jwtToken',
           'Content-Type': 'application/json',
         },
-        // TODO: CẦN THÊM BODY CHỨA THỜI GIAN ĐIỂM DANH (checkInTime/checkOutTime) NẾU API YÊU CẦU
-        /* body: jsonEncode({
-             'startTime': _sessionData!.sessionDate + 'T' + _checkInTime + ':00',
-             'endTime': _sessionData!.sessionDate + 'T' + _checkOutTime + ':00',
-        }), */
       );
 
       if (response.statusCode == 200) {
-        // ... (Xử lý thành công và chuyển trang giữ nguyên) ...
         final String formattedStartTime = _checkInTime;
         final String formattedEndTime = _checkOutTime;
 
@@ -148,15 +144,11 @@ class _CreateQrPageState extends State<CreateQrPage> {
     }
   }
 
-  // ==========================================================
-  // HELPER: TẠO DANH SÁCH THỜI GIAN DROP-DOWN (HH:mm)
-  // ==========================================================
   List<String> _buildTimeList(String start, String end) {
-    // Chuyển đổi "HH:mm" thành phút
+    // ... (Giữ nguyên logic _buildTimeList) ...
     int startMinutes = int.parse(start.split(':')[0]) * 60 + int.parse(start.split(':')[1]);
     int endMinutes = int.parse(end.split(':')[0]) * 60 + int.parse(end.split(':')[1]);
 
-    // Tạo danh sách giờ với khoảng cách 5 phút (hoặc 15 phút nếu muốn ngắn hơn)
     List<String> times = [];
     for (int minutes = startMinutes; minutes <= endMinutes; minutes += 5) {
       final hour = (minutes ~/ 60) % 24;
@@ -166,8 +158,8 @@ class _CreateQrPageState extends State<CreateQrPage> {
     return times;
   }
 
-  // WIDGET HIỂN THỊ THÔNG TIN (Input Text không chỉnh sửa)
   Widget _buildInfoField(String label, String value) {
+    // ... (Giữ nguyên _buildInfoField) ...
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -187,8 +179,8 @@ class _CreateQrPageState extends State<CreateQrPage> {
     );
   }
 
-  // WIDGET TRẠNG THÁI
   Widget _buildStatusChip(String status) {
+    // ... (Giữ nguyên _buildStatusChip) ...
     final bool isActive = status.toLowerCase() == 'in_progress';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -207,13 +199,9 @@ class _CreateQrPageState extends State<CreateQrPage> {
     );
   }
 
-  // ==========================================================
-  // GIAO DIỆN CHÍNH (THEO ẢNH)
-  // ==========================================================
   @override
   Widget build(BuildContext context) {
 
-    // Hiển thị Loading/Error
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Tạo QR', style: TextStyle(color: Colors.white)), backgroundColor: tluPrimaryColor),
@@ -228,10 +216,12 @@ class _CreateQrPageState extends State<CreateQrPage> {
     }
 
     final SessionData data = _sessionData!;
-    // Định dạng lại thời gian hiển thị (ví dụ: "08:00 - 09:30")
-    final String sessionStartTimeStr = data.startTime.split('T')[1].substring(0, 5);
-    final String sessionEndTimeStr = data.endTime.split('T')[1].substring(0, 5);
-    final String sessionDateStr = DateFormat('dd/MM/yyyy').format(DateTime.parse(data.sessionDate));
+    final String sessionStartTimeStr = _checkInTime;
+    final String sessionEndTimeStr = _checkOutTime;
+
+    // <<< PHẦN SỬA LỖI CHÍNH: LẤY VÀ ĐỊNH DẠNG NGÀY HÔM NAY >>>
+    final String sessionDateStr = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    // Ví dụ: Nếu hôm nay là 08/11/2025, sessionDateStr sẽ là "08/11/2025"
 
 
     final List<String> timeList = _buildTimeList(sessionStartTimeStr, sessionEndTimeStr);
@@ -256,23 +246,20 @@ class _CreateQrPageState extends State<CreateQrPage> {
               ],
             ),
 
-            // Trường Tên Môn học (Input giả)
             _buildInfoField('', data.subjectName ?? 'N/A'),
             const SizedBox(height: 16),
 
-            // Trường Phòng học
             _buildInfoField('Phòng học', data.sessionLocation),
             const SizedBox(height: 16),
 
-            // Trường Lớp
             _buildInfoField('Lớp', data.classCode ?? 'N/A'),
             const SizedBox(height: 16),
 
-            // Trường Thời gian học
-            _buildInfoField('Thời gian học', '$sessionStartTimeStr - $sessionEndTimeStr'),
+            // Dùng thời gian học thực tế của session
+            _buildInfoField('Thời gian học', '${_extractTimeSafely(data.startTime)} - ${_extractTimeSafely(data.endTime)}'),
             const SizedBox(height: 16),
 
-            // Trường Ngày
+            // Trường Ngày (Sử dụng ngày hôm nay)
             _buildInfoField('Ngày', sessionDateStr),
             const SizedBox(height: 24),
 
@@ -295,7 +282,6 @@ class _CreateQrPageState extends State<CreateQrPage> {
                     onChanged: (String? newValue) {
                       setState(() {
                         _checkInTime = newValue!;
-                        // TODO: Thêm logic kiểm tra _checkInTime < _checkOutTime
                       });
                     },
                   ),

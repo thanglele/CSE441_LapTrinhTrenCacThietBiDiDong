@@ -173,7 +173,7 @@ class QrDisplayPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 15),
                   // Nút Quản lý điểm danh (Đi đến AttendanceHistoryPage)
-                  
+
                 ],
               ),
             ],
