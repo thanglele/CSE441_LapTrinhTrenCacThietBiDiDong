@@ -8,6 +8,9 @@ using MyTLUServer.Infrastructure.Data;
 using MyTLUServer.Infrastructure.Data.Repositories;
 using System.Text;
 using MyTLUServer.Interfaces;
+using MyTLUServerInterfaces;
+using MyTLUServer.Data.Repositories;
+using MyTLUServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +39,12 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<ILecturerService, LecturerService>();
+builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
 
+// (Các AddScoped cho Enrollment)
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+// (Không cần EnrollmentRepository nếu Service dùng DbContext trực tiếp)
 builder.Services.AddHttpClient<IFaceRecognitionService, FaceRecognitionService>(client =>
 {
     // Đọc BaseUrl từ appsettings.json

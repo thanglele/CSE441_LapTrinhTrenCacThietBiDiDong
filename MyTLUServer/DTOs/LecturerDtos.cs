@@ -126,4 +126,19 @@
         public string ClassType { get; set; } = null!;
         public string ClassStatus { get; set; } = null!;
     }
+    public class LecturerStudentDto
+    {
+        public string StudentCode { get; set; } = null!;
+        public string FullName { get; set; } = null!;
+        public string? Email { get; set; } // Email có thể null
+        public string? PhoneNumber { get; set; } // SĐT có thể null
+        public string MajorName { get; set; } = null!;
+        public string AdminClass { get; set; } = null!;
+        public string FaceDataStatus { get; set; } = "none"; // (none, pending, verified...)
+        public string EnrollmentStatus { get; set; } = "enrolled"; // (enrolled, pending)
+    }
+    public class LecturerEnrollmentRequestDto
+    {
+        public string StudentCode { get; set; } = null!;
+    }
 }
