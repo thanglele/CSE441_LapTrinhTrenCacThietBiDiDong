@@ -121,7 +121,7 @@ class ProfileMenuScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 24), // Thêm padding ở dưới
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -152,7 +152,7 @@ class ProfileMenuScreen extends StatelessWidget {
               },
             ),
             TextButton(
-              child: Text('Đăng xuất'),
+              child: Text('Đăng xuất', style: TextStyle(color: Colors.red),),
               onPressed: () {
                 Navigator.pop(dialogContext, true); // Trả về true
               },
