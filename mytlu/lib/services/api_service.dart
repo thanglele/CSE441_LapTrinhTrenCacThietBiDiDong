@@ -14,7 +14,7 @@ class ApiService {
   // Dùng ApiConfig và thêm path '/api/v1'
   static const String _apiPath = '/api/v1';
 
-  
+
   Future<List<Subject>> fetchMySubjects(String jwtToken) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$_apiPath/lecturer/my-subjects');
 
