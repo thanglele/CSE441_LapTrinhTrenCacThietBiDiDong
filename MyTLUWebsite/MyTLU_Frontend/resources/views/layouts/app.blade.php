@@ -56,7 +56,7 @@
                 </a>
                 <ul class="submenu">
                     <li><a href="{{ route('lecturer.students') }}">Quản lý sinh viên</a></li>
-                    <li><a href="#">Quản lý nhận diện khuôn mặt</a></li> 
+                    <li><a href="{{ route('lecturer.face.approval') }}">Quản lý nhận diện khuôn mặt</a></li>
                 </ul>
             </li>
 

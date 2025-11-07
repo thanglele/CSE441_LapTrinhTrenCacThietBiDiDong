@@ -484,3 +484,96 @@
     background-color: #f8d7da;
     color: #721c24;
 }
+
+/*
+|--------------------------------------------------------------------------
+| CSS CHO TRANG DUYỆT NHẬN DIỆN KHUÔN MẶT (FACE APPROVAL)
+|--------------------------------------------------------------------------
+*/
+.review-item-card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.student-info-section {
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 15px;
+}
+
+.student-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #004d9a; /* Màu TLU */
+    margin: 0 0 5px 0;
+}
+
+.photo-comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.photo-box {
+    text-align: center;
+}
+
+.photo-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.photo-img {
+    width: 100%;
+    max-width: 200px; /* Giới hạn kích thước ảnh */
+    height: auto;
+    border-radius: 8px;
+    border: 3px solid #ccc;
+    object-fit: cover;
+}
+
+.photo-img.border-warning {
+    border-color: #ffc107; /* Màu vàng cho ảnh chờ duyệt */
+}
+
+.photo-source {
+    display: block;
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 5px;
+}
+
+.review-actions {
+    text-align: right;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+}
+
+/* Tùy chỉnh nút */
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}

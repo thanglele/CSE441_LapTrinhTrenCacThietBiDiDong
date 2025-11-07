@@ -73,3 +73,13 @@ Route::get('/tao-ma-qr', function () {
 Route::get('/bao-cao-diem-danh/{sessionId}', function ($sessionId) {
     return view('lecturer.attendance-detail-page');
 })->name('lecturer.attendance.details');
+
+// Quản lý Nhận diện Khuôn mặt (Review List)
+// Route::get('/quan-ly-nhan-dien-khuon-mat', function () {
+//     return view('lecturer.face-approval-management'); 
+// })->name('lecturer.face.approval');
+
+// Quản lý Nhận diện Khuôn mặt (Review List)
+use App\Http\Controllers\FaceController;
+Route::get('/quan-ly-nhan-dien-khuon-mat', [FaceController::class, 'index']) // <--- Dùng Controller
+    ->name('lecturer.face.approval');
