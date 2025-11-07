@@ -311,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           );
 
           if (!mounted) return;
-          if (userRole != 'student')
+          if (userRole == 'student')
             Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const StudentPage()),
