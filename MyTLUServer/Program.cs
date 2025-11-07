@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 using MyTLUServer.Application.Interfaces;
 using MyTLUServer.Application.Services;
 using MyTLUServer.Infrastructure.Data;
+using MyTLUServer.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +27,13 @@ builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IGeoIpService, MockGeoIpService>();
 builder.Services.AddScoped<IDeanService, DeanService>();
 builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
-builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddScoped<ISessionService, SessionService>();
+//builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
+//builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+
+builder.Services.AddScoped<IStudentAffairsService, StudentAffairsService>();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
