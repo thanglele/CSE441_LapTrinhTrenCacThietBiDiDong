@@ -1,49 +1,72 @@
+// lib/models/session_data.dart
 class SessionData {
-  final String sessionId;
-  final String classCode;
-  final String subjectName;
-  final String roomName;
-  final DateTime startTime;
-  final DateTime endTime;
-  final String date; // 🟢 thêm thuộc tính ngày học
+  final int id;                   // ID buổi học
+  final String classCode;         // Mã lớp học phần
+  final String title;             // Tiêu đề buổi học (#1, #2,...)
+  final String sessionDate;       // Ngày diễn ra buổi học
+  final String startTime;         // Giờ bắt đầu
+  final String endTime;           // Giờ kết thúc
+  final String sessionLocation;   // Địa điểm học thực tế
+  final String qrCodeData;        // Dữ liệu QR (nếu có)
+  final String sessionStatus;     // Trạng thái (scheduled, completed,...)
+
+  // Liên kết thêm từ lớp học (class)
+  final String? subjectName;      // Tên môn học
+  final String? lecturerName;     // Tên giảng viên
+  final String? semester;         // Học kỳ
+  final String? academicYear;     // Năm học
 
   SessionData({
-    required this.sessionId,
+    required this.id,
     required this.classCode,
-    required this.subjectName,
-    required this.roomName,
+    required this.title,
+    required this.sessionDate,
     required this.startTime,
     required this.endTime,
-    required this.date,
+    required this.sessionLocation,
+    required this.qrCodeData,
+    required this.sessionStatus,
+    this.subjectName,
+    this.lecturerName,
+    this.semester,
+    this.academicYear,
   });
 
-  // 🧩 Parse từ JSON trả về của API
+  /// Tạo từ JSON (API trả về)
   factory SessionData.fromJson(Map<String, dynamic> json) {
     return SessionData(
-      sessionId: json['sessionId'].toString(),
+      id: json['id'] ?? 0,
       classCode: json['classCode'] ?? '',
-      subjectName: json['subjectName'] ?? '',
-      roomName: json['roomName'] ?? '',
-      startTime: DateTime.parse(json['startTime']),
-      endTime: DateTime.parse(json['endTime']),
-      // Nếu API có field riêng "date" → dùng trực tiếp
-      // Nếu không, bạn có thể tách từ startTime:
-      date: json['date'] ??
-          DateTime.parse(json['startTime'])
-              .toLocal()
-              .toString()
-              .split(' ')[0],
+      title: json['title'] ?? '',
+      sessionDate: json['sessionDate'] ?? '',
+      startTime: json['startTime'] ?? '',
+      endTime: json['endTime'] ?? '',
+      sessionLocation: json['sessionLocation'] ?? '',
+      qrCodeData: json['qrCodeData'] ?? '',
+      sessionStatus: json['sessionStatus'] ?? '',
+      subjectName: json['subjectName'],    // có thể null
+      lecturerName: json['lecturerName'],
+      semester: json['semester'],
+      academicYear: json['academicYear'],
     );
   }
 
-  // 🧾 Chuyển ngược lại JSON (nếu cần)
-  Map<String, dynamic> toJson() => {
-    'sessionId': sessionId,
-    'classCode': classCode,
-    'subjectName': subjectName,
-    'roomName': roomName,
-    'startTime': startTime.toIso8601String(),
-    'endTime': endTime.toIso8601String(),
-    'date': date,
-  };
+  /// Chuyển sang JSON (nếu cần gửi lên server)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'classCode': classCode,
+      'title': title,
+      'sessionDate': sessionDate,
+      'startTime': startTime,
+      'endTime': endTime,
+      'sessionLocation': sessionLocation,
+      'qrCodeData': qrCodeData,
+      'sessionStatus': sessionStatus,
+      'subjectName': subjectName,
+      'lecturerName': lecturerName,
+      'semester': semester,
+      'academicYear': academicYear,
+    };
+  }
 }
