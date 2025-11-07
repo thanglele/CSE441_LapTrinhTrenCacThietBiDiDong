@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     // Khởi tạo danh sách Widget cho các tab
     _widgetOptions = <Widget>[
       _buildHomePageContent(), // Index 0: Trang chủ
-      const ManagementDashboardPage(), // Index 1: Quản lý
+      // const ManagementDashboardPage(), // Index 1: Quản lý
       const StatisticsPage(), // Index 2: Thống kê
       const ProfilePage(), // Index 3: Cá nhân
     ];
@@ -261,7 +261,7 @@ class _HomePageState extends State<HomePage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
             // Index 1
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Quản lý'),
+            // BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Quản lý'),
             // Index 2
             BottomNavigationBarItem(icon: Icon(Icons.insert_chart_outlined), label: 'Thống kê'),
             // Index 3
