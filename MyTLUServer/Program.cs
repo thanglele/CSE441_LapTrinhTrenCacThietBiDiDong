@@ -5,7 +5,6 @@ using Microsoft.OpenApi.Models;
 using MyTLUServer.Application.Interfaces;
 using MyTLUServer.Application.Services;
 using MyTLUServer.Infrastructure.Data;
-using MyTLUServer.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +18,6 @@ else
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PublishConnection")));
 }    
 
-// *** THÊM MỤC 2: ĐĂNG KÝ MEMORY CACHE VÀ CÁC DỊCH VỤ ***
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
@@ -28,8 +26,6 @@ builder.Services.AddScoped<IGeoIpService, MockGeoIpService>();
 builder.Services.AddScoped<IDeanService, DeanService>();
 builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
-//builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
-//builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 builder.Services.AddHttpContextAccessor();
 
