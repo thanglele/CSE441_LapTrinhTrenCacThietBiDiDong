@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'My TLU')</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -39,7 +40,7 @@
                     <i class="fa-solid fa-chevron-down submenu-arrow"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a href="#">Quản lý môn học</a></li>
+                    <li><a href="{{ route('subjects.index') }}">Quản lý môn học</a></li>
                     <li><a href="#">Quản lý lớp</a></li>
                     <li><a href="#">Quản lý nhận diện khuôn mặt</a></li>
                 </ul>

@@ -43,3 +43,7 @@ Route::get('/reset-password', [AuthController::class, 'showResetPasswordForm'])
     ->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'handleResetPassword'])
     ->name('password.reset.submit');
+
+Route::get('/quan-ly-mon-hoc', function () {
+    return view('lecturer.subject-management'); 
+})->name('subjects.index');
