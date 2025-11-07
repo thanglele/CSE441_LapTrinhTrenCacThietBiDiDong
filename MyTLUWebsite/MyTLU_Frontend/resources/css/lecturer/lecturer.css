@@ -185,3 +185,84 @@
     vertical-align: middle;
     color: #333;
 }
+
+/*
+|--------------------------------------------------------------------------
+| CSS CHO TRANG QUẢN LÝ LỚP HỌC
+|--------------------------------------------------------------------------
+*/
+
+/* Lưới lọc 4 cột */
+.filter-grid-4-cols {
+    display: grid;
+    /* Chia 4 cột, mỗi cột tối thiểu 200px */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+/* Thêm style cho các tag trạng thái trong bảng */
+.status-tag {
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-tag.live {
+    background-color: #e6f7ec;
+    color: #0d6832;
+}
+
+.status-tag.finished {
+    background-color: #f4f4f4;
+    color: #555;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CSS CHO FORM (THÊM/SỬA)
+|--------------------------------------------------------------------------
+*/
+
+/* Lưới 2 cột cho form */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột bằng nhau */
+    gap: 1.5rem 1.25rem; /* Khoảng cách (dọc/ngang) */
+}
+
+/* Cho item nào cần chiếm trọn 2 cột */
+.form-item.form-item-full-width {
+    grid-column: 1 / -1;
+}
+
+.form-item label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Style chung cho input, select */
+.form-control {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 0.95rem;
+}
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* Footer chứa nút bấm */
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Đẩy nút về bên phải */
+    gap: 0.75rem;
+    background-color: #f7f9fc;
+}

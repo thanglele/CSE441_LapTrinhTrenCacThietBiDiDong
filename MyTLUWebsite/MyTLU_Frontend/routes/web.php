@@ -47,3 +47,11 @@ Route::post('/reset-password', [AuthController::class, 'handleResetPassword'])
 Route::get('/quan-ly-mon-hoc', function () {
     return view('lecturer.subject-management'); 
 })->name('subjects.index');
+
+Route::get('/quan-ly-lop', function () {
+    return view('lecturer.class-management'); 
+})->name('lecturer.classes');
+
+Route::get('/quan-ly-lop/tao-moi', function () {
+    return view('lecturer.class-create-form'); 
+})->name('lecturer.classes.create');

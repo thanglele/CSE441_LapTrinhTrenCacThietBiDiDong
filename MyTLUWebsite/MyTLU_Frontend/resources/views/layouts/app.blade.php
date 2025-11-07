@@ -41,7 +41,7 @@
                 </a>
                 <ul class="submenu">
                     <li><a href="{{ route('subjects.index') }}">Quản lý môn học</a></li>
-                    <li><a href="#">Quản lý lớp</a></li>
+                    <li><a href="{{ route('lecturer.classes') }}">Quản lý lớp</a></li>
                     <li><a href="#">Quản lý nhận diện khuôn mặt</a></li>
                 </ul>
             </li>
