@@ -5,7 +5,9 @@ using Microsoft.OpenApi.Models;
 using MyTLUServer.Application.Interfaces;
 using MyTLUServer.Application.Services;
 using MyTLUServer.Infrastructure.Data;
+using MyTLUServer.Infrastructure.Data.Repositories;
 using System.Text;
+using MyTLUServer.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,9 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 builder.Services.AddHttpClient<IFaceRecognitionService, FaceRecognitionService>(client =>
 {
