@@ -40,38 +40,38 @@ Route::post('/reset-password', [AuthController::class, 'handleResetPassword'])->
 
 // Quản lý Môn học
 Route::get('/quan-ly-mon-hoc', function () {
-    return view('lecturer.subject-management'); 
+    return view('lecturer.Class_and_subject_management.subject-management');
 })->name('lecturer.subjects');
 
 // Quản lý Lớp học (Danh sách)
 Route::get('/quan-ly-lop', function () {
-    return view('lecturer.class-management'); 
+    return view('lecturer.Class_and_subject_management.class-management'); 
 })->name('lecturer.classes');
 
 // Quản lý Lớp học (Thêm mới Form)
 Route::get('/quan-ly-lop/tao-moi', function () {
-    return view('lecturer.class-create-form'); 
+    return view('lecturer.Class_and_subject_management.class-create-form');
 })->name('lecturer.classes.create');
 
 // Quản lý Sinh viên
 Route::get('/quan-ly-sinh-vien', function () {
-    return view('lecturer.student-management');
+    return view('lecturer.Student_management.student-management');
 })->name('lecturer.students');
 
 
 // Quản lý Buổi học (Danh sách)
 Route::get('/quan-ly-buoi-hoc', function () {
-    return view('lecturer.session-management');
+    return view('lecturer.Lesson_management.session-management');
 })->name('lecturer.sessions');
 
 // Tạo Mã QR
 Route::get('/tao-ma-qr', function () {
-    return view('lecturer.qr-generator-page');
+    return view('lecturer.Lesson_management.qr-generator-page');
 })->name('lecturer.qrcode');
 
 // Quản lý Điểm danh (Chi tiết buổi học)
 Route::get('/bao-cao-diem-danh/{sessionId}', function ($sessionId) {
-    return view('lecturer.attendance-detail-page');
+    return view('lecturer.Lesson_management.attendance-detail-page');
 })->name('lecturer.attendance.details');
 
 // Quản lý Nhận diện Khuôn mặt (Review List)

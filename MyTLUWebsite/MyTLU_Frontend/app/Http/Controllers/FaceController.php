@@ -30,8 +30,8 @@ class FaceController extends Controller
         ];
 
         // 2. Trả về View và truyền biến $reviewList
-        return view('lecturer.face-approval-management', [
-            'reviewList' => $reviewList
+        return view('lecturer.Student_management.face-approval-management', [ 
+        'reviewList' => $reviewList
         ]);
     }
 }

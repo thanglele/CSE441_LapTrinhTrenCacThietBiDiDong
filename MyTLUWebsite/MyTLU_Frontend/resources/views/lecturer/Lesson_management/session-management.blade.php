@@ -130,8 +130,8 @@
     
     {{-- MODAL --}}
     @push('modals')
-        @include('lecturer.modals.session-create-modal')
-        @include('lecturer.modals.session-delete-modal')
+        @include('lecturer.Lesson_management.Lesson_forms.session-create-modal')
+        @include('lecturer.Lesson_management.Lesson_forms.session-delete-modal')
     @endpush
 
 @endsection

@@ -124,7 +124,7 @@
 @endsection
 
 @push('modals')
-    @include('lecturer.modals.add-student-modal')
-    @include('lecturer.modals.edit-student-modal')
-    @include('lecturer.modals.delete-student-modal')
+    @include('lecturer.Student_management.Student_forms.add-student-modal')
+    @include('lecturer.Student_management.Student_forms.edit-student-modal')
+    @include('lecturer.Student_management.Student_forms.delete-student-modal')
 @endpush
