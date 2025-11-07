@@ -17,6 +17,33 @@ namespace MyTLUServer.Application.Services // (Namespace Service của bạn)
             _repository = repository;
         }
 
+        public async Task<List<ScheduleSessionDto>> GetMyScheduleByDate(string lecturerCode, DateTime today)
+        {
+            // 2. GỌI REPOSITORY (Chạy tuần tự)
+
+            // Lấy Lịch học hôm nay
+            var todaySessions = await _repository.GetTodaySessionsAsync(lecturerCode, today);
+
+
+            //// 3. ÁNH XẠ (MAP) DỮ LIỆU
+            List<ScheduleSessionDto> dashboardDto = new List<ScheduleSessionDto>();
+            foreach (var session in todaySessions)
+            {
+                dashboardDto.Add(new ScheduleSessionDto()
+                {
+                    ClassSessionId = session.ClassSessionId,
+                    ClassName = session.ClassName,
+                    SessionTitle = session.SessionTitle,
+                    StartTime = session.StartTime,
+                    EndTime = session.EndTime,
+                    Location = session.Location,
+                    AttendanceStatus = session.AttendanceStatus
+                });
+            }
+
+            return dashboardDto;
+        }
+
         // ==========================================================
         // === HÀM NÀY ĐÃ ĐƯỢC SỬA (BỎ TASK.WHENALL) ===
         // ==========================================================

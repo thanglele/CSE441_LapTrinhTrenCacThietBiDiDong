@@ -45,6 +45,24 @@ namespace MyTLUServer.Controllers
             return Ok(dashboardData);
         }
 
+        /// <summary>
+        /// Lấy dữ liệu tổng hợp cho trang Dashboard của Giảng viên.
+        /// </summary>
+        [HttpGet("my-schedule-by-date")]
+        [ProducesResponseType(typeof(LecturerDashboardDto), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> GetMyScheduleByDate([FromQuery] DateTime selectedDate)
+        {
+            var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(lecturerCode))
+            {
+                return Unauthorized();
+            }
+            var ScheduleData = await _dashboardService.GetMyScheduleByDate(lecturerCode, selectedDate);
+            return Ok(ScheduleData);
+        }
+
         /// <summary>
         /// (Giảng viên) Lấy danh sách môn học GV đang dạy (image_222364.png)
         /// </summary>
