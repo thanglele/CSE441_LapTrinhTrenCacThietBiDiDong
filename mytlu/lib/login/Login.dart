@@ -13,6 +13,7 @@ import 'package:mytlu/presentation/splash_screen.dart';
 import 'package:mytlu/login/ForgetPassword.dart';
 import 'package:mytlu/services/user_session.dart';
 import 'package:mytlu/giaodienlichhoc/screens/student_page.dart';
+import 'package:mytlu/screens/home_page_lecture.dart';
 import 'package:mytlu/giaodienlichhoc/screens/scan_qr_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -111,7 +112,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         final cameraStatus = await Permission.camera.status;
 
         if (locationStatus.isGranted && cameraStatus.isGranted) {
-          // TỐT! Người dùng đã cấp quyền.
           // Khởi động lại app bằng cách điều hướng về SplashScreen
           if (mounted) {
             Navigator.pushAndRemoveUntil(
@@ -311,11 +311,18 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           );
 
           if (!mounted) return;
-          Navigator.pushAndRemoveUntil(
+          if (userRole != 'student')
+            Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const StudentPage()),
             (Route<dynamic> route) => false,
           );
+          else
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (Route<dynamic> route) => false,
+            );
         } catch (e) {
           _showErrorSnackBar(e.toString());
         }
