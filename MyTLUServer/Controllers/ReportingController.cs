@@ -5,7 +5,9 @@ using MyTLUServer.Application.DTOs; // Cần DTOs
 using MyTLUServer.Application.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System; // Cần DateOnly
+using System;
+using System.Security.Claims;
+using MyTLUServer.Interfaces; // Cần DateOnly
 
 namespace MyTLUServer.API.Controllers
 {
@@ -114,6 +116,56 @@ namespace MyTLUServer.API.Controllers
             );
 
             return Ok(result);
+        }
+        /// <summary>
+        /// (Giảng viên) Lấy thống kê tỷ lệ điểm danh theo Môn học
+        /// </summary>
+        [HttpGet("lecturer/stats/subjects")]
+        [Authorize(Roles = "lecturer")] // (Nguồn: 628)
+        [ProducesResponseType(typeof(IEnumerable<SubjectAttendanceStatsDto>), 200)]
+        public async Task<IActionResult> GetSubjectStats()
+        {
+            var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(lecturerCode)) return Unauthorized();
+
+            var stats = await _reportingService.GetSubjectStatsAsync(lecturerCode);
+            return Ok(stats);
+        }
+        /// <summary>
+        /// (Giảng viên) Lấy thống kê tỷ lệ điểm danh theo Lớp học
+        /// </summary>
+        [HttpGet("lecturer/stats/classes")]
+        [Authorize(Roles = "lecturer")] // (Nguồn: 628)
+        [ProducesResponseType(typeof(IEnumerable<ClassAttendanceStatsDto>), 200)]
+        public async Task<IActionResult> GetClassStats()
+        {
+            var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(lecturerCode)) return Unauthorized();
+
+            var stats = await _reportingService.GetClassStatsAsync(lecturerCode);
+            return Ok(stats);
+        }
+        /// <summary>
+        /// (Giảng viên) Lấy thống kê tỷ lệ điểm danh của SV trong 1 Lớp
+        /// </summary>
+        [HttpGet("lecturer/stats/class/{classCode}/students")]
+        [Authorize(Roles = "lecturer")] // (Nguồn: 628)
+        [ProducesResponseType(typeof(IEnumerable<StudentAttendanceStatsDto>), 200)]
+        public async Task<IActionResult> GetStudentStatsInClass(string classCode)
+        {
+            var lecturerCode = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(lecturerCode)) return Unauthorized();
+
+            try
+            {
+                var stats = await _reportingService.GetStudentStatsInClassAsync(classCode, lecturerCode);
+                return Ok(stats);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Trả về 403 Forbidden nếu GV không có quyền
+                return StatusCode(403, new { message = ex.Message });
+            }
         }
     }
 }

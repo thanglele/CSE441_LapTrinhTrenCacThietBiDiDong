@@ -41,6 +41,8 @@ builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>(
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<ILecturerService, LecturerService>();
 builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
+builder.Services.AddScoped<IReportingService, ReportingService>();
+builder.Services.AddScoped<IReportingRepository, ReportingRepository>();
 
 // (Các AddScoped cho Enrollment)
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
