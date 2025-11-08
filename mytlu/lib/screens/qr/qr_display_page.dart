@@ -11,14 +11,15 @@ class QrDisplayPage extends StatelessWidget {
   final SessionData sessionData;
   final String startTime; // Thời gian bắt đầu điểm danh (VD: 08:00)
   final String endTime;   // Thời gian kết thúc điểm danh (VD: 08:30)
-  final String qrToken;   // **THÊM MỚI: Nội dung QR thực tế**
+  // **THAY ĐỔI:** Đổi qrToken thành qrContent
+  final String qrContent; // Nội dung QR là toàn bộ JSON response
 
   const QrDisplayPage({
     super.key,
     required this.sessionData,
     required this.startTime,
     required this.endTime,
-    required this.qrToken, // **THÊM MỚI**
+    required this.qrContent, // **THAY ĐỔI**
   });
 
   // (Giữ nguyên _extractTimeSafely)
@@ -114,8 +115,8 @@ class QrDisplayPage extends StatelessWidget {
       debugPrint("Lỗi parse ngày: $e");
     }
 
-    // **CẬP NHẬT:** Nội dung mã QR giờ CHỈ LÀ qrToken
-    final qrContent = qrToken;
+    // **CẬP NHẬT:** Không cần định nghĩa qrContent, dùng trực tiếp biến của class
+    // final qrContent = this.qrContent; // (Không cần dòng này)
 
     return Scaffold(
       appBar: AppBar(
@@ -137,7 +138,7 @@ class QrDisplayPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(25.0),
                     child: QrImageView(
-                      data: qrContent, // <-- Đã cập nhật
+                      data: this.qrContent, // **THAY ĐỔI:** Dùng biến của class
                       version: QrVersions.auto,
                       size: 250.0,
                     ),
@@ -157,30 +158,21 @@ class QrDisplayPage extends StatelessWidget {
               _buildDetailRow(
                   'Lớp học phần',
                   sessionData.className,
-                  // Trạng thái giờ đã đúng (in_progress) do được cập nhật ở trang trước
                   trailing: _buildStatusChip(sessionData.sessionStatus) 
               ),
               const SizedBox(height: 10),
 
-              // Phòng học
+              // (Giữ nguyên các _buildDetailRow còn lại)
               _buildDetailRow('Phòng', sessionData.location, trailing: const Text('')),
               const SizedBox(height: 10),
-
-              // Giảng viên
               _buildDetailRow('Giảng viên', sessionData.lecturerName ?? 'N/A', trailing: const Text('')),
               const SizedBox(height: 10),
-
-              // Thời gian học
               _buildDetailRow('Thời gian học',
                   '${_extractTimeSafely(sessionData.startTime)} - ${_extractTimeSafely(sessionData.endTime)}',
                   trailing: const Text('')),
               const SizedBox(height: 10),
-
-              // Ngày
               _buildDetailRow('Ngày', sessionDateStr, trailing: const Text('')),
               const SizedBox(height: 10),
-
-              // Thời gian điểm danh (Lấy từ tham số truyền vào)
               _buildDetailRow('Thời gian điểm danh', '$startTime - $endTime', trailing: const Text('')),
               const SizedBox(height: 40),
 

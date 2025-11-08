@@ -13,6 +13,7 @@ import 'package:mytlu/presentation/splash_screen.dart';
 import 'package:mytlu/login/ForgetPassword.dart';
 import 'package:mytlu/services/user_session.dart';
 import 'package:mytlu/giaodienlichhoc/screens/student_page.dart';
+import 'package:mytlu/student_dashboard.dart';
 import 'package:mytlu/screens/home_page_lecture.dart';
 import 'package:mytlu/giaodienlichhoc/screens/scan_qr_screen.dart';
 
@@ -308,13 +309,19 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
             studentCode: username,
             avatarUrl: apiAvatarUrl,
             password: password,
+            loginPosition: loginPosition,
           );
 
           if (!mounted) return;
           if (userRole == 'student')
+            // Navigator.pushAndRemoveUntil(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const StudentPage()),
+            //       (Route<dynamic> route) => false,
+            // );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const StudentPage()),
+              MaterialPageRoute(builder: (context) => const StudentDashboard()),
                   (Route<dynamic> route) => false,
             );
           else
