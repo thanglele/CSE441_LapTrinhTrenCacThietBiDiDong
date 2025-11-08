@@ -63,13 +63,10 @@ class _CreateQrPageState extends State<CreateQrPage> {
       }
       _jwtToken = token;
 
-      final url = Uri.parse(
-        'https://mytlu.thanglele.cloud/api/v1/sessions/${widget.sessionId}',
-      );
-      final response = await http.get(
-        url,
-        headers: {'Authorization': 'Bearer $token'},
-      );
+      final url = Uri.parse('https://mytlu.thanglele.cloud/api/v1/sessions/${widget.sessionId}');
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+      });
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -84,9 +81,7 @@ class _CreateQrPageState extends State<CreateQrPage> {
           _checkOutTime = endTimeStr;
         });
       } else {
-        throw Exception(
-          'Lỗi khi tải dữ liệu (${response.statusCode}): ${response.body}',
-        );
+        throw Exception('Lỗi khi tải dữ liệu (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('❌ Lỗi tải session: $e');
@@ -105,8 +100,7 @@ class _CreateQrPageState extends State<CreateQrPage> {
     setState(() => _isLoading = true);
 
     final url = Uri.parse(
-      'https://mytlu.thanglele.cloud/api/v1/sessions/${widget.sessionId}/start-attendance',
-    );
+        'https://mytlu.thanglele.cloud/api/v1/sessions/${widget.sessionId}/start-attendance');
 
     try {
       final response = await http.post(
@@ -125,12 +119,14 @@ class _CreateQrPageState extends State<CreateQrPage> {
         // 1. Lấy trạng thái mới (ví dụ: "in_progress")
         final String newStatus = responseData['sessionStatus'];
 
-        // 2. Tạo session data MỚI với trạng thái đã cập nhật
-        final updatedSessionData = _sessionData!.copyWith(
-          sessionStatus: newStatus,
-        );
+        // 2. **SỬA LỖI:** Lấy chính xác chuỗi 'qrData' từ response
+        // Đây chính là chuỗi "{\"sessionId\":31,\"qrToken\":\"...\"}"
+        final String qrContent = responseData['qrData'];
 
-        // 3. Cập nhật state của trang này
+        // 3. Tạo session data MỚI với trạng thái đã cập nhật
+        final updatedSessionData = _sessionData!.copyWith(sessionStatus: newStatus);
+
+        // 4. Cập nhật state của trang này
         setState(() {
           _sessionData = updatedSessionData;
         });
@@ -141,9 +137,7 @@ class _CreateQrPageState extends State<CreateQrPage> {
 
         // Hiển thị thông báo thành công từ API
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(responseData['message'] ?? 'Đã bắt đầu điểm danh!'),
-          ),
+          SnackBar(content: Text(responseData['message'] ?? 'Đã bắt đầu điểm danh!')),
         );
 
         if (mounted) {
@@ -154,8 +148,8 @@ class _CreateQrPageState extends State<CreateQrPage> {
                 sessionData: updatedSessionData,
                 startTime: formattedStartTime,
                 endTime: formattedEndTime,
-                // **THAY ĐỔI:** Truyền toàn bộ chuỗi JSON response
-                qrContent: responseBody,
+                // **THAY ĐỔI:** Truyền đúng nội dung QR
+                qrContent: qrContent, 
               ),
             ),
           );
@@ -169,9 +163,9 @@ class _CreateQrPageState extends State<CreateQrPage> {
       }
     } catch (e) {
       // Lỗi mạng, parsing JSON...
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Lỗi kết nối hoặc dữ liệu: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi kết nối hoặc dữ liệu: $e')),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -181,28 +175,21 @@ class _CreateQrPageState extends State<CreateQrPage> {
 
   // (Giữ nguyên _buildTimeList)
   List<String> _buildTimeList(String start, String end) {
-    int startMinutes =
-        int.parse(start.split(':')[0]) * 60 + int.parse(start.split(':')[1]);
-    int endMinutes =
-        int.parse(end.split(':')[0]) * 60 + int.parse(end.split(':')[1]);
+    int startMinutes = int.parse(start.split(':')[0]) * 60 + int.parse(start.split(':')[1]);
+    int endMinutes = int.parse(end.split(':')[0]) * 60 + int.parse(end.split(':')[1]);
 
     List<String> times = [];
     for (int minutes = startMinutes; minutes <= endMinutes; minutes += 5) {
       final hour = (minutes ~/ 60) % 24;
       final minute = minutes % 60;
-      times.add(
-        '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
-      );
+      times.add('${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}');
     }
-
-    String endTimeStr =
-        '${(endMinutes ~/ 60) % 24}'.padLeft(2, '0') +
-        ':' +
-        '${endMinutes % 60}'.padLeft(2, '0');
+    
+    String endTimeStr = '${(endMinutes ~/ 60) % 24}'.padLeft(2, '0') + ':' + '${endMinutes % 60}'.padLeft(2, '0');
     if (!times.contains(endTimeStr) && endMinutes > startMinutes) {
-      times.add(endTimeStr);
+         times.add(endTimeStr);
     }
-
+    
     return times;
   }
 
@@ -212,15 +199,8 @@ class _CreateQrPageState extends State<CreateQrPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty) ...[
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
+           Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500)),
+           const SizedBox(height: 4),
         ],
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -230,10 +210,7 @@ class _CreateQrPageState extends State<CreateQrPage> {
             border: Border.all(color: Colors.grey[300]!),
           ),
           width: double.infinity,
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
+          child: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         ),
       ],
     );
@@ -243,7 +220,7 @@ class _CreateQrPageState extends State<CreateQrPage> {
   Widget _buildStatusChip(String status) {
     final bool isActive = status.toLowerCase() == 'in_progress';
     final bool isScheduled = status.toLowerCase() == 'scheduled';
-
+    
     String text;
     Color bgColor;
     Color textColor;
@@ -284,29 +261,19 @@ class _CreateQrPageState extends State<CreateQrPage> {
   Widget build(BuildContext context) {
     if (_isLoading && _sessionData == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Tạo QR', style: TextStyle(color: Colors.white)),
-          backgroundColor: tluPrimaryColor,
-        ),
+        appBar: AppBar(title: const Text('Tạo QR', style: TextStyle(color: Colors.white)), backgroundColor: tluPrimaryColor),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (_loadError != null && _sessionData == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Tạo QR', style: TextStyle(color: Colors.white)),
-          backgroundColor: tluPrimaryColor,
-        ),
-        body: Center(
-          child: Text(
-            'Lỗi tải dữ liệu: ${_loadError?.toString() ?? "Không có dữ liệu session"}',
-          ),
-        ),
+        appBar: AppBar(title: const Text('Tạo QR', style: TextStyle(color: Colors.white)), backgroundColor: tluPrimaryColor),
+        body: Center(child: Text('Lỗi tải dữ liệu: ${_loadError?.toString() ?? "Không có dữ liệu session"}')),
       );
     }
 
     final SessionData data = _sessionData!;
-
+    
     final String sessionStartTimeStr = _extractTimeSafely(data.startTime);
     final String sessionEndTimeStr = _extractTimeSafely(data.endTime);
 
@@ -318,17 +285,17 @@ class _CreateQrPageState extends State<CreateQrPage> {
       sessionDateStr = DateFormat('dd/MM/yyyy').format(DateTime.now());
     }
 
-    final List<String> timeList = _buildTimeList(
-      sessionStartTimeStr,
-      sessionEndTimeStr,
-    );
+    final List<String> timeList = _buildTimeList(sessionStartTimeStr, sessionEndTimeStr);
 
-    if (!timeList.contains(_checkInTime) && timeList.isNotEmpty) {
-      _checkInTime = timeList.first;
+    if (timeList.isNotEmpty) {
+      if (!timeList.contains(_checkInTime)) {
+        _checkInTime = timeList.first;
+      }
+      if (!timeList.contains(_checkOutTime)) {
+        _checkOutTime = timeList.last;
+      }
     }
-    if (!timeList.contains(_checkOutTime) && timeList.isNotEmpty) {
-      _checkOutTime = timeList.last;
-    }
+
 
     return Scaffold(
       appBar: AppBar(
@@ -347,20 +314,11 @@ class _CreateQrPageState extends State<CreateQrPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'Buổi học',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                    Expanded(child: Text('Buổi học', style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500))),
                     _buildStatusChip(data.sessionStatus),
                   ],
                 ),
-                _buildInfoField('', data.title ?? 'N/A'),
+                _buildInfoField('', data.title ?? 'N/A'), 
                 const SizedBox(height: 16),
                 _buildInfoField('Lớp học phần', data.className ?? 'N/A'),
                 const SizedBox(height: 16),
@@ -368,21 +326,11 @@ class _CreateQrPageState extends State<CreateQrPage> {
                 const SizedBox(height: 16),
                 _buildInfoField('Giảng viên', data.lecturerName ?? 'N/A'),
                 const SizedBox(height: 16),
-                _buildInfoField(
-                  'Thời gian học',
-                  '$sessionStartTimeStr - $sessionEndTimeStr',
-                ),
+                _buildInfoField('Thời gian học', '$sessionStartTimeStr - $sessionEndTimeStr'),
                 const SizedBox(height: 16),
                 _buildInfoField('Ngày', sessionDateStr),
                 const SizedBox(height: 24),
-                Text(
-                  'Thời gian điểm danh',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
-                  ),
-                ),
+                Text('Thời gian điểm danh', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[800])),
                 const SizedBox(height: 8),
 
                 Row(
@@ -391,30 +339,19 @@ class _CreateQrPageState extends State<CreateQrPage> {
                       child: DropdownButtonFormField<String>(
                         value: _checkInTime,
                         decoration: InputDecoration(
-                          labelText: 'Từ',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 12,
-                          ),
-                        ),
+                            labelText: 'Từ',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                         items: timeList.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
+                          return DropdownMenuItem<String>(value: value, child: Text(value));
                         }).toList(),
-                        onChanged: _isLoading
-                            ? null
-                            : (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    _checkInTime = newValue;
-                                  });
-                                }
-                              },
+                        onChanged: _isLoading ? null : (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _checkInTime = newValue;
+                            });
+                          }
+                        },
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -422,30 +359,19 @@ class _CreateQrPageState extends State<CreateQrPage> {
                       child: DropdownButtonFormField<String>(
                         value: _checkOutTime,
                         decoration: InputDecoration(
-                          labelText: 'Đến',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 12,
-                          ),
-                        ),
+                            labelText: 'Đến',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                         items: timeList.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
+                          return DropdownMenuItem<String>(value: value, child: Text(value));
                         }).toList(),
-                        onChanged: _isLoading
-                            ? null
-                            : (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    _checkOutTime = newValue;
-                                  });
-                                }
-                              },
+                        onChanged: _isLoading ? null : (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _checkOutTime = newValue;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -454,27 +380,13 @@ class _CreateQrPageState extends State<CreateQrPage> {
 
                 Center(
                   child: ElevatedButton.icon(
-                    icon: const Icon(
-                      Icons.qr_code_2_sharp,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                      'Tạo QR',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
+                    icon: const Icon(Icons.qr_code_2_sharp, color: Colors.white),
+                    label: const Text('Tạo QR', style: TextStyle(fontSize: 18, color: Colors.white)),
                     onPressed: _isLoading ? null : _startAttendance,
-                    style: ElevatedButton.styleFrom(
-                      // <--- Sửa f thành F
-                      backgroundColor: _isLoading
-                          ? Colors.grey
-                          : tluAccentColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 15,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                    style: ElevatedButton.styleFrom( // Sửa lỗi .stylefrom
+                      backgroundColor: _isLoading ? Colors.grey : tluAccentColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
                 ),
@@ -484,7 +396,9 @@ class _CreateQrPageState extends State<CreateQrPage> {
           if (_isLoading)
             Container(
               color: Colors.black.withOpacity(0.2),
-              child: const Center(child: CircularProgressIndicator()),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
         ],
       ),
