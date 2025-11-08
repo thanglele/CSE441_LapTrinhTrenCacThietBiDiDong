@@ -44,19 +44,12 @@ class _HomePageState extends State<HomePage> {
 
   Map<String, int> _scheduleSummary = {};
 
-  // Danh sách nội dung (Widgets) cho các Tab
-  late final List<Widget> _widgetOptions;
+  // Danh sách nội dung (Widgets) cho các Tab SẼ ĐƯỢC KHỞI TẠO TRONG BUILD()
 
   @override
   void initState() {
     super.initState();
-    // Khởi tạo danh sách Widget cho các tab
-    _widgetOptions = <Widget>[
-      _buildHomePageContent(), // Index 0: Trang chủ
-      // const ManagementDashboardPage(), // Index 1: Quản lý
-      const StatisticsPage(), // Index 2: Thống kê
-      const ProfilePage(), // Index 3: Cá nhân
-    ];
+    // KHÔNG khởi tạo _widgetOptions ở đây để tránh lỗi context
     _initializeData();
   }
 
@@ -82,18 +75,20 @@ class _HomePageState extends State<HomePage> {
 
       await _fetchScheduleSummary();
 
+      // Sử dụng hàm fetchTodayClasses để khởi tạo
       final initialClassesFuture = _apiService.fetchTodayClasses(_jwtToken!);
 
       setState(() {
         _lecturerName = lecturerName;
         _isDataLoaded = true;
-        _classesFuture = initialClassesFuture;
+        _classesFuture = initialClassesFuture; // Gán Future cùng lúc
       });
 
     } catch (e) {
       debugPrint('Lỗi khởi tạo dữ liệu: $e');
       setState(() {
         _isDataLoaded = true;
+        // Gán một Future lỗi để FutureBuilder hiển thị
         _classesFuture = Future.error('Lỗi tải dữ liệu người dùng: $e');
       });
     }
@@ -158,6 +153,7 @@ class _HomePageState extends State<HomePage> {
               builder: (_) => CreateQrPage(sessionId: sessionId),
             ),
           ).then((_) {
+            // Tải lại dữ liệu sau khi quay lại từ trang QR
             _loadClassesForDate(_selectedDate);
             _fetchScheduleSummary();
           });
@@ -193,6 +189,14 @@ class _HomePageState extends State<HomePage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator(color: tluPrimaryColor)));
     }
 
+    // *** SỬA LỖI: Khởi tạo _widgetOptions ở đây, nơi 'context' đã hợp lệ ***
+    final List<Widget> _widgetOptions = <Widget>[
+      _buildHomePageContent(context), // Index 0: Trang chủ (Truyền context)
+      // const ManagementDashboardPage(), // Index 1: Quản lý
+      const StatisticsPage(), // Index 2: Thống kê
+      const ProfilePage(), // Index 3: Cá nhân
+    ];
+
     return Scaffold(
       // SỬ DỤNG _widgetOptions ĐỂ CHUYỂN ĐỔI NỘI DUNG
       body: _widgetOptions[_selectedIndex],
@@ -205,11 +209,12 @@ class _HomePageState extends State<HomePage> {
   // =========================================================================
 
   // WIDGET NỘI DUNG TRANG CHỦ (INDEX 0)
-  Widget _buildHomePageContent() {
+  // *** SỬA LỖI: Thêm (BuildContext context) ***
+  Widget _buildHomePageContent(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          _buildCustomAppBar(context),
+          _buildCustomAppBar(context), // Truyền context xuống
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -248,6 +253,7 @@ class _HomePageState extends State<HomePage> {
             });
             // Tải lại dữ liệu Trang chủ nếu quay lại index 0
             if (index == 0) {
+              // Chọn lại ngày hôm nay khi quay về tab Home
               _loadClassesForDate(DateTime.now());
               _fetchScheduleSummary();
             }
@@ -275,6 +281,7 @@ class _HomePageState extends State<HomePage> {
   // WIDGET CUSTOM APP BAR
   Widget _buildCustomAppBar(BuildContext context) {
     return Container(
+      // Giờ đã an toàn để dùng MediaQuery
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
       decoration: const BoxDecoration(
         color: tluPrimaryColor,
@@ -362,7 +369,7 @@ class _HomePageState extends State<HomePage> {
   // WIDGET DANH SÁCH LỚP HỌC
   Widget _buildClassesList() {
     return FutureBuilder<List<ScheduleSession>>(
-      future: _classesFuture,
+      future: _classesFuture, // Đã được gán trong initState hoặc _loadClassesForDate
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator(color: tluPrimaryColor)));
