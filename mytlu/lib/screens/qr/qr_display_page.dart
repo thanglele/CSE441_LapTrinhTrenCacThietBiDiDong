@@ -1,30 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-// Thay thế bằng đường dẫn chính xác
+import 'package:intl/intl.dart';
 import '../../models/session_data.dart';
-// Import các trang khác nếu cần điều hướng từ nút
-import '../management/attendance_history_page.dart';
+// import '../management/attendance_history_page.dart';
 
-// Màu sắc chung từ các file khác
-const Color tluPrimaryColor = Color(0xFF0D47A1); // Xanh TLU đậm
-const Color tluAccentColor = Color(0xFF42A5F5); // Xanh sáng hơn
+const Color tluPrimaryColor = Color(0xFF0D47A1);
+const Color tluAccentColor = Color(0xFF42A5F5);
 
 class QrDisplayPage extends StatelessWidget {
   final SessionData sessionData;
   final String startTime; // Thời gian bắt đầu điểm danh (VD: 08:00)
   final String endTime;   // Thời gian kết thúc điểm danh (VD: 08:30)
-
-  // Tên Giảng viên (Giả sử bạn không truyền, nhưng cần để khớp UI)
-  final String lecturerName = 'Nguyễn Văn A';
+  final String qrToken;   // **THÊM MỚI: Nội dung QR thực tế**
 
   const QrDisplayPage({
     super.key,
     required this.sessionData,
     required this.startTime,
     required this.endTime,
+    required this.qrToken, // **THÊM MỚI**
   });
 
-  // Helper cho Widget hiển thị thông tin dạng key/value
+  // (Giữ nguyên _extractTimeSafely)
+  String _extractTimeSafely(String fullDateTimeString) {
+    try {
+      final dateTime = DateTime.parse(fullDateTimeString);
+      return DateFormat('HH:mm').format(dateTime.toLocal());
+    } catch (e) {
+      final RegExp timeRegex = RegExp(r'(\d{2}:\d{2})');
+      final match = timeRegex.firstMatch(fullDateTimeString);
+      if (match != null) {
+        return match.group(0)!;
+      }
+      return '00:00';
+    }
+  }
+
+  // (Giữ nguyên _buildDetailRow)
   Widget _buildDetailRow(String label, String value, {Widget? trailing}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,19 +63,39 @@ class QrDisplayPage extends StatelessWidget {
     );
   }
 
-  // Widget cho trạng thái chip
+  // (Giữ nguyên _buildStatusChip)
   Widget _buildStatusChip(String status) {
-    final bool isActive = status.toLowerCase() == 'đang diễn ra';
+    final bool isActive = status.toLowerCase() == 'in_progress' || status.toLowerCase() == 'đang diễn ra';
+    final bool isScheduled = status.toLowerCase() == 'scheduled';
+    
+    String text;
+    Color bgColor;
+    Color textColor;
+
+    if (isActive) {
+      text = 'Đang diễn ra';
+      bgColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+    } else if (isScheduled) {
+      text = 'Sắp diễn ra';
+      bgColor = Colors.blue[100]!;
+      textColor = Colors.blue[800]!;
+    } else {
+      text = status;
+      bgColor = Colors.grey[200]!;
+      textColor = Colors.grey[800]!;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? Colors.green[100] : Colors.orange[100],
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        status,
+        text,
         style: TextStyle(
-          color: isActive ? Colors.green[800] : Colors.orange[800],
+          color: textColor,
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
@@ -71,34 +103,33 @@ class QrDisplayPage extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    // Nội dung mã QR
-    final qrContent =
-        'Class: ${sessionData.classCode}, '
-        'Subject: ${sessionData.subjectName}, '
-        'Room: ${sessionData.sessionLocation}, '
-        'Date: ${sessionData.sessionDate}, '
-        'Start: $startTime, End: $endTime';
+    // Lấy ngày học
+    String sessionDateStr = "N/A";
+    try {
+      final dateTime = DateTime.parse(sessionData.startTime).toLocal();
+      sessionDateStr = DateFormat('dd/MM/yyyy').format(dateTime);
+    } catch (e) {
+      debugPrint("Lỗi parse ngày: $e");
+    }
 
-    // Lấy ngày học (Giả định sessionDate là 'YYYY-MM-DD')
-    final sessionDateStr = sessionData.sessionDate.split('T')[0];
+    // **CẬP NHẬT:** Nội dung mã QR giờ CHỈ LÀ qrToken
+    final qrContent = qrToken;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tạo QR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Mã QR Điểm Danh', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: tluPrimaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. KHUNG CHỨA MÃ QR (Đã sửa lại thành Card cho giống UI)
+              // 1. KHUNG CHỨA MÃ QR
               Center(
                 child: Card(
                   elevation: 4,
@@ -106,7 +137,7 @@ class QrDisplayPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(25.0),
                     child: QrImageView(
-                      data: qrContent,
+                      data: qrContent, // <-- Đã cập nhật
                       version: QrVersions.auto,
                       size: 250.0,
                     ),
@@ -117,30 +148,31 @@ class QrDisplayPage extends StatelessWidget {
 
               // 2. PHẦN THÔNG TIN CHI TIẾT
               const Text(
-                'Thông tin lớp học',
+                'Thông tin buổi học',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               const SizedBox(height: 10),
 
-              // Môn học + Trạng thái
+              // Lớp học phần + Trạng thái
               _buildDetailRow(
-                  'Môn học',
-                  sessionData.subjectName ?? 'N/A',
-                  trailing: _buildStatusChip('Đang diễn ra') // Trạng thái cố định trong UI mẫu
+                  'Lớp học phần',
+                  sessionData.className,
+                  // Trạng thái giờ đã đúng (in_progress) do được cập nhật ở trang trước
+                  trailing: _buildStatusChip(sessionData.sessionStatus) 
               ),
               const SizedBox(height: 10),
 
               // Phòng học
-              _buildDetailRow('Phòng', sessionData.sessionLocation, trailing: const Text('')),
+              _buildDetailRow('Phòng', sessionData.location, trailing: const Text('')),
               const SizedBox(height: 10),
 
-              // Giảng viên (Không có trong SessionData, dùng biến cứng)
-              _buildDetailRow('Giảng viên', lecturerName, trailing: const Text('')),
+              // Giảng viên
+              _buildDetailRow('Giảng viên', sessionData.lecturerName ?? 'N/A', trailing: const Text('')),
               const SizedBox(height: 10),
 
               // Thời gian học
               _buildDetailRow('Thời gian học',
-                  '${sessionData.startTime.split('T')[1].substring(0, 5)} - ${sessionData.endTime.split('T')[1].substring(0, 5)}',
+                  '${_extractTimeSafely(sessionData.startTime)} - ${_extractTimeSafely(sessionData.endTime)}',
                   trailing: const Text('')),
               const SizedBox(height: 10),
 
@@ -148,20 +180,18 @@ class QrDisplayPage extends StatelessWidget {
               _buildDetailRow('Ngày', sessionDateStr, trailing: const Text('')),
               const SizedBox(height: 10),
 
-              // Thời gian điểm danh
+              // Thời gian điểm danh (Lấy từ tham số truyền vào)
               _buildDetailRow('Thời gian điểm danh', '$startTime - $endTime', trailing: const Text('')),
-
               const SizedBox(height: 40),
 
               // 3. NÚT HÀNH ĐỘNG
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  // Nút Chỉnh sửa (Trở về trang CreateQrPage)
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); // Quay về trang CreateQrPage để chỉnh sửa
+                        Navigator.pop(context); // Quay về trang CreateQrPage
                       },
                       child: const Text('Chỉnh sửa', style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
@@ -171,9 +201,6 @@ class QrDisplayPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  // Nút Quản lý điểm danh (Đi đến AttendanceHistoryPage)
-
                 ],
               ),
             ],

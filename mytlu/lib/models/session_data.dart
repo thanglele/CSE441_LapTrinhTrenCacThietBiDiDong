@@ -1,53 +1,37 @@
 // lib/models/session_data.dart
-class SessionData {
-  final int id;                   // ID buổi học
-  final String classCode;         // Mã lớp học phần
-  final String title;             // Tiêu đề buổi học (#1, #2,...)
-  final String sessionDate;       // Ngày diễn ra buổi học
-  final String startTime;         // Giờ bắt đầu
-  final String endTime;           // Giờ kết thúc
-  final String sessionLocation;   // Địa điểm học thực tế
-  final String qrCodeData;        // Dữ liệu QR (nếu có)
-  final String sessionStatus;     // Trạng thái (scheduled, completed,...)
 
-  // Liên kết thêm từ lớp học (class)
-  final String? subjectName;      // Tên môn học
-  final String? lecturerName;     // Tên giảng viên
-  final String? semester;         // Học kỳ
-  final String? academicYear;     // Năm học
+class SessionData {
+  final int id;
+  final String className;
+  final String title;
+  final String startTime;
+  final String endTime;
+  final String location;
+  final String sessionStatus;
+  final String? lecturerName;
 
   SessionData({
     required this.id,
-    required this.classCode,
+    required this.className,
     required this.title,
-    required this.sessionDate,
     required this.startTime,
     required this.endTime,
-    required this.sessionLocation,
-    required this.qrCodeData,
+    required this.location,
     required this.sessionStatus,
-    this.subjectName,
     this.lecturerName,
-    this.semester,
-    this.academicYear,
   });
 
   /// Tạo từ JSON (API trả về)
   factory SessionData.fromJson(Map<String, dynamic> json) {
     return SessionData(
       id: json['id'] ?? 0,
-      classCode: json['classCode'] ?? '',
+      className: json['className'] ?? '',
       title: json['title'] ?? '',
-      sessionDate: json['sessionDate'] ?? '',
       startTime: json['startTime'] ?? '',
       endTime: json['endTime'] ?? '',
-      sessionLocation: json['sessionLocation'] ?? '',
-      qrCodeData: json['qrCodeData'] ?? '',
+      location: json['location'] ?? '',
       sessionStatus: json['sessionStatus'] ?? '',
-      subjectName: json['subjectName'],    // có thể null
       lecturerName: json['lecturerName'],
-      semester: json['semester'],
-      academicYear: json['academicYear'],
     );
   }
 
@@ -55,18 +39,37 @@ class SessionData {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'classCode': classCode,
+      'className': className,
       'title': title,
-      'sessionDate': sessionDate,
       'startTime': startTime,
       'endTime': endTime,
-      'sessionLocation': sessionLocation,
-      'qrCodeData': qrCodeData,
+      'location': location,
       'sessionStatus': sessionStatus,
-      'subjectName': subjectName,
       'lecturerName': lecturerName,
-      'semester': semester,
-      'academicYear': academicYear,
     };
+  }
+
+  /// **PHẦN THÊM MỚI**
+  /// Tạo một bản sao của đối tượng với các trường được cập nhật.
+  SessionData copyWith({
+    int? id,
+    String? className,
+    String? title,
+    String? startTime,
+    String? endTime,
+    String? location,
+    String? sessionStatus,
+    String? lecturerName,
+  }) {
+    return SessionData(
+      id: id ?? this.id,
+      className: className ?? this.className,
+      title: title ?? this.title,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      location: location ?? this.location,
+      sessionStatus: sessionStatus ?? this.sessionStatus,
+      lecturerName: lecturerName ?? this.lecturerName,
+    );
   }
 }

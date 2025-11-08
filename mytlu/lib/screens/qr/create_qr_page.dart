@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:intl/intl.dart'; // Cần cho việc định dạng ngày
+import 'dart:convert'; // Cần cho jsonDecode và utf8
+import 'package:intl/intl.dart';
 import '../../models/session_data.dart';
 import '../../services/user_session.dart';
 import 'qr_display_page.dart';
 
-// Màu sắc phụ (Nếu cần)
+// (Giữ nguyên các hằng số màu sắc)
 const Color tluAccentColor = Color(0xFF42A5F5);
 const Color tluPrimaryColor = Color(0xFF0D47A1);
 
@@ -35,18 +35,24 @@ class _CreateQrPageState extends State<CreateQrPage> {
     _loadData();
   }
 
-  // Helper: Trích xuất HH:mm an toàn (Giữ nguyên từ lần sửa trước)
+  // (Giữ nguyên _extractTimeSafely)
   String _extractTimeSafely(String fullDateTimeString) {
-    final RegExp timeRegex = RegExp(r'(\d{2}:\d{2})');
-    final match = timeRegex.firstMatch(fullDateTimeString);
-    if (match != null) {
-      return match.group(0)!;
+    try {
+      final dateTime = DateTime.parse(fullDateTimeString);
+      return DateFormat('HH:mm').format(dateTime.toLocal());
+    } catch (e) {
+      final RegExp timeRegex = RegExp(r'(\d{2}:\d{2})');
+      final match = timeRegex.firstMatch(fullDateTimeString);
+      if (match != null) {
+        return match.group(0)!;
+      }
+      return '00:00';
     }
-    return '00:00';
   }
 
+  // (Giữ nguyên _loadData)
   Future<void> _loadData() async {
-    // ... (Giữ nguyên logic tải dữ liệu và token) ...
+    setState(() => _isLoading = true);
     try {
       final session = UserSession();
       final token = await session.getToken();
@@ -62,10 +68,9 @@ class _CreateQrPageState extends State<CreateQrPage> {
       });
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
         final sessionData = SessionData.fromJson(data);
 
-        // Sử dụng helper để trích xuất thời gian an toàn
         final String startTimeStr = _extractTimeSafely(sessionData.startTime);
         final String endTimeStr = _extractTimeSafely(sessionData.endTime);
 
@@ -87,8 +92,8 @@ class _CreateQrPageState extends State<CreateQrPage> {
     }
   }
 
+  /// **PHẦN CẬP NHẬT CHÍNH**
   Future<void> _startAttendance() async {
-    // ... (Giữ nguyên logic _startAttendance) ...
     if (_jwtToken == null || _sessionData == null) return;
 
     setState(() => _isLoading = true);
@@ -105,12 +110,38 @@ class _CreateQrPageState extends State<CreateQrPage> {
         },
       );
 
+      // Giải mã response body (dùng utf8 để hỗ trợ tiếng Việt)
+      final responseBody = utf8.decode(response.bodyBytes);
+      final responseData = jsonDecode(responseBody);
+
       if (response.statusCode == 200) {
+        // 1. Lấy chuỗi JSON từ trường 'qrData'
+        final String qrDataString = responseData['qrData'];
+        
+        // 2. Phân tích chuỗi JSON bên trong đó
+        final qrDataJson = jsonDecode(qrDataString);
+        
+        // 3. Lấy ra 'qrToken' (nội dung QR thực tế)
+        final String qrToken = qrDataJson['qrToken'];
+
+        // 4. Lấy trạng thái mới (ví dụ: "in_progress")
+        final String newStatus = responseData['sessionStatus'];
+
+        // 5. Tạo session data MỚI với trạng thái đã cập nhật
+        final updatedSessionData = _sessionData!.copyWith(sessionStatus: newStatus);
+
+        // 6. Cập nhật state của trang này (để nếu user quay lại, trạng thái đã đúng)
+        setState(() {
+          _sessionData = updatedSessionData;
+        });
+
+        // Lấy thời gian điểm danh đã chọn
         final String formattedStartTime = _checkInTime;
         final String formattedEndTime = _checkOutTime;
 
+        // Hiển thị thông báo thành công từ API
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã bắt đầu điểm danh và tạo QR!')),
+          SnackBar(content: Text(responseData['message'] ?? 'Đã bắt đầu điểm danh!')),
         );
 
         if (mounted) {
@@ -118,24 +149,27 @@ class _CreateQrPageState extends State<CreateQrPage> {
             context,
             MaterialPageRoute(
               builder: (_) => QrDisplayPage(
-                sessionData: _sessionData!,
+                sessionData: updatedSessionData, // <-- Truyền data đã cập nhật
                 startTime: formattedStartTime,
                 endTime: formattedEndTime,
+                qrToken: qrToken, // <-- Truyền qrToken
               ),
             ),
           );
         }
       } else {
-        final errorMessage = jsonDecode(response.body)['message'] ?? 'Lỗi không xác định.';
+        // Lỗi từ server (4xx, 5xx)
+        final errorMessage = responseData['message'] ?? 'Lỗi không xác định.';
         debugPrint('❌ Lỗi start-attendance: ${response.statusCode} - $errorMessage');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Không thể bắt đầu điểm danh: $errorMessage')),
         );
       }
     } catch (e) {
-      debugPrint('Lỗi mạng: $e');
+      // Lỗi mạng, parsing JSON...
+      debugPrint('Lỗi mạng hoặc parsing: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi kết nối mạng: $e')),
+        SnackBar(content: Text('Lỗi kết nối hoặc dữ liệu: $e')),
       );
     } finally {
       if (mounted) {
@@ -144,8 +178,8 @@ class _CreateQrPageState extends State<CreateQrPage> {
     }
   }
 
+  // (Giữ nguyên _buildTimeList)
   List<String> _buildTimeList(String start, String end) {
-    // ... (Giữ nguyên logic _buildTimeList) ...
     int startMinutes = int.parse(start.split(':')[0]) * 60 + int.parse(start.split(':')[1]);
     int endMinutes = int.parse(end.split(':')[0]) * 60 + int.parse(end.split(':')[1]);
 
@@ -155,16 +189,25 @@ class _CreateQrPageState extends State<CreateQrPage> {
       final minute = minutes % 60;
       times.add('${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}');
     }
+    
+    String endTimeStr = '${(endMinutes ~/ 60) % 24}'.padLeft(2, '0') + ':' + '${endMinutes % 60}'.padLeft(2, '0');
+    if (!times.contains(endTimeStr) && endMinutes > startMinutes) {
+         times.add(endTimeStr);
+    }
+    
     return times;
   }
 
+
+  // (Giữ nguyên _buildInfoField)
   Widget _buildInfoField(String label, String value) {
-    // ... (Giữ nguyên _buildInfoField) ...
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500)),
-        const SizedBox(height: 4),
+        if (label.isNotEmpty) ...[
+           Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500)),
+           const SizedBox(height: 4),
+        ],
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
@@ -179,19 +222,39 @@ class _CreateQrPageState extends State<CreateQrPage> {
     );
   }
 
+  // (Giữ nguyên _buildStatusChip)
   Widget _buildStatusChip(String status) {
-    // ... (Giữ nguyên _buildStatusChip) ...
     final bool isActive = status.toLowerCase() == 'in_progress';
+    final bool isScheduled = status.toLowerCase() == 'scheduled';
+    
+    String text;
+    Color bgColor;
+    Color textColor;
+
+    if (isActive) {
+      text = 'Đang diễn ra';
+      bgColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+    } else if (isScheduled) {
+      text = 'Sắp diễn ra';
+      bgColor = Colors.blue[100]!;
+      textColor = Colors.blue[800]!;
+    } else {
+      text = status;
+      bgColor = Colors.grey[200]!;
+      textColor = Colors.grey[800]!;
+    }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isActive ? Colors.green[100] : Colors.orange[100],
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isActive ? 'Đang diễn ra' : 'Sắp diễn ra',
+        text,
         style: TextStyle(
-          color: isActive ? Colors.green[800] : Colors.orange[800],
+          color: textColor,
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
@@ -199,16 +262,16 @@ class _CreateQrPageState extends State<CreateQrPage> {
     );
   }
 
+  // (Giữ nguyên build)
   @override
   Widget build(BuildContext context) {
-
-    if (_isLoading) {
+    if (_isLoading && _sessionData == null) { // Chỉ full load khi chưa có data
       return Scaffold(
         appBar: AppBar(title: const Text('Tạo QR', style: TextStyle(color: Colors.white)), backgroundColor: tluPrimaryColor),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
-    if (_loadError != null || _sessionData == null) {
+    if (_loadError != null && _sessionData == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Tạo QR', style: TextStyle(color: Colors.white)), backgroundColor: tluPrimaryColor),
         body: Center(child: Text('Lỗi tải dữ liệu: ${_loadError?.toString() ?? "Không có dữ liệu session"}')),
@@ -216,15 +279,26 @@ class _CreateQrPageState extends State<CreateQrPage> {
     }
 
     final SessionData data = _sessionData!;
-    final String sessionStartTimeStr = _checkInTime;
-    final String sessionEndTimeStr = _checkOutTime;
+    
+    final String sessionStartTimeStr = _extractTimeSafely(data.startTime);
+    final String sessionEndTimeStr = _extractTimeSafely(data.endTime);
 
-    // <<< PHẦN SỬA LỖI CHÍNH: LẤY VÀ ĐỊNH DẠNG NGÀY HÔM NAY >>>
-    final String sessionDateStr = DateFormat('dd/MM/yyyy').format(DateTime.now());
-    // Ví dụ: Nếu hôm nay là 08/11/2025, sessionDateStr sẽ là "08/11/2025"
-
+    String sessionDateStr = "N/A";
+    try {
+      final dateTime = DateTime.parse(data.startTime).toLocal();
+      sessionDateStr = DateFormat('dd/MM/yyyy').format(dateTime);
+    } catch (e) {
+      sessionDateStr = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    }
 
     final List<String> timeList = _buildTimeList(sessionStartTimeStr, sessionEndTimeStr);
+
+    if (!timeList.contains(_checkInTime) && timeList.isNotEmpty) {
+      _checkInTime = timeList.first;
+    }
+    if (!timeList.contains(_checkOutTime) && timeList.isNotEmpty) {
+      _checkOutTime = timeList.last;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -232,98 +306,106 @@ class _CreateQrPageState extends State<CreateQrPage> {
         backgroundColor: tluPrimaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Dòng Tên Môn học và Trạng thái
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: Text('Tên môn học', style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500))),
-                _buildStatusChip(data.sessionStatus),
-              ],
-            ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: Text('Buổi học', style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500))),
+                    _buildStatusChip(data.sessionStatus),
+                  ],
+                ),
+                _buildInfoField('', data.title ?? 'N/A'), 
+                const SizedBox(height: 16),
+                _buildInfoField('Lớp học phần', data.className ?? 'N/A'),
+                const SizedBox(height: 16),
+                _buildInfoField('Phòng học', data.location ?? 'N/Am'),
+                const SizedBox(height: 16),
+                _buildInfoField('Giảng viên', data.lecturerName ?? 'N/A'),
+                const SizedBox(height: 16),
+                _buildInfoField('Thời gian học', '$sessionStartTimeStr - $sessionEndTimeStr'),
+                const SizedBox(height: 16),
+                _buildInfoField('Ngày', sessionDateStr),
+                const SizedBox(height: 24),
+                Text('Thời gian điểm danh', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[800])),
+                const SizedBox(height: 8),
 
-            _buildInfoField('', data.subjectName ?? 'N/A'),
-            const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _checkInTime,
+                        decoration: InputDecoration(
+                            labelText: 'Từ',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
+                        items: timeList.map((String value) {
+                          return DropdownMenuItem<String>(value: value, child: Text(value));
+                        }).toList(),
+                        onChanged: _isLoading ? null : (String? newValue) { // Vô hiệu hóa khi đang tải
+                          if (newValue != null) {
+                            setState(() {
+                              _checkInTime = newValue;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _checkOutTime,
+                        decoration: InputDecoration(
+                            labelText: 'Đến',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
+                        items: timeList.map((String value) {
+                          return DropdownMenuItem<String>(value: value, child: Text(value));
+                        }).toList(),
+                        onChanged: _isLoading ? null : (String? newValue) { // Vô hiệu hóa khi đang tải
+                          if (newValue != null) {
+                            setState(() {
+                              _checkOutTime = newValue;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
 
-            _buildInfoField('Phòng học', data.sessionLocation),
-            const SizedBox(height: 16),
-
-            _buildInfoField('Lớp', data.classCode ?? 'N/A'),
-            const SizedBox(height: 16),
-
-            // Dùng thời gian học thực tế của session
-            _buildInfoField('Thời gian học', '${_extractTimeSafely(data.startTime)} - ${_extractTimeSafely(data.endTime)}'),
-            const SizedBox(height: 16),
-
-            // Trường Ngày (Sử dụng ngày hôm nay)
-            _buildInfoField('Ngày', sessionDateStr),
-            const SizedBox(height: 24),
-
-            // THỜI GIAN ĐIỂM DANH (Dropdowns)
-            Text('Thời gian điểm danh', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[800])),
-            const SizedBox(height: 8),
-
-            Row(
-              children: [
-                // Dropdown Bắt đầu
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _checkInTime,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10)),
-                    items: timeList.map((String value) {
-                      return DropdownMenuItem<String>(value: value, child: Text(value));
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _checkInTime = newValue!;
-                      });
-                    },
+                Center(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.qr_code_2_sharp, color: Colors.white),
+                    label: const Text('Tạo QR', style: TextStyle(fontSize: 18, color: Colors.white)),
+                    onPressed: _isLoading ? null : _startAttendance,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isLoading ? Colors.grey : tluAccentColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 16),
-
-                // Dropdown Kết thúc
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _checkOutTime,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10)),
-                    items: timeList.map((String value) {
-                      return DropdownMenuItem<String>(value: value, child: Text(value));
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _checkOutTime = newValue!;
-                      });
-                    },
-                  ),
-                ),
               ],
             ),
-            const SizedBox(height: 30),
+          ),
 
-            // Nút TẠO QR
-            Center(
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.qr_code_2_sharp, color: Colors.white),
-                label: const Text('Tạo QR', style: TextStyle(fontSize: 18, color: Colors.white)),
-                onPressed: _startAttendance,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: tluAccentColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
+          // Lớp phủ loading
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.2),
+              child: const Center(
+                child: CircularProgressIndicator(),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
