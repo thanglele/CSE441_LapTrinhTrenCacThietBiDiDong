@@ -1,30 +1,33 @@
 // Import ApiService CHUNG (chuẩn hệ thống)
 import 'package:mytlu/services/api_service.dart';
+import 'package:mytlu/core/errors/exceptions.dart'; // Import ApiException
 
 // Import Model CheckIn (đã tạo ở bước trước)
 import 'package:mytlu/Students/attendance/models/check_in_request_model.dart';
-import 'package:mytlu/Students/attendance/models/check_in_response_model.dart ';
+import 'package:mytlu/Students/attendance/models/check_in_response_model.dart';
+
 class CheckInService {
   final ApiService _apiService = ApiService();
 
   /// Gửi yêu cầu điểm danh sinh viên
   Future<CheckInResponse> checkInStudent(CheckInRequest request) async {
+    // ---- SỬA LẠI KHỐI TRY...CATCH Ở ĐÂY ----
     try {
-      // 1️⃣ Gọi API POST /attendance/check-in (chuẩn)
       final response = await _apiService.postRequest(
         '/api/v1/attendance/check-in',
         request.toJson(),
       );
 
-      // 2️⃣ Kiểm tra phản hồi
-      if (response.statusCode == 200) {
-        // Parse JSON thành model
-        return checkInResponseFromJson(response.body);
-      } else {
-        throw Exception('Điểm danh thất bại (Code: ${response.statusCode})');
-      }
+      // response.statusCode đã được xử lý bên trong _apiService.postRequest
+      // Nếu code là 200, nó sẽ chạy tiếp. Nếu không, _apiService đã ném ApiException.
+      return checkInResponseFromJson(response.body);
+    } on ApiException {
+      // Nếu là lỗi API (400, 401, 500...), ném nó lên
+      rethrow;
     } catch (e) {
+      // Nếu là lỗi MẠNG hoặc lỗi CHUNG, bọc nó lại
       throw Exception('Lỗi khi điểm danh: $e');
     }
+    // ---- KẾT THÚC SỬA ĐỔI ----
   }
 }

@@ -104,7 +104,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
             final profile = snapshot.data!;
 
             final List<Widget> tabs = [
-              const ScheduleScreen(),              // Tab 0: Lịch học
+              ScheduleScreen(onSwitchTab: _onSwitchTab),              // Tab 0: Lịch học
               ScanQRScreen(onSwitchTab: _onSwitchTab),  // Tab 1: Quét mã
               const HistoryScreen(),               // Tab 2: Lịch sử
               ProfileMenuScreen(                   // Tab 3: Hồ sơ

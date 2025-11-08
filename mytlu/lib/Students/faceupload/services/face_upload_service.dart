@@ -79,7 +79,7 @@ class FaceUploadService {
     } on SocketException {
       throw Exception("Lỗi kết nối mạng: Không có Internet hoặc máy chủ đang ngoại tuyến.");
     } catch (e) {
-      // Bắt lỗi mạng hoặc lỗi từ service
+      // Bắt lỗi mạng hoặc lỗi từ services
       throw Exception("Lỗi kết nối API Upload: ${e.toString()}");
     }
   }

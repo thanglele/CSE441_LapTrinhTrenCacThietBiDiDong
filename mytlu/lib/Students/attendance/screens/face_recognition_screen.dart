@@ -12,12 +12,11 @@ import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:mytlu/Students/attendance/services/attendance_service.dart';
 import 'package:mytlu/Students/attendance/models/check_in_request_model.dart';
 import 'package:mytlu/Students/attendance/models/check_in_response_model.dart';
-import 'package:mytlu/core/errors/exceptions.dart';
+import 'package:mytlu/core/errors/exceptions.dart'; // Để bắt lỗi API
+import 'package:mytlu/Students/theme/app_theme.dart';
 
 // Import Widget UI
 import 'package:mytlu/Students/attendance/widgets/face_recognition_frame.dart';
-// THÊM IMPORT THEME
-import 'package:mytlu/Students/theme/app_theme.dart';
 
 class FaceRecognitionScreen extends StatefulWidget {
   final String sessionId;
@@ -37,12 +36,6 @@ class FaceRecognitionScreen extends StatefulWidget {
 
 class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
   // --- TOÀN BỘ LOGIC GIỮ NGUYÊN ---
-  // (initState, dispose, _initializeCamera, _processCameraImage,
-  // _startCountdown, _getGpsCoordinates, _captureAndCheckIn,
-  // _showResultDialog, _showErrorDialog, _inputImageFromCameraImage)
-  // ...
-  // ... (Toàn bộ code logic từ file trước của bạn được giữ nguyên ở đây) ...
-  // ...
   CameraController? _cameraController;
   Future<void>? _initializeControllerFuture;
   late final FaceDetector _faceDetector;
@@ -53,8 +46,6 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
   bool _isFaceDetected = false; // Đã thấy mặt
   int _countdown = 3;
   Timer? _timer;
-
-  // --- TOÀN BỘ LOGIC GIỮ NGUYÊN ---
 
   @override
   void initState() {
@@ -100,7 +91,6 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
       if (!mounted) return;
       setState(() {});
 
-      // Bắt đầu stream ảnh cho ML Kit
       _cameraController!.startImageStream(_processCameraImage);
     } catch (e) {
       if (mounted) _showErrorDialog("Lỗi camera: ${e.toString()}");
@@ -180,12 +170,16 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
     setState(() => _isProcessing = true);
 
+    // Biến này để lưu tọa độ GPS đã gửi đi
+    String gpsCoordsSent = "Chưa lấy được";
+
     try {
       await _cameraController!.stopImageStream();
 
+      // Dùng tọa độ test cố định
       // final pos = await _getGpsCoordinates();
-      // final gps = "${pos.latitude},${pos.longitude}";
-      const gps = "21.0065,105.8249"; // TỌA ĐỘ TEST CỐ ĐỊNH
+      // gpsCoordsSent = "${pos.latitude},${pos.longitude}";
+      gpsCoordsSent = "21.0065,105.8249"; // Tọa độ test cố định
 
       final XFile imageFile = await _cameraController!.takePicture();
       final imageBytes = await File(imageFile.path).readAsBytes();
@@ -195,7 +189,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
         classSessionId: int.parse(widget.sessionId),
         qrToken: widget.qrToken,
         liveSelfieBase64: base64Image,
-        clientGpsCoordinates: gps,
+        clientGpsCoordinates: gpsCoordsSent, // Gửi tọa độ đi
       );
 
       if (mounted) {
@@ -211,14 +205,47 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
         _showResultDialog(true, response.message);
       }
     } on ApiException catch (e) {
+      // --- NÂNG CẤP XỬ LÝ LỖI Ở ĐÂY ---
+      String detailedMessage;
+      final serverMessage = e.message;
+
+      // Phân tích lỗi dựa trên tài liệu API
+      if (e.statusCode == 400 &&
+          serverMessage.contains("Tọa độ điểm danh (GPS)")) {
+        detailedMessage = "Lỗi Vị trí 1 (Lúc điểm danh):\n\n"
+            "Server báo: \"$serverMessage\"\n\n"
+            "Giá trị GPS đã gửi: $gpsCoordsSent";
+      } else if (e.statusCode == 400 &&
+          serverMessage.contains("Tọa độ lần đăng nhập")) {
+        detailedMessage = "Lỗi Vị trí 2 (Lúc đăng nhập):\n\n"
+            "Server báo: \"$serverMessage\"\n\n"
+            "Lỗi này là do vị trí lúc bạn ĐĂNG NHẬP. "
+            "Vui lòng (1) Sửa 'user_session.dart', (2) GỠ ỨNG DỤNG, (3) Cài lại và ĐĂNG NHẬP lại.";
+      } else if (e.statusCode == 401 && serverMessage.contains("Khuôn mặt")) {
+        detailedMessage = "Lỗi Nhận diện (401):\n\n\"$serverMessage\"\n\n"
+            "Vui lòng thử lại ở nơi đủ sáng, không đeo kính hoặc khẩu trang.";
+      } else if (e.statusCode == 400 && serverMessage.contains("Mã QR")) {
+        detailedMessage = "Lỗi Mã QR (400):\n\n\"$serverMessage\"";
+      } else if (e.statusCode == 403 &&
+          serverMessage.contains("Sinh trắc học")) {
+        detailedMessage = "Lỗi Tài khoản (403):\n\n\"$serverMessage\"\n\n"
+            "Vui lòng liên hệ P.QLSV để xác thực sinh trắc học.";
+      } else {
+        // Các lỗi API khác (500, 404...)
+        detailedMessage =
+        "Lỗi Server (Code: ${e.statusCode}):\n\n\"$serverMessage\"";
+      }
+      // --- KẾT THÚC NÂNG CẤP ---
+
       if (mounted) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        _showResultDialog(false, "Điểm danh thất bại: ${e.message}");
+        _showResultDialog(false, detailedMessage); // Hiển thị lỗi chi tiết
       }
     } catch (e) {
+      // Lỗi chung (Mất mạng, Lỗi GPS, Lỗi Camera...)
       if (mounted) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        _showResultDialog(false, "Đã xảy ra lỗi: ${e.toString()}");
+        _showResultDialog(false, "Lỗi cục bộ (client):\n\n${e.toString()}");
       }
     }
   }
@@ -230,7 +257,10 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: Text(success ? "Thành công" : "Thất bại"),
-        content: Text(message),
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 14),
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -238,6 +268,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
               if (success) {
                 widget.onBack?.call();
               } else {
+                // Reset để thử lại
                 setState(() {
                   _countdown = 3;
                   _isProcessing = false;
@@ -289,8 +320,9 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
     try {
       final camera = _cameraController!.description;
-      final rotation = InputImageRotationValue.fromRawValue(camera.sensorOrientation) ??
-          InputImageRotation.rotation0deg;
+      final rotation =
+          InputImageRotationValue.fromRawValue(camera.sensorOrientation) ??
+              InputImageRotation.rotation0deg;
       final format = InputImageFormatValue.fromRawValue(image.format.raw) ??
           InputImageFormat.nv21;
 
@@ -317,21 +349,14 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
     }
   }
 
-  // --- HÀM BUILD ĐÃ ĐƯỢC CẬP NHẬT ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 1. XÓA APPBAR CŨ
-      // appBar: ...
-
-      // 2. THÊM MÀU NỀN
       backgroundColor: Colors.white,
-
-      // 3. THÊM SAFEAREA VÀ COLUMN
       body: SafeArea(
         child: Column(
           children: [
-            // 4. THÊM THANH TIÊU ĐỀ TÙY CHỈNH
+            // Thanh tiêu đề tùy chỉnh
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               height: 56,
@@ -350,12 +375,12 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: _onCancelPress, // Dùng logic cũ
+                    onPressed: _onCancelPress,
                   ),
                   const Expanded(
                     child: Center(
                       child: Text(
-                        "Nhận diện khuôn mặt", // Tiêu đề mới
+                        "Nhận diện khuôn mặt",
                         style: TextStyle(
                           fontFamily: 'Ubuntu',
                           fontSize: 18,
@@ -365,12 +390,12 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // Để căn giữa
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
 
-            // 5. BỌC WIDGET FRAME TRONG EXPANDED
+            // Widget Giao diện
             Expanded(
               child: FaceRecognitionFrame(
                 initializeControllerFuture: _initializeControllerFuture,

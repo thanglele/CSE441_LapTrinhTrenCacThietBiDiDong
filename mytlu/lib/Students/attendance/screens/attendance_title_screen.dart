@@ -6,7 +6,7 @@ import 'package:mytlu/Students/attendance/screens/face_recognition_screen.dart';
 class AttendanceTitleScreen extends StatelessWidget {
   final String sessionId;
   final String qrToken;
-  final VoidCallback? onBack;
+  final VoidCallback? onBack; // Đây là hàm _resetScan từ ScanQRScreen
 
   const AttendanceTitleScreen({
     super.key,
@@ -17,20 +17,39 @@ class AttendanceTitleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Hàm để điều hướng đến màn hình nhận diện
+    // --- LOGIC MỚI (1) ---
+    // Hàm này được gọi khi FaceRecognitionScreen (màn hình 3) hoàn thành.
+    // Nó sẽ đóng TẤT CẢ các màn hình (FaceRec, Title)
+    // để quay về màn hình gốc (ScanQR) và gọi _resetScan.
+    void handleFaceScanCompletion() {
+      // 1. Gọi _resetScan (nếu có)
+      // SỬA LỖI: Bỏ 'widget.'
+      onBack?.call();
+      // 2. Pop về màn hình đầu tiên (ScanQRScreen) của Navigator lồng
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+
+    // --- LOGIC MỚI (2) ---
+    // Hàm này được gọi khi nhấn "Hủy" hoặc "Back" trên màn hình Title (màn hình 2).
+    // Nó chỉ đóng màn hình Title và gọi _resetScan.
+    void handleBackToQR() {
+      // 1. Gọi _resetScan (nếu có)
+      // SỬA LỖI: Bỏ 'widget.'
+      onBack?.call();
+      // 2. Pop màn hình hiện tại (AttendanceTitleScreen)
+      Navigator.of(context).pop();
+    }
+
+    // --- LOGIC MỚI (3) ---
+    // Hàm để điều hướng đến màn hình nhận diện (màn hình 3)
     void _navigateToFaceRecognition() {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => FaceRecognitionScreen(
-            sessionId: sessionId,
-            qrToken: qrToken,
-            onBack: () {
-              // Khi màn hình nhận diện (FaceRecognitionScreen) đóng,
-              // nó sẽ gọi hàm onBack này.
-              // Chúng ta gọi Navigator.pop(context) ở đây để
-              // đóng nốt màn hình "Chuẩn bị" (AttendanceTitleScreen) này.
-              Navigator.of(context).pop();
-            },
+            sessionId: sessionId, // Truy cập trực tiếp
+            qrToken: qrToken, // Truy cập trực tiếp
+            // 3. Truyền hàm xử lý hoàn thành vào FaceRecognitionScreen
+            onBack: handleFaceScanCompletion,
           ),
         ),
       );
@@ -48,7 +67,8 @@ class AttendanceTitleScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: onBack,
+          // Sửa: Dùng logic handleBackToQR
+          onPressed: handleBackToQR,
         ),
         backgroundColor: AppTheme.primaryColor, // Áp dụng theme
         elevation: 1,
@@ -57,10 +77,10 @@ class AttendanceTitleScreen extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          // Căn lề trái cho nội dung văn bản
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 1. ICON SVG MỚI
+            // 1. ICON SVG
             SvgPicture.asset(
               'assets/faceid_scan_icon.svg', // Đường dẫn asset
               width: 120,
@@ -72,7 +92,7 @@ class AttendanceTitleScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // 2. TIÊU ĐỀ MỚI
+            // 2. TIÊU ĐỀ
             const Text(
               "Nhận diện khuôn mặt",
               style: TextStyle(
@@ -81,11 +101,11 @@ class AttendanceTitleScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: AppTheme.primaryColor, // Màu từ theme
               ),
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.center, // Tiêu đề căn giữa
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
-            // 3. PHỤ ĐỀ 1 MỚI
+            // 3. PHỤ ĐỀ MỚI (Căn lề trái - mặc định của Column)
             const Text(
               "Không dùng kính, khẩu trang... các phụ kiện che mặt",
               textAlign: TextAlign.left,
@@ -95,6 +115,7 @@ class AttendanceTitleScreen extends StatelessWidget {
                 color: Color(0xFF4B5563), // Màu xám đậm
               ),
             ),
+            const SizedBox(height: 8),
             const Text(
               "Hãy nhận diện khuôn mặt của bạn ở nơi có ánh sáng tốt",
               textAlign: TextAlign.left,
@@ -104,6 +125,7 @@ class AttendanceTitleScreen extends StatelessWidget {
                 color: Color(0xFF4B5563), // Màu xám đậm
               ),
             ),
+            const SizedBox(height: 8),
             const Text(
               "Thiết bị sẽ truy cập camera và bắt đầu thực hiện nhận diện khuôn mặt của bạn",
               textAlign: TextAlign.left,
@@ -113,24 +135,16 @@ class AttendanceTitleScreen extends StatelessWidget {
                 color: Color(0xFF4B5563), // Màu xám đậm
               ),
             ),
-            const SizedBox(height: 40),
 
-            // 4. PHỤ ĐỀ 2 MỚI (Mô tả)
-            const Text(
-              "Thiết bị sẽ truy cập camera và bắt đầu thực hiện nhận diện khuôn mặt của bạn.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Ubuntu',
-                fontSize: 14,
-                color: Color(0xFF6B7280), // Màu xám nhạt
-              ),
-            ),
+            // Xóa văn bản mô tả trùng lặp
+
             const Spacer(), // Đẩy 2 nút xuống dưới
 
-            // 5. NÚT "THỰC HIỆN" (VỚI TEXT MỚI)
+            // 5. NÚT "THỰC HIỆN"
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                // Sửa: Dùng logic _navigateToFaceRecognition
                 onPressed: _navigateToFaceRecognition,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor, // Màu từ theme
@@ -157,7 +171,8 @@ class AttendanceTitleScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: onBack,
+                // Sửa: Dùng logic handleBackToQR
+                onPressed: handleBackToQR,
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
