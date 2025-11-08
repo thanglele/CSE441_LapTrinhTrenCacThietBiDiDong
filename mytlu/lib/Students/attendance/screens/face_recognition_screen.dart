@@ -12,11 +12,10 @@ import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:mytlu/Students/attendance/services/attendance_service.dart';
 import 'package:mytlu/Students/attendance/models/check_in_request_model.dart';
 import 'package:mytlu/Students/attendance/models/check_in_response_model.dart';
-import 'package:mytlu/core/errors/exceptions.dart'; // Để bắt lỗi API
+import 'package:mytlu/core/errors/exceptions.dart'; 
 import 'package:mytlu/Students/theme/app_theme.dart';
-
-// Import Widget UI
 import 'package:mytlu/Students/attendance/widgets/face_recognition_frame.dart';
+import 'package:mytlu/services/user_session.dart'; 
 
 class FaceRecognitionScreen extends StatefulWidget {
   final String sessionId;
@@ -35,17 +34,18 @@ class FaceRecognitionScreen extends StatefulWidget {
 }
 
 class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
-  // --- TOÀN BỘ LOGIC GIỮ NGUYÊN ---
+  // (Giữ nguyên các biến state và controllers)
   CameraController? _cameraController;
   Future<void>? _initializeControllerFuture;
   late final FaceDetector _faceDetector;
   final CheckInService _checkInService = CheckInService();
-
-  bool _isProcessing = false; // Đang gọi API
-  bool _isDetecting = false; // Đang xử lý 1 frame
-  bool _isFaceDetected = false; // Đã thấy mặt
+  bool _isProcessing = false;
+  bool _isDetecting = false;
+  bool _isFaceDetected = false;
   int _countdown = 3;
   Timer? _timer;
+  final UserSession _userSession = UserSession();
+  String? _jwtToken;
 
   @override
   void initState() {
@@ -57,6 +57,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
       ),
     );
     _initializeCamera();
+    _loadToken();
   }
 
   @override
@@ -68,13 +69,26 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
     super.dispose();
   }
 
-  /// Khởi tạo camera
+  Future<void> _loadToken() async {
+    try {
+      _jwtToken = await _userSession.getToken();
+      if (_jwtToken == null && mounted) {
+        _showErrorDialog("Lỗi: Không tìm thấy token. Vui lòng đăng nhập lại.");
+      }
+    } catch (e) {
+      if (mounted) {
+         _showErrorDialog("Lỗi lấy token: ${e.toString()}");
+      }
+    }
+  }
+
   Future<void> _initializeCamera() async {
+    // (Giữ nguyên logic)
     try {
       final cameras = await availableCameras();
       final frontCamera = cameras.firstWhere(
-              (cam) => cam.lensDirection == CameraLensDirection.front,
-          orElse: () => cameras.first);
+            (cam) => cam.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first);
 
       _cameraController = CameraController(
         frontCamera,
@@ -97,8 +111,8 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
     }
   }
 
-  /// Xử lý từng frame camera
   Future<void> _processCameraImage(CameraImage image) async {
+    // (Giữ nguyên logic)
     if (_isDetecting || _isProcessing || !mounted) return;
 
     _isDetecting = true;
@@ -117,18 +131,19 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
       if (_timer != null) {
         _timer?.cancel();
         _timer = null;
-        setState(() {
-          _countdown = 3;
-          _isFaceDetected = false;
-        });
+        if (mounted) {
+          setState(() {
+            _countdown = 3;
+            _isFaceDetected = false;
+          });
+        }
       }
     }
-
     _isDetecting = false;
   }
 
-  /// Chạy đếm ngược trước khi chụp ảnh
   void _startCountdown() {
+    // (Giữ nguyên logic)
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdown == 1) {
         timer.cancel();
@@ -140,11 +155,10 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
     });
   }
 
-  /// Lấy GPS coordinates
   Future<Position> _getGpsCoordinates() async {
+    // (Giữ nguyên logic)
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) throw Exception('Dịch vụ vị trí đã bị tắt.');
-
     var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -155,61 +169,138 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
     if (permission == LocationPermission.deniedForever) {
       throw Exception('Quyền truy cập vị trí bị từ chối vĩnh viễn.');
     }
-
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 0,
     );
-
     return await Geolocator.getCurrentPosition(locationSettings: settings);
   }
+
+
+  // *** HÀM MỚI ĐỂ HIỂN THỊ DIALOG DEBUG ***
+  Future<bool> _showDebugDialog(CheckInRequest request) async {
+    // Rút gọn base64 để hiển thị
+    final String selfiePreview = (request.liveSelfieBase64.length > 50)
+        ? "${request.liveSelfieBase64.substring(0, 50)}..."
+        : request.liveSelfieBase64;
+
+    final bool? wantsToContinue = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // Bắt buộc chọn
+      builder: (ctx) => AlertDialog(
+        title: const Text("Xác nhận Dữ liệu Gửi đi"),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text("Kiểm tra dữ liệu (đặc biệt là ID và Token):"),
+              const SizedBox(height: 15),
+              Text("Session ID: ${request.classSessionId}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
+              Text("QR Token: ${request.qrToken}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
+              Text("GPS: ${request.clientGpsCoordinates}"),
+              const SizedBox(height: 8),
+              Text("Selfie (đầu): $selfiePreview"),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text("HỦY"),
+            onPressed: () {
+              Navigator.of(ctx).pop(false); // Trả về false
+            },
+          ),
+          TextButton(
+            // Giả sử AppTheme.primaryColor là màu chính của bạn
+            style: TextButton.styleFrom(backgroundColor: AppTheme.primaryColor),
+            child: const Text("TIẾP TỤC GỬI", style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              Navigator.of(ctx).pop(true); // Trả về true
+            },
+          ),
+        ],
+      ),
+    );
+    
+    // Trả về true nếu 'wantsToContinue' là true, ngược lại trả về false
+    return wantsToContinue ?? false;
+  }
+
 
   /// Chụp ảnh và gọi API điểm danh
   Future<void> _captureAndCheckIn() async {
     if (_isProcessing || !mounted || _cameraController == null) return;
 
-    setState(() => _isProcessing = true);
+    // 1. Kiểm tra null (như đã làm ở lần trước)
+    if (widget.sessionId == null || widget.qrToken == null) {
+      _showErrorDialog(
+          "Lỗi nghiêm trọng: Dữ liệu (sessionId hoặc qrToken) bị null. Không thể điểm danh.");
+      return;
+    }
 
-    // Biến này để lưu tọa độ GPS đã gửi đi
+    setState(() => _isProcessing = true);
     String gpsCoordsSent = "Chưa lấy được";
+
+    if (_jwtToken == null) {
+      _showResultDialog(false, "Mất phiên đăng nhập. Vui lòng quay lại và thử lại.");
+      setState(() => _isProcessing = false); // Reset state
+      return;
+    }
 
     try {
       await _cameraController!.stopImageStream();
-
-      // Dùng tọa độ test cố định
-      // final pos = await _getGpsCoordinates();
-      // gpsCoordsSent = "${pos.latitude},${pos.longitude}";
+      
       gpsCoordsSent = "21.0065,105.8249"; // Tọa độ test cố định
 
       final XFile imageFile = await _cameraController!.takePicture();
       final imageBytes = await File(imageFile.path).readAsBytes();
       final base64Image = "data:image/jpeg;base64,${base64Encode(imageBytes)}";
 
+      // 2. Tạo request object
       final request = CheckInRequest(
-        classSessionId: int.parse(widget.sessionId),
+        classSessionId: int.parse(widget.sessionId), 
         qrToken: widget.qrToken,
         liveSelfieBase64: base64Image,
-        clientGpsCoordinates: gpsCoordsSent, // Gửi tọa độ đi
+        clientGpsCoordinates: gpsCoordsSent,
       );
 
+      // *** 3. GỌI DIALOG DEBUG ***
+      if (!mounted) return;
+      final bool wantsToContinue = await _showDebugDialog(request);
+
+      // 4. Kiểm tra kết quả dialog
+      if (!wantsToContinue) {
+        // Nếu user bấm Hủy, reset state và dừng
+        setState(() {
+            _countdown = 3;
+            _isProcessing = false;
+            _isFaceDetected = false;
+          });
+          if (_cameraController != null) {
+            _cameraController!.startImageStream(_processCameraImage);
+          }
+        return; // Dừng, không gọi API
+      }
+
+      // 5. Nếu user bấm "Tiếp tục", mới gọi API
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đang xử lý khuôn mặt...')),
         );
       }
 
-      final response = await _checkInService.checkInStudent(request);
+      final response = await _checkInService.checkInStudent(request, _jwtToken!);
 
       if (mounted) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         _showResultDialog(true, response.message);
       }
     } on ApiException catch (e) {
-      // --- NÂNG CẤP XỬ LÝ LỖI Ở ĐÂY ---
+      // (Giữ nguyên logic catch ApiException của bạn)
       String detailedMessage;
       final serverMessage = e.message;
 
-      // Phân tích lỗi dựa trên tài liệu API
       if (e.statusCode == 400 &&
           serverMessage.contains("Tọa độ điểm danh (GPS)")) {
         detailedMessage = "Lỗi Vị trí 1 (Lúc điểm danh):\n\n"
@@ -231,18 +322,16 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
         detailedMessage = "Lỗi Tài khoản (403):\n\n\"$serverMessage\"\n\n"
             "Vui lòng liên hệ P.QLSV để xác thực sinh trắc học.";
       } else {
-        // Các lỗi API khác (500, 404...)
         detailedMessage =
         "Lỗi Server (Code: ${e.statusCode}):\n\n\"$serverMessage\"";
       }
-      // --- KẾT THÚC NÂNG CẤP ---
-
+      
       if (mounted) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        _showResultDialog(false, detailedMessage); // Hiển thị lỗi chi tiết
+        _showResultDialog(false, detailedMessage); 
       }
     } catch (e) {
-      // Lỗi chung (Mất mạng, Lỗi GPS, Lỗi Camera...)
+      // (Giữ nguyên logic catch chung)
       if (mounted) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         _showResultDialog(false, "Lỗi cục bộ (client):\n\n${e.toString()}");
@@ -252,6 +341,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
   /// Dialog kết quả
   void _showResultDialog(bool success, String message) {
+    // (Giữ nguyên logic)
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -288,6 +378,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
   /// Dialog lỗi nghiêm trọng
   void _showErrorDialog(String message) {
+    // (Giữ nguyên logic)
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -309,6 +400,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
   /// Cancel button
   void _onCancelPress() {
+    // (Giữ nguyên logic)
     if (_isProcessing) return;
     _timer?.cancel();
     widget.onBack?.call();
@@ -316,6 +408,7 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
   /// Chuyển CameraImage -> InputImage
   InputImage? _inputImageFromCameraImage(CameraImage image) {
+    // (Giữ nguyên logic)
     if (_cameraController == null) return null;
 
     try {
@@ -351,12 +444,12 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // (Giữ nguyên logic build)
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            // Thanh tiêu đề tùy chỉnh
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               height: 56,
@@ -394,8 +487,6 @@ class _FaceRecognitionScreenState extends State<FaceRecognitionScreen> {
                 ],
               ),
             ),
-
-            // Widget Giao diện
             Expanded(
               child: FaceRecognitionFrame(
                 initializeControllerFuture: _initializeControllerFuture,

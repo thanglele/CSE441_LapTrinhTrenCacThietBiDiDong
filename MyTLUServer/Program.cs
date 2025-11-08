@@ -38,6 +38,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<ILecturerDashboardService, LecturerDashboardService>();
+builder.Services.AddScoped<IStudentAffairsService, StudentAffairsService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<ILecturerService, LecturerService>();
 builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();

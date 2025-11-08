@@ -1,5 +1,4 @@
-// src/Students/attendance/models/check_in_request_model.dart
-
+// Model cho body request
 class CheckInRequest {
   final int classSessionId;
   final String qrToken;
@@ -13,11 +12,12 @@ class CheckInRequest {
     required this.clientGpsCoordinates,
   });
 
-  /// Chuyển đổi object thành Map để GỬI (POST) lên Server.
-  Map<String, dynamic> toJson() => {
-    "classSessionId": classSessionId,
-    "qrToken": qrToken,
-    "liveSelfieBase64": liveSelfieBase64,
-    "clientGpsCoordinates": clientGpsCoordinates,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      'classSessionId': classSessionId,
+      'qrToken': qrToken,
+      'liveSelfieBase64': liveSelfieBase64,
+      'clientGpsCoordinates': clientGpsCoordinates,
+    };
+  }
 }

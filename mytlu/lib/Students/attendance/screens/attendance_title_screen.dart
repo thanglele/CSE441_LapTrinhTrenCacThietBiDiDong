@@ -48,7 +48,6 @@ class AttendanceTitleScreen extends StatelessWidget {
           builder: (_) => FaceRecognitionScreen(
             sessionId: sessionId, // Truy cập trực tiếp
             qrToken: qrToken, // Truy cập trực tiếp
-            // 3. Truyền hàm xử lý hoàn thành vào FaceRecognitionScreen
             onBack: handleFaceScanCompletion,
           ),
         ),
